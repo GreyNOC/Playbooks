@@ -1,47 +1,61 @@
-# GreyNOC Security Playbooks
+# GreyNOC Security Playbooks — AI · Post-Quantum · E2EE
 
-Production-ready detection and response playbooks authored by the GreyNOC detection-engineering team. Each playbook follows a consistent structure: overview, MITRE ATT&CK mapping, detection strategy, indicators, sample logic, example data, investigation steps, false positives, tuning, response actions, escalation criteria, an analyst notes template, and a closing summary.
+Production-grade detection, response, and authorized-testing playbooks authored by the
+GreyNOC detection-engineering team. This collection is re-centered on the cryptographic
+transition that now defines the threat surface: **post-quantum (PQ) migration**,
+**end-to-end-encrypted (E2EE) protocol security**, and **AI-augmented detection** —
+with two playbooks dedicated to **authorized bug-bounty methodology** against PQ/E2EE
+attack surface.
 
-These are written for SOC analysts, incident responders, and detection engineers. They focus on behavior-based detection over signatures, and on operational clarity over theory.
+Each playbook follows the standard GreyNOC structure: overview, MITRE ATT&CK / ATLAS
+mapping, detection strategy, indicators, sample logic, example data, investigation steps,
+false positives, tuning, response actions, escalation criteria, an analyst-notes template,
+and a closing summary. Written for SOC analysts, IR, detection engineers, and authorized
+offensive operators. Behavior-based over signature-based; operational clarity over theory.
+
+> **Why this rewrite.** NIST finalized the first PQ standards in August 2024 (FIPS 203
+> ML-KEM, FIPS 204 ML-DSA, FIPS 205 SLH-DSA), with FN-DSA (FIPS 206) and the HQC backup
+> KEM following. Hybrid TLS (`X25519MLKEM768`, NamedGroup `0x11EC`) is now default or
+> near-default across Chrome, Firefox, Cloudflare, Akamai, and AWS, and E2EE messengers
+> (Signal PQXDH, iMessage PQ3) ship PQ key establishment in production. The window where
+> "crypto detection" meant "expired certs and weak ciphers" is closed. The dominant risk is
+> now **harvest-now-decrypt-later (HNDL)**, **downgrade of hybrid handshakes**, and
+> **migration-defect classes** introduced while organizations swap primitives under deadline.
 
 ---
 
 ## Index
 
-| # | Playbook | Focus |
-|---|----------|-------|
-| 01 | [Password Spraying](01-password-spraying.md) | Distributed credential access against IdPs |
-| 02 | [Brute Force Attack](02-brute-force.md) | Single-target authentication abuse |
-| 03 | [Distributed Port Scan](03-distributed-port-scan.md) | Multi-source coordinated reconnaissance |
-| 04 | [Credential Stuffing](04-credential-stuffing.md) | Leaked-credential replay against web/SaaS |
-| 05 | [Impossible Travel](05-impossible-travel.md) | Geographic velocity + risk-feature composite |
-| 06 | [Privilege Escalation](06-privilege-escalation.md) | Identity, endpoint, and cloud elevation |
-| 07 | [Suspicious PowerShell Execution](07-suspicious-powershell.md) | Encoded, in-memory, and parented PowerShell abuse |
-| 08 | [Malware Beaconing](08-malware-beaconing.md) | Periodic C2 traffic detection |
-| 09 | [AI / Automated Agent Abuse](09-ai-automated-agent-abuse.md) | Adversary automation and owned-AI-feature abuse |
-| 10 | [Coordinated Multi-Stage Attack](10-coordinated-multi-stage-attack.md) | Kill-chain correlation across entities |
+| #  | Playbook | Focus |
+| --- | --- | --- |
+| 01 | [Cryptographic Inventory & PQC Readiness](01-cryptographic-inventory-pqc-readiness.md) | CBOM discovery, AI/LLM-assisted code auditing, crypto-agility scoring |
+| 02 | [Harvest-Now-Decrypt-Later Exposure](02-harvest-now-decrypt-later.md) | Bulk-capture detection, long-shelf-life data prioritization |
+| 03 | [Hybrid TLS / KEM Downgrade](03-hybrid-tls-kem-downgrade.md) | PQ key-exchange stripping, negotiation downgrade, middlebox tampering |
+| 04 | [E2EE Messaging Protocol Security](04-e2ee-messaging-protocol-security.md) | Double Ratchet / PQXDH / PQ3 / MLS, key-transparency & MITM detection |
+| 05 | [PQ Signature & Token Integrity](05-pq-signature-token-integrity.md) | ML-DSA / SLH-DSA / FN-DSA, JWT/SAML/X.509, algorithm-confusion |
+| 06 | [AI-Augmented Detection & Guardrails](06-ai-augmented-detection-guardrails.md) | LLM-assisted triage, pipeline poisoning & prompt-injection defense (ATLAS) |
+| 07 | [Bug Bounty: PQC/E2EE Methodology](07-bugbounty-pqc-e2ee-methodology.md) | Authorized recon → crypto-surface mapping → validation → reporting |
+| 08 | [Bug Bounty: Crypto Implementation Defects](08-bugbounty-crypto-implementation-defects.md) | Authorized hunting of migration/downgrade/oracle defect classes |
 
----
-
-## Conventions
-
-- **MITRE ATT&CK** technique IDs are referenced for every playbook; ATLAS IDs are used where AI-system techniques apply.
-- **Sample detection logic** is JSON-shaped pseudocode — not tied to any specific SIEM query language. Translate to KQL, SPL, EQL, Sigma, or your platform of choice.
-- **Example event data** is simplified for clarity and uses RFC 5737 / RFC 3849 documentation address space where applicable.
-- **Severity** is suggested, not prescriptive. Tune to your environment and risk model.
-- **Tuning guidance** favors composite features over per-rule suppression. Suppressing a base detector to clean up noise blinds you to other intrusions; suppressing or weighting at the correlation/escalation layer does not.
+See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named groups,
+documentation address space, and **rules of engagement** that bind playbooks 07–08.
 
 ---
 
 ## How to Use
 
-1. Read the playbook end-to-end before deploying the rule.
-2. Map the data sources to your environment; verify telemetry sufficiency before relying on a detection.
-3. Translate the sample logic to your platform; validate on historical data where possible.
+1. Read the playbook end-to-end before deploying any rule.
+2. Map data sources to your environment; verify telemetry sufficiency before relying on a
+   detection. PQ/E2EE detection depends on handshake- and key-level visibility that many
+   estates do not yet log — confirm you have it before trusting the absence of alerts.
+3. Translate the JSON-shaped sample logic to your platform (KQL, SPL, EQL, Sigma, etc.);
+   validate on historical data where possible.
 4. Adopt the analyst-notes template into your case-management workflow.
-5. Apply the escalation criteria to your on-call and incident-response procedures.
+5. For playbooks 07–08, do not begin any activity without a signed authorization / program
+   scope on file. GreyNOC operates as the submitting firm; ROE in CONVENTIONS is mandatory.
 6. Revisit tuning after every confirmed true positive and false positive.
 
 ---
 
-*GreyNOC — detection-engineering-first security operations.*
+*GreyNOC — detection-engineering-first security operations. No fabrication: every finding,
+indicator, and report artifact must be reproducible from evidence.*
