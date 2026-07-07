@@ -25,7 +25,7 @@ Michele Mosca's rule is the one equation this whole program turns on. Let:
 will still be sensitive when the machine arrives, and you cannot migrate fast enough to stop
 the harvest happening now (PB-02). Z has wide error bars, so plan against the *pessimistic* Z.
 If X = 15 and Y = 5, any Z below 20 years means today's decisions are already too late for that
-class. Governance computes X + Y − Z **per data class**, not enterprise-wide, and escalates
+class. Governance computes Z − (X + Y) **per data class**, not enterprise-wide, and escalates
 every class where the margin is negative or thin.
 
 ## MITRE mapping
@@ -65,7 +65,7 @@ Signals of governance failure or compliance gap:
 
 - A mandated control with **no bound evidence source**, or evidence older than its freshness SLA.
 - CBOM coverage below target, or coverage figure that is itself unmeasured ("we think ~most").
-- A negative or thin **Mosca margin** (X + Y − Z ≤ 0) for any data class with no dated remediation.
+- A negative or thin **Mosca margin** (Z − (X + Y) ≤ 0) for any data class with no dated remediation.
 - Migration KPI flat or regressing across two reporting periods (program stall).
 - Quantum-risk register item **not reflected** in the enterprise risk register or board reporting.
 - Material vendor with **no PQ roadmap attestation**, or an attestation with no dates / no owner.
@@ -176,7 +176,7 @@ Governance / program actions, not incident response:
 - Open a tracked remediation item per confirmed gap, each carrying mandate, control, evidence
   source to bind, owner (RACI), and dated target.
 - For negative-margin classes: fast-track hybrid PQ enablement (PB-13) and re-encryption at rest
-  with AES-256, ordered by X + Y − Z (most negative first) — the highest-leverage action here.
+  with AES-256, ordered by Z − (X + Y) (most negative first) — the highest-leverage action here.
 - Bind every "asserted" control to a reproducible CBOM/telemetry source; retire any claim that
   cannot be reproduced.
 - Escalate un-attested material vendors: require a dated PQ roadmap as a contract/renewal
@@ -216,7 +216,7 @@ Disposition:         remediation-item | accepted-risk | escalated
 ## Summary
 
 Quantum-risk governance is the arithmetic of Mosca's inequality applied continuously and
-proven with evidence. Compute X + Y − Z per data class, act on every negative margin, and bind
+proven with evidence. Compute Z − (X + Y) per data class, act on every negative margin, and bind
 each mandated control (CNSA 2.0, NSM-10 / M-23-02, NIST FIPS 203/204/205 + SP 1800-38, PCI DSS
 4.0 — deadlines as of 2026, verify against current publications) to a reproducible CBOM or
 telemetry source. Everything the program claims rests on PB-01's inventory, PB-02's HNDL
