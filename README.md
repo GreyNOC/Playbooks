@@ -50,6 +50,12 @@ A visual index of the detection & response collection is available in [index.htm
 | 06 | [AI-Augmented Detection & Guardrails](06-ai-augmented-detection-guardrails.md) | LLM-assisted triage, pipeline poisoning & prompt-injection defense (ATLAS) |
 | 07 | [Bug Bounty: PQC/E2EE Methodology](07-bugbounty-pqc-e2ee-methodology.md) | Authorized recon → crypto-surface mapping → validation → reporting |
 | 08 | [Bug Bounty: Crypto Implementation Defects](08-bugbounty-crypto-implementation-defects.md) | Authorized hunting of migration/downgrade/oracle defect classes |
+| 09 | [Post-Quantum VPN, IPsec & SSH Migration](09-pq-vpn-ipsec-ssh.md) | Hybrid KEX for IKEv2/IPsec, OpenSSH, WireGuard; tunnel downgrade detection |
+| 10 | [Post-Quantum PKI & Certificate Lifecycle](10-pq-pki-certificate-lifecycle.md) | ML-DSA CA hierarchies, composite certs, CT mis-issuance, PQ-scale revocation |
+| 11 | [Post-Quantum Code Signing & Firmware Integrity](11-pq-code-signing-firmware.md) | LMS/XMSS firmware & ML-DSA supply-chain signing; stateful-key hazards |
+| 12 | [Post-Quantum E2EE for Real-Time Media](12-pq-e2ee-realtime-media.md) | WebRTC/DTLS-SRTP, SFrame, MLS calls; downgrade & ghost-participant detection |
+| 13 | [Crypto-Agility & PQ Migration Operations](13-crypto-agility-migration-ops.md) | Agility architecture, wave rollout, rollback gates, algorithm-break runbook |
+| 14 | [Quantum Risk Governance & Compliance](14-quantum-risk-governance.md) | Mosca's inequality, CNSA 2.0 / NSM-10 mandates, evidence-backed reporting |
 
 See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named groups, documentation address space, and **rules of engagement** that bind the bug-bounty playbooks (crypto collection 07–08).
 
