@@ -264,9 +264,9 @@
     <span class="hero-eyebrow">Security Playbooks · Full Library</span>
     <h1>Detection patterns SOCs <span class="accent">actually run.</span></h1>
     <p class="lede">
-      Eighteen production-ready playbooks from the GreyNOC detection-engineering team —
-      spanning the intrusion lifecycle from initial access to impact, written for the
-      analysts who have to act on them.
+      Two collections from the GreyNOC detection-engineering team — eighteen detection &amp;
+      response playbooks spanning initial access to impact, and eight on the post-quantum /
+      E2EE cryptographic transition — written for the analysts who have to act on them.
     </p>
     <div class="cta-row">
       <a class="btn btn-primary" href="#playbooks">
@@ -318,7 +318,7 @@
 <section id="playbooks" class="gallery">
   <div class="container">
     <div class="gallery-head">
-      <h2>The Library</h2>
+      <h2>Detection &amp; Response</h2>
       <span class="gallery-count">18 playbooks · initial access → impact</span>
     </div>
     <div class="gallery-grid">
@@ -499,6 +499,94 @@
         <p>Recovery-inhibition precursors and mass-encryption impact. Detect early, or measure the damage.</p>
         <div class="gcard-foot">
           <div class="mitre-chips"><span class="chip">T1486</span><span class="chip">T1490</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="gallery-head" style="margin-top:56px;">
+      <h2>AI · Post-Quantum · E2EE</h2>
+      <span class="gallery-count">8 playbooks · crypto transition + authorized testing</span>
+    </div>
+    <div class="gallery-grid">
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/01-cryptographic-inventory-pqc-readiness.md">
+        <div class="gcard-top"><span class="gcard-num">01</span><span class="gcard-cat">PQ Readiness</span></div>
+        <h3>Cryptographic Inventory &amp; PQC Readiness</h3>
+        <p>CBOM discovery, AI/LLM-assisted code auditing, and crypto-agility scoring for the PQ migration.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1040</span><span class="chip">T1600</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/02-harvest-now-decrypt-later.md">
+        <div class="gcard-top"><span class="gcard-num">02</span><span class="gcard-cat">Exfiltration</span></div>
+        <h3>Harvest-Now-Decrypt-Later Exposure</h3>
+        <p>Bulk-capture detection and prioritization of long-shelf-life data at risk from future decryption.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1040</span><span class="chip">T1557</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/03-hybrid-tls-kem-downgrade.md">
+        <div class="gcard-top"><span class="gcard-num">03</span><span class="gcard-cat">Downgrade</span></div>
+        <h3>Hybrid TLS / KEM Downgrade</h3>
+        <p>PQ key-exchange stripping, negotiation downgrade, and middlebox tampering of hybrid handshakes.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1600</span><span class="chip">T1557</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/04-e2ee-messaging-protocol-security.md">
+        <div class="gcard-top"><span class="gcard-num">04</span><span class="gcard-cat">E2EE</span></div>
+        <h3>E2EE Messaging Protocol Security</h3>
+        <p>Double Ratchet, PQXDH, PQ3, and MLS — key-transparency and man-in-the-middle detection.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1557</span><span class="chip">T1556</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/05-pq-signature-token-integrity.md">
+        <div class="gcard-top"><span class="gcard-num">05</span><span class="gcard-cat">Integrity</span></div>
+        <h3>PQ Signature &amp; Token Integrity</h3>
+        <p>ML-DSA / SLH-DSA / FN-DSA across JWT, SAML, and X.509 — algorithm-confusion defense.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1606</span><span class="chip">T1556</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/06-ai-augmented-detection-guardrails.md">
+        <div class="gcard-top"><span class="gcard-num">06</span><span class="gcard-cat">AI · Guardrails</span></div>
+        <h3>AI-Augmented Detection &amp; Guardrails</h3>
+        <p>LLM-assisted triage with pipeline-poisoning and prompt-injection defense, mapped to MITRE ATLAS.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1552</span><span class="chip">T1213</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/07-bugbounty-pqc-e2ee-methodology.md">
+        <div class="gcard-top"><span class="gcard-num">07</span><span class="gcard-cat">Bug Bounty</span></div>
+        <h3>Bug Bounty: PQC/E2EE Methodology</h3>
+        <p>Authorized recon → crypto-surface mapping → validation → reporting, bound by rules of engagement.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">ROE-bound</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/08-bugbounty-crypto-implementation-defects.md">
+        <div class="gcard-top"><span class="gcard-num">08</span><span class="gcard-cat">Bug Bounty</span></div>
+        <h3>Bug Bounty: Crypto Implementation Defects</h3>
+        <p>Authorized hunting of migration, downgrade, and oracle defect classes in crypto implementations.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">ROE-bound</span></div>
           <span class="gcard-link">Open <span class="arrow">→</span></span>
         </div>
       </a>
