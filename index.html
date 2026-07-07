@@ -265,7 +265,7 @@
     <h1>Detection patterns SOCs <span class="accent">actually run.</span></h1>
     <p class="lede">
       Two collections from the GreyNOC detection-engineering team — eighteen detection &amp;
-      response playbooks spanning initial access to impact, and eight on the post-quantum /
+      response playbooks spanning initial access to impact, and fourteen on the post-quantum /
       E2EE cryptographic transition — written for the analysts who have to act on them.
     </p>
     <div class="cta-row">
@@ -507,7 +507,7 @@
 
     <div class="gallery-head" style="margin-top:56px;">
       <h2>AI · Post-Quantum · E2EE</h2>
-      <span class="gallery-count">8 playbooks · crypto transition + authorized testing</span>
+      <span class="gallery-count">14 playbooks · crypto transition, migration &amp; governance</span>
     </div>
     <div class="gallery-grid">
 
@@ -587,6 +587,66 @@
         <p>Authorized hunting of migration, downgrade, and oracle defect classes in crypto implementations.</p>
         <div class="gcard-foot">
           <div class="mitre-chips"><span class="chip">ROE-bound</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/09-pq-vpn-ipsec-ssh.md">
+        <div class="gcard-top"><span class="gcard-num">09</span><span class="gcard-cat">VPN · SSH</span></div>
+        <h3>PQ VPN, IPsec &amp; SSH Migration</h3>
+        <p>Hybrid PQ key exchange for IKEv2/IPsec, OpenSSH, and WireGuard — tunnel inventory, downgrade detection, migration.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1600</span><span class="chip">T1557</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/10-pq-pki-certificate-lifecycle.md">
+        <div class="gcard-top"><span class="gcard-num">10</span><span class="gcard-cat">PKI</span></div>
+        <h3>PQ PKI &amp; Certificate Lifecycle</h3>
+        <p>ML-DSA CA hierarchies, composite/hybrid certs, CT-log mis-issuance monitoring, and revocation at PQ scale.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1649</span><span class="chip">T1553.004</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/11-pq-code-signing-firmware.md">
+        <div class="gcard-top"><span class="gcard-num">11</span><span class="gcard-cat">Supply Chain</span></div>
+        <h3>PQ Code Signing &amp; Firmware Integrity</h3>
+        <p>LMS/XMSS firmware signing and ML-DSA software supply chain — the signatures that can't wait for the CRQC.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1553.002</span><span class="chip">T1195.002</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/12-pq-e2ee-realtime-media.md">
+        <div class="gcard-top"><span class="gcard-num">12</span><span class="gcard-cat">E2EE Media</span></div>
+        <h3>PQ E2EE for Real-Time Media</h3>
+        <p>WebRTC/DTLS-SRTP, SFrame, and MLS calls — downgrade, key-substitution, and ghost-participant detection.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1557</span><span class="chip">T1600</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/13-crypto-agility-migration-ops.md">
+        <div class="gcard-top"><span class="gcard-num">13</span><span class="gcard-cat">Migration Ops</span></div>
+        <h3>Crypto-Agility &amp; PQ Migration Ops</h3>
+        <p>Running the migration: agility architecture, wave rollout, rollback gates, and the algorithm-break runbook.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1600</span><span class="chip">T1562</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/14-quantum-risk-governance.md">
+        <div class="gcard-top"><span class="gcard-num">14</span><span class="gcard-cat">Governance</span></div>
+        <h3>Quantum Risk Governance &amp; Compliance</h3>
+        <p>Mosca's inequality, CNSA 2.0 / NSM-10 mandates, and evidence-backed compliance reporting.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1040</span><span class="chip">T1600</span></div>
           <span class="gcard-link">Open <span class="arrow">→</span></span>
         </div>
       </a>
