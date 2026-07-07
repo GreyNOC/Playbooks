@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GreyNOC Security Playbooks — Top 3</title>
+<meta name="description" content="Production-ready detection and response playbooks from GreyNOC: password spraying, brute force, and distributed port scan." />
+<style>
+  :root {
+    --ink:        #0a1929;
+    --ink-2:      #0f2238;
+    --ink-3:      #16314c;
+    --rule-dark:  #1f3d5e;
+    --cyan:       #4fa9d9;
+    --cyan-bright:#6fc1ed;
+    --cyan-dim:   #2d6a90;
+    --paper:      #ffffff;
+    --paper-2:    #f5f7fa;
+    --paper-3:    #eef2f7;
+    --text:       #0f172a;
+    --text-muted: #475569;
+    --text-faint: #64748b;
+    --rule:       #e2e8f0;
+    --code-bg:    #0f1f33;
+    --code-text:  #d3e1f1;
+    --code-cyan:  #7ec8ec;
+    --code-amber: #f0c674;
+    --code-green: #b5cea8;
+    --shadow:     0 1px 2px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.04);
+    --shadow-lg:  0 4px 20px rgba(15,23,42,.06), 0 12px 40px rgba(15,23,42,.06);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--cyan-dim); text-decoration: none; }
+  a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    background: var(--ink);
+    border-bottom: 1px solid var(--rule-dark);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-row {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .brand {
+    display: inline-flex; align-items: center; gap: 12px;
+    color: #fff; font-weight: 700; letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+  .brand:hover { color: var(--cyan-bright); text-decoration: none; }
+  .brand-glyph { width: 28px; height: 28px; }
+  .brand-text { font-size: 15px; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    color: #cbd5e1; font-size: 14px; letter-spacing: 0.02em;
+  }
+  .nav-links a:hover { color: var(--cyan-bright); text-decoration: none; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background:
+      radial-gradient(900px 500px at 80% -10%, rgba(79,169,217,.18), transparent 60%),
+      radial-gradient(700px 400px at 0% 110%, rgba(79,169,217,.10), transparent 60%),
+      linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%);
+    color: #e6eef7;
+    padding: 96px 0 110px;
+    border-bottom: 1px solid var(--rule-dark);
+    position: relative; overflow: hidden;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--cyan-bright);
+    border: 1px solid var(--cyan-dim);
+    padding: 6px 12px;
+    border-radius: 999px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    line-height: 1.08;
+    margin: 0 0 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .hero h1 .accent { color: var(--cyan-bright); }
+  .hero p.lede {
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    color: #b9c8d8;
+    max-width: 720px;
+    margin: 0 0 32px;
+  }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform .08s ease, background .2s ease, border-color .2s ease, color .2s ease;
+  }
+  .btn-primary {
+    background: var(--cyan);
+    color: var(--ink);
+    border-color: var(--cyan);
+  }
+  .btn-primary:hover { background: var(--cyan-bright); color: var(--ink); text-decoration: none; }
+  .btn-ghost {
+    background: transparent;
+    color: #e6eef7;
+    border-color: var(--rule-dark);
+  }
+  .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan-bright); text-decoration: none; }
+
+  .hero-hud {
+    position: absolute;
+    right: -120px; top: 50%;
+    transform: translateY(-50%);
+    width: 480px; height: 480px;
+    opacity: .35;
+    pointer-events: none;
+  }
+
+  /* ---------- Intro band ---------- */
+  .band {
+    background: var(--paper);
+    padding: 64px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .band-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 32px;
+  }
+  .band h2 {
+    font-size: 1.75rem;
+    margin: 0 0 16px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .pillar {
+    padding: 20px 22px;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: var(--paper);
+  }
+  .pillar h3 {
+    font-size: 0.78rem;
+    margin: 0 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--cyan-dim);
+  }
+  .pillar p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* ---------- Playbooks ---------- */
+  .playbooks { padding: 16px 0 40px; }
+  .playbook {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .playbook:nth-of-type(even) { background: var(--paper-2); }
+  .playbook:last-child { border-bottom: 0; }
+
+  .pb-head {
+    display: flex; align-items: baseline; gap: 16px;
+    margin-bottom: 8px;
+  }
+  .pb-num {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    color: var(--cyan-dim);
+    background: var(--paper-3);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+  .playbook h2 {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .pb-tagline {
+    color: var(--text-muted);
+    margin: 0 0 32px;
+    max-width: 760px;
+    font-size: 1.05rem;
+  }
+
+  .pb-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 28px;
+  }
+  .pb-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+  }
+  .pb-card h3 {
+    font-size: 0.78rem;
+    margin: 0 0 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--cyan-dim);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 10px;
+  }
+  .pb-card ul {
+    margin: 0; padding-left: 18px;
+    color: var(--text);
+  }
+  .pb-card li {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  .pb-card li::marker { color: var(--cyan); }
+
+  table.mitre {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  table.mitre th, table.mitre td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--rule);
+  }
+  table.mitre th {
+    color: var(--text-faint);
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  table.mitre td code {
+    background: var(--paper-3);
+    color: var(--ink);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+  }
+  table.mitre tr:last-child td { border-bottom: 0; }
+
+  pre.code {
+    margin: 0;
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 18px 20px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    border: 1px solid var(--ink-3);
+  }
+  pre.code .k { color: var(--code-cyan); }
+  pre.code .s { color: var(--code-amber); }
+  pre.code .n { color: var(--code-green); }
+  pre.code .c { color: #6b7c91; font-style: italic; }
+
+  .pb-cta {
+    margin-top: 28px;
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--ink);
+    font-weight: 600;
+    border-bottom: 2px solid var(--cyan);
+    padding-bottom: 2px;
+  }
+  .pb-cta:hover { color: var(--cyan-dim); text-decoration: none; }
+  .pb-cta .arrow { transition: transform .15s ease; }
+  .pb-cta:hover .arrow { transform: translateX(3px); }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    background: var(--ink);
+    color: #94a3b8;
+    padding: 40px 0;
+    border-top: 1px solid var(--rule-dark);
+  }
+  .footer-row {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .footer a { color: #cbd5e1; }
+  .footer a:hover { color: var(--cyan-bright); text-decoration: none; }
+  .footer .small { font-size: 13px; color: #94a3b8; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 880px) {
+    .band-grid { grid-template-columns: 1fr; }
+    .pb-grid { grid-template-columns: 1fr; }
+    .nav-links { gap: 16px; }
+    .hero { padding: 72px 0 80px; }
+    .hero-hud { display: none; }
+  }
+  @media (max-width: 540px) {
+    .nav-links a:nth-child(3) { display: none; }
+    .pb-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-row">
+    <a class="brand" href="#top" aria-label="GreyNOC">
+      <svg class="brand-glyph" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="26" fill="none" stroke="#4fa9d9" stroke-width="1.5"/>
+        <circle cx="32" cy="32" r="20" fill="none" stroke="#4fa9d9" stroke-width="1" stroke-dasharray="2 4"/>
+        <line x1="32" y1="2"  x2="32" y2="10" stroke="#4fa9d9" stroke-width="2"/>
+        <line x1="32" y1="54" x2="32" y2="62" stroke="#4fa9d9" stroke-width="2"/>
+        <line x1="2"  y1="32" x2="10" y2="32" stroke="#4fa9d9" stroke-width="2"/>
+        <line x1="54" y1="32" x2="62" y2="32" stroke="#4fa9d9" stroke-width="2"/>
+        <circle cx="32" cy="32" r="3" fill="#4fa9d9"/>
+      </svg>
+      <span class="brand-text">GREYNOC</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#playbooks">Playbooks</a>
+      <a href="https://github.com/GreyNOC/Playbooks" rel="noopener">GitHub</a>
+      <a href="https://greynoc.com" rel="noopener">greynoc.com</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="container">
+    <span class="hero-eyebrow">Security Playbooks · Top 3</span>
+    <h1>Detection patterns SOCs <span class="accent">actually run.</span></h1>
+    <p class="lede">
+      Three production-ready playbooks from the GreyNOC detection-engineering team —
+      the techniques you will see this week, written for analysts who have to act on them.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#pb-01">
+        Read the Playbooks
+        <span aria-hidden="true">→</span>
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/GreyNOC/Playbooks" rel="noopener">
+        View on GitHub
+      </a>
+    </div>
+  </div>
+  <svg class="hero-hud" viewBox="0 0 200 200" aria-hidden="true">
+    <circle cx="100" cy="100" r="90" fill="none" stroke="#4fa9d9" stroke-width="1"/>
+    <circle cx="100" cy="100" r="70" fill="none" stroke="#4fa9d9" stroke-width="0.6" stroke-dasharray="2 6"/>
+    <circle cx="100" cy="100" r="50" fill="none" stroke="#4fa9d9" stroke-width="0.6"/>
+    <circle cx="100" cy="100" r="6" fill="#4fa9d9"/>
+    <line x1="100" y1="0"   x2="100" y2="20"  stroke="#4fa9d9"/>
+    <line x1="100" y1="180" x2="100" y2="200" stroke="#4fa9d9"/>
+    <line x1="0"   y1="100" x2="20"  y2="100" stroke="#4fa9d9"/>
+    <line x1="180" y1="100" x2="200" y2="100" stroke="#4fa9d9"/>
+  </svg>
+</section>
+
+<section class="band">
+  <div class="container">
+    <h2>Built for the analysts who run them.</h2>
+    <p style="color:var(--text-muted); max-width:760px; margin:0 0 28px;">
+      Every playbook follows the same 13-section format: overview, MITRE ATT&amp;CK mapping, detection strategy,
+      key indicators, sample logic, example data, investigation steps, false positives, tuning,
+      response actions, escalation criteria, analyst-notes template, and summary.
+    </p>
+    <div class="band-grid">
+      <div class="pillar">
+        <h3>Behavior over signature</h3>
+        <p>Detections are framed by what the attacker actually does — fan-out, periodicity, sequence — not by IOCs that rotate.</p>
+      </div>
+      <div class="pillar">
+        <h3>Portable logic</h3>
+        <p>Sample rules are JSON-shaped pseudocode, ready to translate to KQL, SPL, EQL, Sigma, or your platform of choice.</p>
+      </div>
+      <div class="pillar">
+        <h3>Operationally honest</h3>
+        <p>False positives, tuning paths, and escalation criteria sit alongside the detection logic. Nothing ships without them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="playbooks" class="playbooks">
+
+<!-- ============= 01 PASSWORD SPRAYING ============= -->
+<article class="playbook" id="pb-01">
+  <div class="container">
+    <div class="pb-head">
+      <span class="pb-num">01 / Credential Access</span>
+    </div>
+    <h2>Password Spraying</h2>
+    <p class="pb-tagline">
+      Low-volume, high-fan-out authentication abuse against identity providers.
+      A spray hides per-user — and only becomes visible when failures are aggregated across the user dimension.
+    </p>
+
+    <div class="pb-grid">
+      <div class="pb-card">
+        <h3>MITRE ATT&amp;CK</h3>
+        <table class="mitre">
+          <thead><tr><th>Technique</th><th>ID</th><th>Tactic</th></tr></thead>
+          <tbody>
+            <tr><td>Brute Force: Password Spraying</td><td><code>T1110.003</code></td><td>Credential Access</td></tr>
+            <tr><td>Valid Accounts</td><td><code>T1078</code></td><td>Initial Access / Persistence</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pb-card">
+        <h3>Key Indicators</h3>
+        <ul>
+          <li>Single source authenticating against many distinct usernames in a short window.</li>
+          <li>Failure-to-user ratio close to 1:1 (each user fails roughly once).</li>
+          <li>Bursts against legacy auth protocols (<code>BAV2ROPC</code>, IMAP, POP, SMTP AUTH).</li>
+          <li>Unusual user-agents (<code>python-requests</code>, <code>MSOLSpray</code>, <code>FireProx</code>).</li>
+          <li>Successful login from the same source shortly after the fan-out — highest-value signal.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pb-grid" style="margin-top:24px;">
+      <div class="pb-card" style="grid-column: 1 / -1;">
+        <h3>Sample Detection Logic</h3>
+<pre class="code"><span class="c">// Distinct-user fan-out from a single source within a sliding window.</span>
+{
+  <span class="k">"rule_name"</span>: <span class="s">"Password Spray - Distinct User Fan-Out"</span>,
+  <span class="k">"data_source"</span>: [<span class="s">"AzureAD.SignInLogs"</span>, <span class="s">"Okta.SystemLog"</span>, <span class="s">"ADFS.SecurityLog"</span>],
+  <span class="k">"logic"</span>: {
+    <span class="k">"window"</span>: <span class="s">"10m"</span>,
+    <span class="k">"group_by"</span>: [<span class="s">"src_ip"</span>, <span class="s">"user_agent"</span>],
+    <span class="k">"where"</span>: {
+      <span class="k">"event_type"</span>: <span class="s">"authentication"</span>,
+      <span class="k">"result"</span>: <span class="s">"failure"</span>,
+      <span class="k">"failure_reason_in"</span>: [<span class="s">"invalid_password"</span>, <span class="s">"50126"</span>]
+    },
+    <span class="k">"having"</span>: {
+      <span class="k">"distinct_users_gte"</span>: <span class="n">15</span>,
+      <span class="k">"avg_failures_per_user_lte"</span>: <span class="n">3</span>
+    }
+  },
+  <span class="k">"severity"</span>: <span class="s">"high"</span>,
+  <span class="k">"tags"</span>: [<span class="s">"T1110.003"</span>, <span class="s">"credential_access"</span>, <span class="s">"identity"</span>]
+}</pre>
+      </div>
+    </div>
+
+    <a class="pb-cta" href="https://github.com/GreyNOC/Playbooks/blob/main/01-password-spraying.md">
+      Open the full playbook <span class="arrow">→</span>
+    </a>
+  </div>
+</article>
+
+<!-- ============= 02 BRUTE FORCE ============= -->
+<article class="playbook" id="pb-02">
+  <div class="container">
+    <div class="pb-head">
+      <span class="pb-num">02 / Credential Access</span>
+    </div>
+    <h2>Brute Force Attack</h2>
+    <p class="pb-tagline">
+      High-volume password guessing against a single account or service. Noisy but effective against weak
+      credentials, exposed services, and accounts without lockout — and still one of the most common access
+      vectors for SSH, RDP, and VPN concentrators.
+    </p>
+
+    <div class="pb-grid">
+      <div class="pb-card">
+        <h3>MITRE ATT&amp;CK</h3>
+        <table class="mitre">
+          <thead><tr><th>Technique</th><th>ID</th><th>Tactic</th></tr></thead>
+          <tbody>
+            <tr><td>Brute Force</td><td><code>T1110</code></td><td>Credential Access</td></tr>
+            <tr><td>Password Guessing</td><td><code>T1110.001</code></td><td>Credential Access</td></tr>
+            <tr><td>External Remote Services</td><td><code>T1133</code></td><td>Initial Access</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pb-card">
+        <h3>Key Indicators</h3>
+        <ul>
+          <li>≥ N authentication failures against a single user/host within a short window.</li>
+          <li>Failures followed by a success from the same source — treat as confirmed compromise.</li>
+          <li>Repeated SYN to authentication ports (22, 3389, 445, 1433, 3306, 5432).</li>
+          <li>Sequential username enumeration patterns.</li>
+          <li>Default-credential pairs (<code>admin/admin</code>, <code>root/toor</code>, <code>sa/sa</code>).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pb-grid" style="margin-top:24px;">
+      <div class="pb-card" style="grid-column: 1 / -1;">
+        <h3>Sample Detection Logic</h3>
+<pre class="code"><span class="c">// Sustained per-target failures with post-success enrichment.</span>
+{
+  <span class="k">"rule_name"</span>: <span class="s">"Brute Force - Single Target High Failure Volume"</span>,
+  <span class="k">"data_source"</span>: [<span class="s">"Linux.Auth"</span>, <span class="s">"WindowsEvent.Security"</span>, <span class="s">"VPN.Auth"</span>, <span class="s">"Firewall.Conn"</span>],
+  <span class="k">"logic"</span>: {
+    <span class="k">"window"</span>: <span class="s">"5m"</span>,
+    <span class="k">"group_by"</span>: [<span class="s">"src_ip"</span>, <span class="s">"dst_user"</span>],
+    <span class="k">"where"</span>: { <span class="k">"event_type"</span>: <span class="s">"authentication"</span>, <span class="k">"result"</span>: <span class="s">"failure"</span> },
+    <span class="k">"having"</span>: { <span class="k">"failure_count_gte"</span>: <span class="n">25</span> },
+    <span class="k">"enrich_with_post_success"</span>: <span class="n">true</span>
+  },
+  <span class="k">"severity"</span>: <span class="s">"high"</span>,
+  <span class="k">"tags"</span>: [<span class="s">"T1110"</span>, <span class="s">"credential_access"</span>, <span class="s">"perimeter"</span>]
+}</pre>
+      </div>
+    </div>
+
+    <a class="pb-cta" href="https://github.com/GreyNOC/Playbooks/blob/main/02-brute-force.md">
+      Open the full playbook <span class="arrow">→</span>
+    </a>
+  </div>
+</article>
+
+<!-- ============= 03 DISTRIBUTED PORT SCAN ============= -->
+<article class="playbook" id="pb-03">
+  <div class="container">
+    <div class="pb-head">
+      <span class="pb-num">03 / Reconnaissance</span>
+    </div>
+    <h2>Distributed Port Scan</h2>
+    <p class="pb-tagline">
+      Multi-source coordinated reconnaissance that evades per-IP thresholds. Each source touches few ports;
+      the aggregate coverage of your assets is comprehensive. Detection has to pivot to the destination
+      dimension and correlate sources by timing and fingerprint.
+    </p>
+
+    <div class="pb-grid">
+      <div class="pb-card">
+        <h3>MITRE ATT&amp;CK</h3>
+        <table class="mitre">
+          <thead><tr><th>Technique</th><th>ID</th><th>Tactic</th></tr></thead>
+          <tbody>
+            <tr><td>Network Service Discovery</td><td><code>T1046</code></td><td>Discovery</td></tr>
+            <tr><td>Active Scanning: IP Blocks</td><td><code>T1595.001</code></td><td>Reconnaissance</td></tr>
+            <tr><td>Active Scanning: Vulnerability</td><td><code>T1595.002</code></td><td>Reconnaissance</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pb-card">
+        <h3>Key Indicators</h3>
+        <ul>
+          <li>Many distinct sources probing one destination in a short window.</li>
+          <li>Sequential or strided port coverage across sources.</li>
+          <li>Sources sharing TCP fingerprint (TTL, window size) or JA3/JA4 hashes.</li>
+          <li>SYN without ACK at scale (half-open scan signature).</li>
+          <li>Tightly clustered start times across geographically disparate ASNs.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pb-grid" style="margin-top:24px;">
+      <div class="pb-card" style="grid-column: 1 / -1;">
+        <h3>Sample Detection Logic</h3>
+<pre class="code"><span class="c">// Many sources, one destination, broad port coverage in a narrow window.</span>
+{
+  <span class="k">"rule_name"</span>: <span class="s">"Distributed Port Scan - Many Sources, One Destination"</span>,
+  <span class="k">"data_source"</span>: [<span class="s">"Firewall.Conn"</span>, <span class="s">"NetFlow"</span>, <span class="s">"IDS.Alerts"</span>],
+  <span class="k">"logic"</span>: {
+    <span class="k">"window"</span>: <span class="s">"10m"</span>,
+    <span class="k">"group_by"</span>: [<span class="s">"dst_ip"</span>],
+    <span class="k">"where"</span>: { <span class="k">"tcp_flags_in"</span>: [<span class="s">"SYN"</span>], <span class="k">"bytes_in_lt"</span>: <span class="n">200</span> },
+    <span class="k">"having"</span>: {
+      <span class="k">"distinct_src_ip_gte"</span>: <span class="n">25</span>,
+      <span class="k">"distinct_dst_port_gte"</span>: <span class="n">30</span>,
+      <span class="k">"avg_ports_per_src_lte"</span>: <span class="n">5</span>
+    }
+  },
+  <span class="k">"severity"</span>: <span class="s">"medium"</span>,
+  <span class="k">"tags"</span>: [<span class="s">"T1046"</span>, <span class="s">"T1595"</span>, <span class="s">"reconnaissance"</span>, <span class="s">"perimeter"</span>]
+}</pre>
+      </div>
+    </div>
+
+    <a class="pb-cta" href="https://github.com/GreyNOC/Playbooks/blob/main/03-distributed-port-scan.md">
+      Open the full playbook <span class="arrow">→</span>
+    </a>
+  </div>
+</article>
+
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-row">
+    <div>
+      <strong style="color:#e6eef7; letter-spacing:.08em;">GREYNOC</strong>
+      <span class="small" style="margin-left:10px;">Detection-engineering-first security operations.</span>
+    </div>
+    <div class="small">
+      <a href="https://greynoc.com">greynoc.com</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/GreyNOC/Playbooks">GitHub</a>
+      &nbsp;·&nbsp;
+      <a href="mailto:CustomerService@GreyNOC.com">CustomerService@GreyNOC.com</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

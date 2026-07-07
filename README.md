@@ -1,7 +1,5 @@
 # GreyNOC Security Playbooks
 
-Production-ready detection and response playbooks authored by the GreyNOC detection-engineering team. Each playbook follows a consistent structure: overview, MITRE ATT&CK mapping, detection strategy, indicators, sample logic, example data, investigation steps, false positives, tuning, response actions, escalation criteria, an analyst notes template, and a closing summary.
-
 These are written for SOC analysts, incident responders, and detection engineers. They focus on behavior-based detection over signatures, and on operational clarity over theory.
 
 ---
@@ -20,6 +18,14 @@ These are written for SOC analysts, incident responders, and detection engineers
 | 08 | [Malware Beaconing](08-malware-beaconing.md) | Periodic C2 traffic detection |
 | 09 | [AI / Automated Agent Abuse](09-ai-automated-agent-abuse.md) | Adversary automation and owned-AI-feature abuse |
 | 10 | [Coordinated Multi-Stage Attack](10-coordinated-multi-stage-attack.md) | Kill-chain correlation across entities |
+| 11 | [Phishing](11-phishing.md) | Malicious email delivery, AiTM/MFA-bypass, retro-hunting |
+| 12 | [Business Email Compromise](12-business-email-compromise.md) | Post-compromise mailbox rules, forwarding, OAuth abuse |
+| 13 | [Lateral Movement](13-lateral-movement.md) | Host-to-host propagation and authentication-edge anomalies |
+| 14 | [Active Directory Credential Theft](14-ad-credential-theft.md) | Kerberoasting, DCSync, LSASS dumping, ticket forgery |
+| 15 | [Persistence Mechanisms](15-persistence-mechanisms.md) | Tasks, services, run keys, WMI subscriptions, rogue accounts |
+| 16 | [Web Shell](16-web-shell.md) | Post-exploitation implants in the webroot |
+| 17 | [Data Exfiltration](17-data-exfiltration.md) | Staging and egress anomalies to cloud, C2, and alt protocols |
+| 18 | [Ransomware](18-ransomware.md) | Recovery-inhibition precursors and mass-encryption impact |
 
 ---
 
