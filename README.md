@@ -1,30 +1,44 @@
-# GreyNOC Security Playbooks — AI · Post-Quantum · E2EE
+# GreyNOC Security Playbooks
 
-Production-grade detection, response, and authorized-testing playbooks authored by the
-GreyNOC detection-engineering team. This collection is re-centered on the cryptographic
-transition that now defines the threat surface: **post-quantum (PQ) migration**,
-**end-to-end-encrypted (E2EE) protocol security**, and **AI-augmented detection** —
-with two playbooks dedicated to **authorized bug-bounty methodology** against PQ/E2EE
-attack surface.
+Production-grade detection, response, and authorized-testing playbooks authored by the GreyNOC detection-engineering team. The library spans two complementary collections:
 
-Each playbook follows the standard GreyNOC structure: overview, MITRE ATT&CK / ATLAS
-mapping, detection strategy, indicators, sample logic, example data, investigation steps,
-false positives, tuning, response actions, escalation criteria, an analyst-notes template,
-and a closing summary. Written for SOC analysts, IR, detection engineers, and authorized
-offensive operators. Behavior-based over signature-based; operational clarity over theory.
+- **Detection & Response** — behavior-based SOC playbooks across the intrusion lifecycle, from initial access to impact.
+- **AI · Post-Quantum · E2EE** — playbooks re-centered on the cryptographic transition: post-quantum (PQ) migration, end-to-end-encrypted (E2EE) protocol security, and AI-augmented detection, plus two dedicated to authorized bug-bounty methodology against PQ/E2EE attack surface.
 
-> **Why this rewrite.** NIST finalized the first PQ standards in August 2024 (FIPS 203
-> ML-KEM, FIPS 204 ML-DSA, FIPS 205 SLH-DSA), with FN-DSA (FIPS 206) and the HQC backup
-> KEM following. Hybrid TLS (`X25519MLKEM768`, NamedGroup `0x11EC`) is now default or
-> near-default across Chrome, Firefox, Cloudflare, Akamai, and AWS, and E2EE messengers
-> (Signal PQXDH, iMessage PQ3) ship PQ key establishment in production. The window where
-> "crypto detection" meant "expired certs and weak ciphers" is closed. The dominant risk is
-> now **harvest-now-decrypt-later (HNDL)**, **downgrade of hybrid handshakes**, and
-> **migration-defect classes** introduced while organizations swap primitives under deadline.
+Every playbook follows the same GreyNOC structure: overview, MITRE ATT&CK / ATLAS mapping, detection strategy, indicators, sample logic, example data, investigation steps, false positives, tuning, response actions, escalation criteria, an analyst-notes template, and a closing summary. Written for SOC analysts, IR, detection engineers, and authorized offensive operators. Behavior-based over signature-based; operational clarity over theory.
+
+> **Why the crypto collection.** NIST finalized the first PQ standards in August 2024 (FIPS 203 ML-KEM, FIPS 204 ML-DSA, FIPS 205 SLH-DSA), with FN-DSA (FIPS 206) and the HQC backup KEM following. Hybrid TLS (`X25519MLKEM768`, NamedGroup `0x11EC`) is now default or near-default across Chrome, Firefox, Cloudflare, Akamai, and AWS, and E2EE messengers (Signal PQXDH, iMessage PQ3) ship PQ key establishment in production. The window where "crypto detection" meant "expired certs and weak ciphers" is closed. The dominant risk is now **harvest-now-decrypt-later (HNDL)**, **downgrade of hybrid handshakes**, and **migration-defect classes** introduced while organizations swap primitives under deadline.
+
+A visual index of the detection & response collection is available in [index.html](index.html).
 
 ---
 
-## Index
+## Detection & Response Playbooks
+
+| # | Playbook | Focus |
+|---|----------|-------|
+| 01 | [Password Spraying](01-password-spraying.md) | Distributed credential access against IdPs |
+| 02 | [Brute Force Attack](02-brute-force.md) | Single-target authentication abuse |
+| 03 | [Distributed Port Scan](03-distributed-port-scan.md) | Multi-source coordinated reconnaissance |
+| 04 | [Credential Stuffing](04-credential-stuffing.md) | Leaked-credential replay against web/SaaS |
+| 05 | [Impossible Travel](05-impossible-travel.md) | Geographic velocity + risk-feature composite |
+| 06 | [Privilege Escalation](06-privilege-escalation.md) | Identity, endpoint, and cloud elevation |
+| 07 | [Suspicious PowerShell Execution](07-suspicious-powershell.md) | Encoded, in-memory, and parented PowerShell abuse |
+| 08 | [Malware Beaconing](08-malware-beaconing.md) | Periodic C2 traffic detection |
+| 09 | [AI / Automated Agent Abuse](09-ai-automated-agent-abuse.md) | Adversary automation and owned-AI-feature abuse |
+| 10 | [Coordinated Multi-Stage Attack](10-coordinated-multi-stage-attack.md) | Kill-chain correlation across entities |
+| 11 | [Phishing](11-phishing.md) | Malicious email delivery, AiTM/MFA-bypass, retro-hunting |
+| 12 | [Business Email Compromise](12-business-email-compromise.md) | Post-compromise mailbox rules, forwarding, OAuth abuse |
+| 13 | [Lateral Movement](13-lateral-movement.md) | Host-to-host propagation and authentication-edge anomalies |
+| 14 | [Active Directory Credential Theft](14-ad-credential-theft.md) | Kerberoasting, DCSync, LSASS dumping, ticket forgery |
+| 15 | [Persistence Mechanisms](15-persistence-mechanisms.md) | Tasks, services, run keys, WMI subscriptions, rogue accounts |
+| 16 | [Web Shell](16-web-shell.md) | Post-exploitation implants in the webroot |
+| 17 | [Data Exfiltration](17-data-exfiltration.md) | Staging and egress anomalies to cloud, C2, and alt protocols |
+| 18 | [Ransomware](18-ransomware.md) | Recovery-inhibition precursors and mass-encryption impact |
+
+---
+
+## AI · Post-Quantum · E2EE Playbooks
 
 | #  | Playbook | Focus |
 | --- | --- | --- |
@@ -37,25 +51,19 @@ offensive operators. Behavior-based over signature-based; operational clarity ov
 | 07 | [Bug Bounty: PQC/E2EE Methodology](07-bugbounty-pqc-e2ee-methodology.md) | Authorized recon → crypto-surface mapping → validation → reporting |
 | 08 | [Bug Bounty: Crypto Implementation Defects](08-bugbounty-crypto-implementation-defects.md) | Authorized hunting of migration/downgrade/oracle defect classes |
 
-See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named groups,
-documentation address space, and **rules of engagement** that bind playbooks 07–08.
+See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named groups, documentation address space, and **rules of engagement** that bind the bug-bounty playbooks (crypto collection 07–08).
 
 ---
 
 ## How to Use
 
 1. Read the playbook end-to-end before deploying any rule.
-2. Map data sources to your environment; verify telemetry sufficiency before relying on a
-   detection. PQ/E2EE detection depends on handshake- and key-level visibility that many
-   estates do not yet log — confirm you have it before trusting the absence of alerts.
-3. Translate the JSON-shaped sample logic to your platform (KQL, SPL, EQL, Sigma, etc.);
-   validate on historical data where possible.
+2. Map data sources to your environment; verify telemetry sufficiency before relying on a detection. PQ/E2EE detection in particular depends on handshake- and key-level visibility that many estates do not yet log — confirm you have it before trusting the absence of alerts.
+3. Translate the JSON-shaped sample logic to your platform (KQL, SPL, EQL, Sigma, etc.); validate on historical data where possible.
 4. Adopt the analyst-notes template into your case-management workflow.
-5. For playbooks 07–08, do not begin any activity without a signed authorization / program
-   scope on file. GreyNOC operates as the submitting firm; ROE in CONVENTIONS is mandatory.
+5. For the bug-bounty playbooks (crypto collection 07–08), do not begin any activity without a signed authorization / program scope on file. GreyNOC operates as the submitting firm; ROE in CONVENTIONS is mandatory.
 6. Revisit tuning after every confirmed true positive and false positive.
 
 ---
 
-*GreyNOC — detection-engineering-first security operations. No fabrication: every finding,
-indicator, and report artifact must be reproducible from evidence.*
+*GreyNOC — detection-engineering-first security operations. No fabrication: every finding, indicator, and report artifact must be reproducible from evidence.*

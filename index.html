@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GreyNOC Security Playbooks — Library</title>
+<meta name="description" content="Eighteen production-ready detection and response playbooks from GreyNOC, spanning initial access through impact: phishing, credential theft, lateral movement, beaconing, exfiltration, ransomware, and more." />
+<style>
+  :root {
+    --ink:        #0a1929;
+    --ink-2:      #0f2238;
+    --ink-3:      #16314c;
+    --rule-dark:  #1f3d5e;
+    --cyan:       #4fa9d9;
+    --cyan-bright:#6fc1ed;
+    --cyan-dim:   #2d6a90;
+    --paper:      #ffffff;
+    --paper-2:    #f5f7fa;
+    --paper-3:    #eef2f7;
+    --text:       #0f172a;
+    --text-muted: #475569;
+    --text-faint: #64748b;
+    --rule:       #e2e8f0;
+    --shadow:     0 1px 2px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.04);
+    --shadow-lg:  0 4px 20px rgba(15,23,42,.06), 0 12px 40px rgba(15,23,42,.08);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: var(--cyan-dim); text-decoration: none; }
+  a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    background: var(--ink);
+    border-bottom: 1px solid var(--rule-dark);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-row {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .brand {
+    display: inline-flex; align-items: center; gap: 12px;
+    color: #fff; font-weight: 700; letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+  .brand:hover { color: var(--cyan-bright); text-decoration: none; }
+  .brand-glyph { width: 28px; height: 28px; }
+  .brand-text { font-size: 15px; }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a { color: #cbd5e1; font-size: 14px; letter-spacing: 0.02em; }
+  .nav-links a:hover { color: var(--cyan-bright); text-decoration: none; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background:
+      radial-gradient(900px 500px at 80% -10%, rgba(79,169,217,.18), transparent 60%),
+      radial-gradient(700px 400px at 0% 110%, rgba(79,169,217,.10), transparent 60%),
+      linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%);
+    color: #e6eef7;
+    padding: 92px 0 100px;
+    border-bottom: 1px solid var(--rule-dark);
+    position: relative; overflow: hidden;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--cyan-bright);
+    border: 1px solid var(--cyan-dim);
+    padding: 6px 12px;
+    border-radius: 999px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    line-height: 1.08;
+    margin: 0 0 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .hero h1 .accent { color: var(--cyan-bright); }
+  .hero p.lede {
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    color: #b9c8d8;
+    max-width: 740px;
+    margin: 0 0 32px;
+  }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform .08s ease, background .2s ease, border-color .2s ease, color .2s ease;
+  }
+  .btn-primary { background: var(--cyan); color: var(--ink); border-color: var(--cyan); }
+  .btn-primary:hover { background: var(--cyan-bright); color: var(--ink); text-decoration: none; }
+  .btn-ghost { background: transparent; color: #e6eef7; border-color: var(--rule-dark); }
+  .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan-bright); text-decoration: none; }
+
+  .hero-hud {
+    position: absolute;
+    right: -120px; top: 50%;
+    transform: translateY(-50%);
+    width: 480px; height: 480px;
+    opacity: .35;
+    pointer-events: none;
+  }
+
+  /* ---------- Intro band ---------- */
+  .band {
+    background: var(--paper);
+    padding: 60px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .band h2 {
+    font-size: 1.75rem;
+    margin: 0 0 16px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .band-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; margin-top: 28px; }
+  .pillar { padding: 20px 22px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); }
+  .pillar h3 {
+    font-size: 0.78rem; margin: 0 0 8px;
+    text-transform: uppercase; letter-spacing: 0.16em; color: var(--cyan-dim);
+  }
+  .pillar p { margin: 0; color: var(--text-muted); font-size: 0.95rem; }
+
+  /* ---------- Gallery ---------- */
+  .gallery { padding: 56px 0 40px; }
+  .gallery-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap; margin-bottom: 28px;
+  }
+  .gallery-head h2 { font-size: 1.75rem; margin: 0; color: var(--ink); letter-spacing: -0.01em; }
+  .gallery-count {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.82rem; color: var(--text-faint); letter-spacing: 0.04em;
+  }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 22px;
+  }
+  a.gcard {
+    display: flex; flex-direction: column;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 22px 22px 16px;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  a.gcard:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--cyan-dim);
+    text-decoration: none;
+  }
+  .gcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .gcard-num {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px; letter-spacing: 0.16em; font-weight: 600;
+    color: var(--cyan-dim); background: var(--paper-3);
+    padding: 4px 9px; border-radius: 4px;
+  }
+  .gcard-cat {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--text-faint); font-weight: 600;
+  }
+  .gcard h3 { font-size: 1.16rem; margin: 0 0 8px; color: var(--ink); letter-spacing: -0.01em; }
+  .gcard p { margin: 0 0 16px; color: var(--text-muted); font-size: 0.92rem; line-height: 1.55; flex: 1; }
+  .gcard-foot {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    border-top: 1px solid var(--rule); padding-top: 12px;
+  }
+  .mitre-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.72rem; color: var(--ink); background: var(--paper-3);
+    padding: 2px 7px; border-radius: 4px;
+  }
+  .gcard-link { font-size: 0.8rem; font-weight: 600; color: var(--cyan-dim); white-space: nowrap; }
+  a.gcard:hover .gcard-link { color: var(--ink); }
+  .gcard-link .arrow { display: inline-block; transition: transform .15s ease; }
+  a.gcard:hover .gcard-link .arrow { transform: translateX(3px); }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    background: var(--ink);
+    color: #94a3b8;
+    padding: 40px 0;
+    border-top: 1px solid var(--rule-dark);
+  }
+  .footer-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .footer a { color: #cbd5e1; }
+  .footer a:hover { color: var(--cyan-bright); text-decoration: none; }
+  .footer .small { font-size: 13px; color: #94a3b8; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .band-grid { grid-template-columns: 1fr; }
+    .nav-links { gap: 16px; }
+    .hero { padding: 72px 0 76px; }
+    .hero-hud { display: none; }
+  }
+  @media (max-width: 540px) {
+    .nav-links a:nth-child(3) { display: none; }
+    .gallery-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-row">
+    <a class="brand" href="#top" aria-label="GreyNOC">
+      <svg class="brand-glyph" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="26" fill="none" stroke="#4fa9d9" stroke-width="1.5"/>
+        <circle cx="32" cy="32" r="20" fill="none" stroke="#4fa9d9" stroke-width="1" stroke-dasharray="2 4"/>
+        <line x1="32" y1="2"  x2="32" y2="10" stroke="#4fa9d9" stroke-width="2"/>
+        <line x1="32" y1="54" x2="32" y2="62" stroke="#4fa9d9" stroke-width="2"/>
+        <line x1="2"  y1="32" x2="10" y2="32" stroke="#4fa9d9" stroke-width="2"/>
+        <line x1="54" y1="32" x2="62" y2="32" stroke="#4fa9d9" stroke-width="2"/>
+        <circle cx="32" cy="32" r="3" fill="#4fa9d9"/>
+      </svg>
+      <span class="brand-text">GREYNOC</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#playbooks">Playbooks</a>
+      <a href="https://github.com/GreyNOC/Playbooks" rel="noopener">GitHub</a>
+      <a href="https://greynoc.com" rel="noopener">greynoc.com</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="container">
+    <span class="hero-eyebrow">Security Playbooks · Full Library</span>
+    <h1>Detection patterns SOCs <span class="accent">actually run.</span></h1>
+    <p class="lede">
+      Two collections from the GreyNOC detection-engineering team — eighteen detection &amp;
+      response playbooks spanning initial access to impact, and eight on the post-quantum /
+      E2EE cryptographic transition — written for the analysts who have to act on them.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#playbooks">
+        Browse the Library
+        <span aria-hidden="true">→</span>
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/GreyNOC/Playbooks" rel="noopener">
+        View on GitHub
+      </a>
+    </div>
+  </div>
+  <svg class="hero-hud" viewBox="0 0 200 200" aria-hidden="true">
+    <circle cx="100" cy="100" r="90" fill="none" stroke="#4fa9d9" stroke-width="1"/>
+    <circle cx="100" cy="100" r="70" fill="none" stroke="#4fa9d9" stroke-width="0.6" stroke-dasharray="2 6"/>
+    <circle cx="100" cy="100" r="50" fill="none" stroke="#4fa9d9" stroke-width="0.6"/>
+    <circle cx="100" cy="100" r="6" fill="#4fa9d9"/>
+    <line x1="100" y1="0"   x2="100" y2="20"  stroke="#4fa9d9"/>
+    <line x1="100" y1="180" x2="100" y2="200" stroke="#4fa9d9"/>
+    <line x1="0"   y1="100" x2="20"  y2="100" stroke="#4fa9d9"/>
+    <line x1="180" y1="100" x2="200" y2="100" stroke="#4fa9d9"/>
+  </svg>
+</section>
+
+<section class="band">
+  <div class="container">
+    <h2>Built for the analysts who run them.</h2>
+    <p style="color:var(--text-muted); max-width:760px; margin:0;">
+      Every playbook follows the same 13-section format: overview, MITRE ATT&amp;CK mapping, detection strategy,
+      key indicators, sample logic, example data, investigation steps, false positives, tuning,
+      response actions, escalation criteria, analyst-notes template, and summary.
+    </p>
+    <div class="band-grid">
+      <div class="pillar">
+        <h3>Behavior over signature</h3>
+        <p>Detections are framed by what the attacker actually does — fan-out, periodicity, sequence — not by IOCs that rotate.</p>
+      </div>
+      <div class="pillar">
+        <h3>Portable logic</h3>
+        <p>Sample rules are JSON-shaped pseudocode, ready to translate to KQL, SPL, EQL, Sigma, or your platform of choice.</p>
+      </div>
+      <div class="pillar">
+        <h3>Operationally honest</h3>
+        <p>False positives, tuning paths, and escalation criteria sit alongside the detection logic. Nothing ships without them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="playbooks" class="gallery">
+  <div class="container">
+    <div class="gallery-head">
+      <h2>Detection &amp; Response</h2>
+      <span class="gallery-count">18 playbooks · initial access → impact</span>
+    </div>
+    <div class="gallery-grid">
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/01-password-spraying.md">
+        <div class="gcard-top"><span class="gcard-num">01</span><span class="gcard-cat">Credential Access</span></div>
+        <h3>Password Spraying</h3>
+        <p>Low-volume, high-fan-out authentication abuse against identity providers — visible only when failures aggregate across the user dimension.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1110.003</span><span class="chip">T1078</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/02-brute-force.md">
+        <div class="gcard-top"><span class="gcard-num">02</span><span class="gcard-cat">Credential Access</span></div>
+        <h3>Brute Force Attack</h3>
+        <p>High-volume password guessing against a single account or service. Noisy, but still a top vector for SSH, RDP, and VPN concentrators.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1110</span><span class="chip">T1133</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/03-distributed-port-scan.md">
+        <div class="gcard-top"><span class="gcard-num">03</span><span class="gcard-cat">Reconnaissance</span></div>
+        <h3>Distributed Port Scan</h3>
+        <p>Multi-source coordinated reconnaissance that evades per-IP thresholds. Detection has to pivot to the destination dimension.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1046</span><span class="chip">T1595</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/04-credential-stuffing.md">
+        <div class="gcard-top"><span class="gcard-num">04</span><span class="gcard-cat">Credential Access</span></div>
+        <h3>Credential Stuffing</h3>
+        <p>Leaked-credential replay against web and SaaS logins — high-volume, automation-driven, and low per-account failure.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1110.004</span><span class="chip">T1078</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/05-impossible-travel.md">
+        <div class="gcard-top"><span class="gcard-num">05</span><span class="gcard-cat">Identity</span></div>
+        <h3>Impossible Travel</h3>
+        <p>Geographic-velocity impossibilities fused with sign-in risk features into a single composite identity signal.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1078</span><span class="chip">T1539</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/06-privilege-escalation.md">
+        <div class="gcard-top"><span class="gcard-num">06</span><span class="gcard-cat">Privilege Escalation</span></div>
+        <h3>Privilege Escalation</h3>
+        <p>Elevation across identity, endpoint, and cloud — role grants, token abuse, and local privilege exploits.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1548</span><span class="chip">T1098</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/07-suspicious-powershell.md">
+        <div class="gcard-top"><span class="gcard-num">07</span><span class="gcard-cat">Execution</span></div>
+        <h3>Suspicious PowerShell</h3>
+        <p>Encoded, in-memory, and oddly-parented PowerShell abuse — the workhorse of hands-on-keyboard intrusions.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1059.001</span><span class="chip">T1027</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/08-malware-beaconing.md">
+        <div class="gcard-top"><span class="gcard-num">08</span><span class="gcard-cat">Command &amp; Control</span></div>
+        <h3>Malware Beaconing</h3>
+        <p>Periodic C2 check-in traffic surfaced by geometry: periodicity, shape, and destination character over payload.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1071.001</span><span class="chip">T1573</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/09-ai-automated-agent-abuse.md">
+        <div class="gcard-top"><span class="gcard-num">09</span><span class="gcard-cat">AI · Emerging</span></div>
+        <h3>AI / Automated Agent Abuse</h3>
+        <p>Adversary automation and abuse of owned AI features and agents — mapped to MITRE ATLAS as well as ATT&amp;CK.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">AML.T0051</span><span class="chip">T1566</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/10-coordinated-multi-stage-attack.md">
+        <div class="gcard-top"><span class="gcard-num">10</span><span class="gcard-cat">Correlation</span></div>
+        <h3>Coordinated Multi-Stage Attack</h3>
+        <p>Kill-chain correlation that links weak, individually-benign signals across entities into one incident.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1566</span><span class="chip">T1190</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/11-phishing.md">
+        <div class="gcard-top"><span class="gcard-num">11</span><span class="gcard-cat">Initial Access</span></div>
+        <h3>Phishing</h3>
+        <p>Malicious email delivery — credential lures, AiTM/MFA-bypass kits, quishing, and post-delivery retro-hunting.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1566</span><span class="chip">T1539</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/12-business-email-compromise.md">
+        <div class="gcard-top"><span class="gcard-num">12</span><span class="gcard-cat">Collection</span></div>
+        <h3>Business Email Compromise</h3>
+        <p>Post-compromise mailbox abuse — inbox rules, auto-forwarding, delegate additions, and malicious OAuth consent.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1114.003</span><span class="chip">T1528</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/13-lateral-movement.md">
+        <div class="gcard-top"><span class="gcard-num">13</span><span class="gcard-cat">Lateral Movement</span></div>
+        <h3>Lateral Movement</h3>
+        <p>Host-to-host propagation surfaced by first-time authentication edges and Windows logon-type anomalies.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1021.002</span><span class="chip">T1550.002</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/14-ad-credential-theft.md">
+        <div class="gcard-top"><span class="gcard-num">14</span><span class="gcard-cat">Credential Access</span></div>
+        <h3>AD Credential Theft</h3>
+        <p>Kerberoasting, AS-REP roasting, DCSync, and LSASS dumping against Active Directory.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1003.006</span><span class="chip">T1558.003</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/15-persistence-mechanisms.md">
+        <div class="gcard-top"><span class="gcard-num">15</span><span class="gcard-cat">Persistence</span></div>
+        <h3>Persistence Mechanisms</h3>
+        <p>Footholds that survive reboot — scheduled tasks, services, run keys, WMI subscriptions, and rogue accounts.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1053.005</span><span class="chip">T1543.003</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/16-web-shell.md">
+        <div class="gcard-top"><span class="gcard-num">16</span><span class="gcard-cat">Persistence</span></div>
+        <h3>Web Shell</h3>
+        <p>Implants dropped in the webroot after exploitation of a public-facing app — process lineage and traffic anomalies.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1505.003</span><span class="chip">T1190</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/17-data-exfiltration.md">
+        <div class="gcard-top"><span class="gcard-num">17</span><span class="gcard-cat">Exfiltration</span></div>
+        <h3>Data Exfiltration</h3>
+        <p>Staging and theft — archive bursts, egress-volume anomalies, and cloud or alternative-protocol transfers.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1567.002</span><span class="chip">T1041</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/18-ransomware.md">
+        <div class="gcard-top"><span class="gcard-num">18</span><span class="gcard-cat">Impact</span></div>
+        <h3>Ransomware</h3>
+        <p>Recovery-inhibition precursors and mass-encryption impact. Detect early, or measure the damage.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1486</span><span class="chip">T1490</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="gallery-head" style="margin-top:56px;">
+      <h2>AI · Post-Quantum · E2EE</h2>
+      <span class="gallery-count">8 playbooks · crypto transition + authorized testing</span>
+    </div>
+    <div class="gallery-grid">
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/01-cryptographic-inventory-pqc-readiness.md">
+        <div class="gcard-top"><span class="gcard-num">01</span><span class="gcard-cat">PQ Readiness</span></div>
+        <h3>Cryptographic Inventory &amp; PQC Readiness</h3>
+        <p>CBOM discovery, AI/LLM-assisted code auditing, and crypto-agility scoring for the PQ migration.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1040</span><span class="chip">T1600</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/02-harvest-now-decrypt-later.md">
+        <div class="gcard-top"><span class="gcard-num">02</span><span class="gcard-cat">Exfiltration</span></div>
+        <h3>Harvest-Now-Decrypt-Later Exposure</h3>
+        <p>Bulk-capture detection and prioritization of long-shelf-life data at risk from future decryption.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1040</span><span class="chip">T1557</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/03-hybrid-tls-kem-downgrade.md">
+        <div class="gcard-top"><span class="gcard-num">03</span><span class="gcard-cat">Downgrade</span></div>
+        <h3>Hybrid TLS / KEM Downgrade</h3>
+        <p>PQ key-exchange stripping, negotiation downgrade, and middlebox tampering of hybrid handshakes.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1600</span><span class="chip">T1557</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/04-e2ee-messaging-protocol-security.md">
+        <div class="gcard-top"><span class="gcard-num">04</span><span class="gcard-cat">E2EE</span></div>
+        <h3>E2EE Messaging Protocol Security</h3>
+        <p>Double Ratchet, PQXDH, PQ3, and MLS — key-transparency and man-in-the-middle detection.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1557</span><span class="chip">T1556</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/05-pq-signature-token-integrity.md">
+        <div class="gcard-top"><span class="gcard-num">05</span><span class="gcard-cat">Integrity</span></div>
+        <h3>PQ Signature &amp; Token Integrity</h3>
+        <p>ML-DSA / SLH-DSA / FN-DSA across JWT, SAML, and X.509 — algorithm-confusion defense.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1606</span><span class="chip">T1556</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/06-ai-augmented-detection-guardrails.md">
+        <div class="gcard-top"><span class="gcard-num">06</span><span class="gcard-cat">AI · Guardrails</span></div>
+        <h3>AI-Augmented Detection &amp; Guardrails</h3>
+        <p>LLM-assisted triage with pipeline-poisoning and prompt-injection defense, mapped to MITRE ATLAS.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1552</span><span class="chip">T1213</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/07-bugbounty-pqc-e2ee-methodology.md">
+        <div class="gcard-top"><span class="gcard-num">07</span><span class="gcard-cat">Bug Bounty</span></div>
+        <h3>Bug Bounty: PQC/E2EE Methodology</h3>
+        <p>Authorized recon → crypto-surface mapping → validation → reporting, bound by rules of engagement.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">ROE-bound</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/08-bugbounty-crypto-implementation-defects.md">
+        <div class="gcard-top"><span class="gcard-num">08</span><span class="gcard-cat">Bug Bounty</span></div>
+        <h3>Bug Bounty: Crypto Implementation Defects</h3>
+        <p>Authorized hunting of migration, downgrade, and oracle defect classes in crypto implementations.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">ROE-bound</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-row">
+    <div>
+      <strong style="color:#e6eef7; letter-spacing:.08em;">GREYNOC</strong>
+      <span class="small" style="margin-left:10px;">Detection-engineering-first security operations.</span>
+    </div>
+    <div class="small">
+      <a href="https://greynoc.com">greynoc.com</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/GreyNOC/Playbooks">GitHub</a>
+      &nbsp;·&nbsp;
+      <a href="mailto:CustomerService@GreyNOC.com">CustomerService@GreyNOC.com</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
