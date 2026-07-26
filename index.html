@@ -265,8 +265,9 @@
     <h1>Detection patterns SOCs <span class="accent">actually run.</span></h1>
     <p class="lede">
       Two collections from the GreyNOC detection-engineering team — eighteen detection &amp;
-      response playbooks spanning initial access to impact, and fourteen on the post-quantum /
-      E2EE cryptographic transition — written for the analysts who have to act on them.
+      response playbooks spanning initial access to impact, and twenty on the post-quantum /
+      E2EE cryptographic transition and AI-system security — written for the analysts and
+      authorized operators who have to act on them.
     </p>
     <div class="cta-row">
       <a class="btn btn-primary" href="#playbooks">
@@ -507,7 +508,7 @@
 
     <div class="gallery-head" style="margin-top:56px;">
       <h2>AI · Post-Quantum · E2EE</h2>
-      <span class="gallery-count">14 playbooks · crypto transition, migration &amp; governance</span>
+      <span class="gallery-count">20 playbooks · crypto transition, AI security &amp; authorized testing</span>
     </div>
     <div class="gallery-grid">
 
@@ -647,6 +648,66 @@
         <p>Mosca's inequality, CNSA 2.0 / NSM-10 mandates, and evidence-backed compliance reporting.</p>
         <div class="gcard-foot">
           <div class="mitre-chips"><span class="chip">T1040</span><span class="chip">T1600</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/15-bugbounty-ai-attack-surface-methodology.md">
+        <div class="gcard-top"><span class="gcard-num">15</span><span class="gcard-cat">Bug Bounty · AI</span></div>
+        <h3>Bug Bounty: AI &amp; LLM Attack-Surface Methodology</h3>
+        <p>Trust-boundary mapping, canary and trial-ledger harness, and the security-vs-model-safety routing decision.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">ROE-bound</span><span class="chip">AML.T0051</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/16-bugbounty-llm-application-defects.md">
+        <div class="gcard-top"><span class="gcard-num">16</span><span class="gcard-cat">Bug Bounty · AI</span></div>
+        <h3>Bug Bounty: LLM Application-Layer Defects</h3>
+        <p>Prompt injection, retrieval scope, output handling, session isolation, and app-level authorization.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">L1&ndash;L14</span><span class="chip">AML.T0051</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/17-bugbounty-ai-supply-chain-model-artifacts.md">
+        <div class="gcard-top"><span class="gcard-num">17</span><span class="gcard-cat">Bug Bounty · AI</span></div>
+        <h3>Bug Bounty: AI Supply Chain &amp; Model Artifacts</h3>
+        <p>Artifact provenance, registry and namespace abuse, build pipelines, and classical-only signing gaps.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">S1&ndash;S10</span><span class="chip">AML.T0010</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/18-bugbounty-agentic-systems-mcp.md">
+        <div class="gcard-top"><span class="gcard-num">18</span><span class="gcard-cat">Bug Bounty · AI</span></div>
+        <h3>Bug Bounty: Agentic Systems, Tools &amp; the MCP Boundary</h3>
+        <p>Tool-metadata poisoning, confused-deputy delegation, connector scope, and autonomy limits.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">G1&ndash;G12</span><span class="chip">AML.T0053</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/19-bugbounty-model-behavior-safety-boundaries.md">
+        <div class="gcard-top"><span class="gcard-num">19</span><span class="gcard-cat">Bug Bounty · AI</span></div>
+        <h3>Bug Bounty: Model Behavior &amp; Safety-Boundary Testing</h3>
+        <p>Routing to model-safety channels, eval-grade measurement, and proving a control failure without producing harm.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">ROE-bound</span><span class="chip">AML.T0054</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/20-bugbounty-inference-infrastructure-isolation.md">
+        <div class="gcard-top"><span class="gcard-num">20</span><span class="gcard-cat">Bug Bounty · AI</span></div>
+        <h3>Bug Bounty: Inference Infrastructure &amp; Multi-Tenant Isolation</h3>
+        <p>Serving control plane, tenant routing, cache leakage, quota controls, and inference-path transport.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">I1&ndash;I10</span><span class="chip">AML.T0034</span></div>
           <span class="gcard-link">Open <span class="arrow">→</span></span>
         </div>
       </a>
