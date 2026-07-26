@@ -3,13 +3,13 @@
 Production-grade detection, response, and authorized-testing playbooks authored by the GreyNOC detection-engineering team. The library spans two complementary collections:
 
 - **Detection & Response** — behavior-based SOC playbooks across the intrusion lifecycle, from initial access to impact.
-- **AI · Post-Quantum · E2EE** — playbooks re-centered on the cryptographic transition: post-quantum (PQ) migration, end-to-end-encrypted (E2EE) protocol security, and AI-augmented detection, plus two dedicated to authorized bug-bounty methodology against PQ/E2EE attack surface.
+- **AI · Post-Quantum · E2EE** — playbooks re-centered on the cryptographic transition and on AI-system security: post-quantum (PQ) migration, end-to-end-encrypted (E2EE) protocol security, AI-augmented detection, plus eight dedicated to authorized bug-bounty methodology — two against PQ/E2EE attack surface and six against AI systems (methodology, application layer, supply chain, agentic/MCP boundary, model behavior, and inference infrastructure).
 
-Every playbook follows the same GreyNOC structure: overview, MITRE ATT&CK / ATLAS mapping, detection strategy, indicators, sample logic, example data, investigation steps, false positives, tuning, response actions, escalation criteria, an analyst-notes template, and a closing summary. Written for SOC analysts, IR, detection engineers, and authorized offensive operators. Behavior-based over signature-based; operational clarity over theory.
+Every detection playbook follows the same GreyNOC structure: overview, MITRE ATT&CK / ATLAS mapping, detection strategy, indicators, sample logic, example data, investigation steps, false positives, tuning, response actions, escalation criteria, an analyst-notes template, and a closing summary. The authorized-testing playbooks (07–08, 15–20) follow the bug-bounty structure instead: overview, MITRE mapping, surface map or defect-class catalog, phased methodology or hunting workflow, anti-patterns, validation discipline, report template, stop conditions, and summary. Written for SOC analysts, IR, detection engineers, and authorized offensive operators. Behavior-based over signature-based; operational clarity over theory.
 
 > **Why the crypto collection.** NIST finalized the first PQ standards in August 2024 (FIPS 203 ML-KEM, FIPS 204 ML-DSA, FIPS 205 SLH-DSA), with FN-DSA (FIPS 206) and the HQC backup KEM following. Hybrid TLS (`X25519MLKEM768`, NamedGroup `0x11EC`) is now default or near-default across Chrome, Firefox, Cloudflare, Akamai, and AWS, and E2EE messengers (Signal PQXDH, iMessage PQ3) ship PQ key establishment in production. The window where "crypto detection" meant "expired certs and weak ciphers" is closed. The dominant risk is now **harvest-now-decrypt-later (HNDL)**, **downgrade of hybrid handshakes**, and **migration-defect classes** introduced while organizations swap primitives under deadline.
 
-A visual index of the detection & response collection is available in [index.html](index.html).
+A visual index of the full library is available in [index.html](index.html).
 
 ---
 
@@ -56,8 +56,14 @@ A visual index of the detection & response collection is available in [index.htm
 | 12 | [Post-Quantum E2EE for Real-Time Media](12-pq-e2ee-realtime-media.md) | WebRTC/DTLS-SRTP, SFrame, MLS calls; downgrade & ghost-participant detection |
 | 13 | [Crypto-Agility & PQ Migration Operations](13-crypto-agility-migration-ops.md) | Agility architecture, wave rollout, rollback gates, algorithm-break runbook |
 | 14 | [Quantum Risk Governance & Compliance](14-quantum-risk-governance.md) | Mosca's inequality, CNSA 2.0 / NSM-10 mandates, evidence-backed reporting |
+| 15 | [Bug Bounty: AI & LLM Attack-Surface Methodology](15-bugbounty-ai-attack-surface-methodology.md) | Trust-boundary mapping, test harness, trial ledgers, security-vs-safety routing |
+| 16 | [Bug Bounty: LLM Application-Layer Defects](16-bugbounty-llm-application-defects.md) | `L1–L14` — prompt injection, RAG scope, output handling, sessions, app authz |
+| 17 | [Bug Bounty: AI Supply Chain & Model Artifacts](17-bugbounty-ai-supply-chain-model-artifacts.md) | `S1–S10` — artifact provenance, registries, pipelines, PQ signing gaps |
+| 18 | [Bug Bounty: Agentic Systems, Tools & the MCP Boundary](18-bugbounty-agentic-systems-mcp.md) | `G1–G12` — tool poisoning, confused deputy, connector scope, autonomy limits |
+| 19 | [Bug Bounty: Model Behavior & Safety-Boundary Testing](19-bugbounty-model-behavior-safety-boundaries.md) | Routing, measurement standard, proof without harm — model-safety channel |
+| 20 | [Bug Bounty: Inference Infrastructure & Multi-Tenant Isolation](20-bugbounty-inference-infrastructure-isolation.md) | `I1–I10` — control plane, tenant routing, caches, quotas, inference transport |
 
-See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named groups, documentation address space, and **rules of engagement** that bind the bug-bounty playbooks (crypto collection 07–08).
+See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named groups, documentation address space, **rules of engagement** (§6) that bind every bug-bounty playbook, the **AI-system testing addendum** (§7) that binds 15–20, and the **defect-class registry and AI evidence notation** (§8).
 
 ---
 
@@ -67,7 +73,7 @@ See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named group
 2. Map data sources to your environment; verify telemetry sufficiency before relying on a detection. PQ/E2EE detection in particular depends on handshake- and key-level visibility that many estates do not yet log — confirm you have it before trusting the absence of alerts.
 3. Translate the JSON-shaped sample logic to your platform (KQL, SPL, EQL, Sigma, etc.); validate on historical data where possible.
 4. Adopt the analyst-notes template into your case-management workflow.
-5. For the bug-bounty playbooks (crypto collection 07–08), do not begin any activity without a signed authorization / program scope on file. GreyNOC operates as the submitting firm; ROE in CONVENTIONS is mandatory.
+5. For the bug-bounty playbooks (crypto collection 07–08 and 15–20), do not begin any activity without a signed authorization / program scope on file. GreyNOC operates as the submitting firm; ROE in CONVENTIONS §6 is mandatory, and §7 adds non-negotiable rules for AI targets — self-scoped tenancy, inert canaries, capped request budgets, trial ledgers, and never generating genuinely harmful content as proof.
 6. Revisit tuning after every confirmed true positive and false positive.
 
 ---
