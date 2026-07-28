@@ -11,8 +11,10 @@ detection lineage in the GreyNOC catalog.
 
 ## MITRE mapping
 
-- **ATLAS** (by name — map to current IDs at deploy): *LLM Prompt Injection*, *Training/Tuning
-  Data Poisoning*, *Model Evasion*, *LLM Plugin/Tool Compromise*, *Model/Output Manipulation*.
+- **ATLAS 2026.06**: *LLM Prompt Injection* (`AML.T0051`), *RAG Poisoning*
+  (`AML.T0070`), *False RAG Entry Injection* (`AML.T0071`), *AI Agent Context Poisoning*
+  (`AML.T0080`), *AI Agent Tool Invocation* (`AML.T0053`), and *AI Agent Tool Poisoning*
+  (`AML.T0110`). Re-map at deployment per [CONVENTIONS §4](CONVENTIONS.md).
 - **ATT&CK**: **T1059** (agent executing commands/code), **T1552** (agent exposing secrets),
   **T1213** (data from information repositories the agent can read), **T1556** (auth-process
   changes an over-permissioned agent could trigger).

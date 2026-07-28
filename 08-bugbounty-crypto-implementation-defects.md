@@ -81,6 +81,86 @@ falsifiable hypothesis per PB-07 Phase 3, and validate on your own scope.
   insecure fallback. Self-scoped.
 - **Maps to:** PB-03/04. **Severity:** medium–high.
 
+### C9 — KEM decapsulation failure and oracle behavior
+- **What:** A decapsulation path exposes whether a ciphertext was valid through error, timing,
+  output shape, retry, or downstream behavior instead of applying the algorithm's required failure
+  handling and implicit rejection behavior.
+- **Recognize:** malformed ciphertext classes produce stable, attributable response differences;
+  the application distinguishes decapsulation failure from later authentication failure.
+- **Confirm (least-impact):** only on your own endpoint/key material, compare a small,
+  pre-registered set of valid and intentionally malformed ciphertexts. Record raw per-trial timing
+  and categorical results. Do not fuzz a shared production endpoint or infer an oracle from two
+  noisy requests.
+- **Maps to:** PB-05/PB-25; NIST SP 800-227. **Severity:** high–critical only when a reliable
+  oracle with a concrete cryptographic consequence is demonstrated.
+
+### C10 — Side-channel, fault and secret-residue exposure
+- **What:** Timing, cache, power, electromagnetic, fault, crash-dump, swap, accelerator-memory, or
+  post-use residue exposes secret-dependent state from key generation, decapsulation, or signing.
+- **Recognize:** secret-dependent timing in a controlled implementation; private seed/key material
+  in an authorized crash dump or freed buffer; one tenant's key material visible in another
+  authorized test partition.
+- **Confirm:** hosted APIs permit only remote, rate-capped timing observation under explicit scope.
+  Local power/fault/cache or memory-residue work requires host/device authorization and isolated
+  lab equipment. Stop at the first secret-bearing minimal proof; never recover a production key.
+- **Maps to:** PB-25; PB-20 `I4`. **Severity:** consequence and attacker position determine score.
+
+### C11 — Encoding, parameter, OID and mode confusion
+- **What:** Verifiers or decapsulators accept non-canonical encodings, wrong parameter sets,
+  mismatched algorithm identifiers/OIDs, incorrect public-key/ciphertext/signature lengths, or
+  confused pure/prehash/context modes.
+- **Recognize:** parser normalizes two encodings to one trust decision; declared and actual
+  parameter sets differ; a key or signature is accepted under the wrong OID or context.
+- **Confirm:** mutate one field at a time in your own signed/encrypted artifact, keeping the
+  expected rejection rule explicit. Acceptance without the required binding is the evidence.
+- **Maps to:** PB-05/PB-10/PB-25. **Severity:** high when it creates acceptance or key-establishment
+  under policy-invalid parameters; low when the effect is only a strictness issue.
+
+### C12 — Hybrid combiner, transcript and domain-separation defects
+- **What:** Classical and PQ secrets are combined without binding algorithm identifiers, roles,
+  transcript, peer identities, context, or protocol domain; order is ambiguous; one component can
+  be replayed or substituted across sessions/protocols.
+- **Recognize:** implementation/spec mismatch; the same component secret or signature verifies in
+  a different role/context; altered negotiation metadata does not change the derived binding.
+- **Confirm:** prefer code/spec review and test vectors. Dynamic proof uses only your own peers and
+  changes one bound input while holding the rest constant. Never transplant another user's traffic.
+- **Maps to:** PB-03/PB-05/PB-09. **Severity:** high–critical if a component can be removed,
+  substituted, or replayed without detection.
+
+### C13 — PQ key and seed lifecycle failures
+- **What:** Seeds/private keys are generated, stored, exported, backed up, rotated, escrowed,
+  destroyed, or restored without the protections their algorithm and use require; public and
+  private material or tenants share unintended seeds.
+- **Recognize:** exportable production signing seeds, identical public keys across independent
+  tenants/installations, no rotation path, plaintext seed in backup/config/log, or destroyed key
+  still usable from a replica.
+- **Confirm:** configuration and your own test keys are the default proof. Compare public
+  fingerprints across your own installations; test revocation/rotation with your own artifact.
+  Never use or export a discovered live production private key.
+- **Maps to:** PB-25/PB-11/PB-13. **Severity:** critical for exposed fleet signing/decapsulation
+  material; medium–high for missing lifecycle controls with a reachable misuse path.
+
+### C14 — Stateful signature state reuse, rollback or exhaustion
+- **What:** LMS/XMSS signing state is cloned, restored, raced, reused, or exhausted, causing a
+  one-time signing index to repeat or the signer to continue after its safe state boundary.
+- **Recognize:** HA nodes or restored backups share a state range; transactional state update is
+  absent; rollback produces a previously used leaf/index; monitoring does not project exhaustion.
+- **Confirm:** only in a vendor-provided test signer or your isolated lab key. Demonstrate repeated
+  state/index metadata without signing harmful or production artifacts. Production evidence should
+  be configuration/state-management proof, not an induced reuse.
+- **Maps to:** PB-11/PB-25. **Severity:** critical if production signing state reuse is proven.
+
+### C15 — Mixed-chain and trust-store migration failures
+- **What:** Classical/PQ/composite certificate or signing chains validate under inconsistent path,
+  trust-anchor, revocation, name-constraint, EKU, or policy rules across clients and gateways.
+- **Recognize:** a PQ/hybrid leaf is accepted through an unintended classical anchor; one path
+  skips revocation or constraints; a proxy and origin reach different trust decisions.
+- **Confirm:** use a private test hierarchy and your own clients/services. Present controlled
+  alternate paths and record the exact path each verifier built. Never introduce a test CA into a
+  shared production trust store.
+- **Maps to:** PB-10/PB-05/PB-26. **Severity:** high when the alternate path bypasses a required
+  trust or identity control.
+
 ## Hunting workflow
 
 1. Pick a class above; write the falsifiable hypothesis (expected-secure behavior + falsifier).
@@ -107,13 +187,20 @@ falsifiable hypothesis per PB-07 Phase 3, and validate on your own scope.
 
 ## Report template
 
-Use the PB-07 report template. Add a `DEFECT-CLASS:` line (C1–C8) and a `PROOF-BAR-MET:` line
+Use the PB-07 report template. Add a `DEFECT-CLASS:` line (C1–C15) and a `PROOF-BAR-MET:` line
 (`reproduced-twice: Y/N`, `self-scoped: Y/N`) so triage can immediately see the evidence quality.
+
+## Stop conditions
+
+The standing [CONVENTIONS §6](CONVENTIONS.md) stop conditions apply. Additionally stop on any
+production private key/seed, real-user plaintext, stateful-signature reuse, shared-service
+degradation, or result that would require continued oracle/side-channel sampling beyond the
+program's written budget. Preserve the minimum evidence and notify the program.
 
 ## Summary
 
 Migration-defect hunting is high-yield right now because organizations are swapping primitives
-fast. Work the catalog by class, hold the C6 randomness/crypto-internals class to an exacting
+fast. Work the C1–C15 catalog by class, hold randomness and crypto-internals classes to an exacting
 proof bar (refuse to speculate), keep every test self-scoped and least-impact, and report only
 reproducible findings with honest, demonstrated impact. That discipline is what separates a
 credible GreyNOC submission from the flood of low-quality "quantum" noise programs are learning

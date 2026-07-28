@@ -2,11 +2,12 @@
 
 ## Overview
 
-Signatures authenticate certificates, tokens, code, and federation trust chains. The PQ
-replacements are **ML-DSA** (FIPS 204, the recommended default — ML-DSA-65), **SLH-DSA**
-(FIPS 205, conservative hash-based backup), and **FN-DSA** (FIPS 206, compact NTRU-lattice
-signatures for bandwidth-constrained signing); **LMS/XMSS** (SP 800-208) are recommended *now*
-for firmware/code-signing. Migration introduces a fresh family of **algorithm-confusion and
+Signatures authenticate certificates, tokens, code, and federation trust chains. The finalized
+PQ replacements are **ML-DSA** (FIPS 204, the recommended default — ML-DSA-65) and
+**SLH-DSA** (FIPS 205, conservative hash-based backup). **Falcon / expected FN-DSA remains
+the selected algorithm for FIPS 206, which is still in development; it is not a completed FIPS
+compliance target.** **LMS/XMSS** (SP 800-208) are recommended *now* for firmware/code-signing.
+Migration introduces a fresh family of **algorithm-confusion and
 downgrade** defects on top of the classic ones. This playbook detects integrity attacks on
 signed material across the JWT/SAML/X.509/code-signing surface during and after PQ migration.
 
@@ -143,3 +144,10 @@ are a verifier *accepting* policy-invalid material and hybrid signatures where o
 half is checked. Bind "what's acceptable" to per-asset policy, treat policy-invalid successes as
 authentication bypass, and hold code-signing to the strictest bar (LMS/XMSS now, PQ/hybrid for
 long-lived artifacts).
+
+## Reference status
+
+FIPS 203/204/205 are final. FIPS 206 and HQC status must be checked against
+[CONVENTIONS §9](CONVENTIONS.md) before a compliance or production-readiness claim is made.
+Draft or experimental Falcon/FN-DSA integrations may be evaluated in authorized test paths, but
+their presence does not establish FIPS approval.

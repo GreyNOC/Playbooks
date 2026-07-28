@@ -264,9 +264,9 @@
     <span class="hero-eyebrow">Security Playbooks · Full Library</span>
     <h1>Detection patterns SOCs <span class="accent">actually run.</span></h1>
     <p class="lede">
-      Two collections from the GreyNOC detection-engineering team — eighteen detection &amp;
-      response playbooks spanning initial access to impact, and twenty on the post-quantum /
-      E2EE cryptographic transition and AI-system security — written for the analysts and
+      Two collections from the GreyNOC detection-engineering team — twenty detection &amp;
+      response playbooks spanning initial access to AI incident recovery, and twenty-seven on the
+      post-quantum / E2EE cryptographic transition and enterprise AI-system security — written for the analysts and
       authorized operators who have to act on them.
     </p>
     <div class="cta-row">
@@ -295,9 +295,9 @@
   <div class="container">
     <h2>Built for the analysts who run them.</h2>
     <p style="color:var(--text-muted); max-width:760px; margin:0;">
-      Every playbook follows the same 13-section format: overview, MITRE ATT&amp;CK mapping, detection strategy,
-      key indicators, sample logic, example data, investigation steps, false positives, tuning,
-      response actions, escalation criteria, analyst-notes template, and summary.
+      Detection playbooks use a consistent operational structure from mapping and telemetry through
+      investigation, response, escalation, and analyst notes. Authorized-testing and governance
+      playbooks use purpose-built workflows, evidence gates, stop conditions, and lifecycle records.
     </p>
     <div class="band-grid">
       <div class="pillar">
@@ -320,7 +320,7 @@
   <div class="container">
     <div class="gallery-head">
       <h2>Detection &amp; Response</h2>
-      <span class="gallery-count">18 playbooks · initial access → impact</span>
+      <span class="gallery-count">20 playbooks · initial access → AI incident recovery</span>
     </div>
     <div class="gallery-grid">
 
@@ -504,11 +504,31 @@
         </div>
       </a>
 
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/19-ai-security-incident-response.md">
+        <div class="gcard-top"><span class="gcard-num">19</span><span class="gcard-cat">AI · Incident Response</span></div>
+        <h3>AI Security Incident Response &amp; Evidence</h3>
+        <p>AI-specific evidence, scoped containment, provider coordination, recovery testing, and incident disclosure.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">AML.T0051</span><span class="chip">T1213</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/20-ai-serving-plane-isolation.md">
+        <div class="gcard-top"><span class="gcard-num">20</span><span class="gcard-cat">AI · Serving</span></div>
+        <h3>AI Serving Plane &amp; Multi-Tenant Isolation</h3>
+        <p>Gateway authorization, cache and batch isolation, artifact routing, quotas, and end-to-end request correlation.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">AML.T0024</span><span class="chip">AML.T0034</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
     </div>
 
     <div class="gallery-head" style="margin-top:56px;">
       <h2>AI · Post-Quantum · E2EE</h2>
-      <span class="gallery-count">20 playbooks · crypto transition, AI security &amp; authorized testing</span>
+      <span class="gallery-count">27 playbooks · crypto transition, enterprise AI security &amp; authorized testing</span>
     </div>
     <div class="gallery-grid">
 
@@ -708,6 +728,76 @@
         <p>Serving control plane, tenant routing, cache leakage, quota controls, and inference-path transport.</p>
         <div class="gcard-foot">
           <div class="mitre-chips"><span class="chip">I1&ndash;I10</span><span class="chip">AML.T0034</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/21-ai-governance-asset-third-party-risk.md">
+        <div class="gcard-top"><span class="gcard-num">21</span><span class="gcard-cat">AI · Governance</span></div>
+        <h3>AI Governance, Asset Inventory &amp; Third-Party Risk</h3>
+        <p>AI-BOM ownership, risk tiers, shadow-AI discovery, approval gates, supplier assurance, and exit planning.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">AI RMF</span><span class="chip">CSF 2.0</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/22-ai-secure-development-tev-v-change-management.md">
+        <div class="gcard-top"><span class="gcard-num">22</span><span class="gcard-cat">AI · Assurance</span></div>
+        <h3>AI Secure Development, TEVV &amp; Change Management</h3>
+        <p>Threat modeling, evaluation gates, immutable releases, change impact, regression, and runtime drift.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">TEVV</span><span class="chip">SDLC</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/23-ai-data-governance-privacy-retention.md">
+        <div class="gcard-top"><span class="gcard-num">23</span><span class="gcard-cat">AI · Data</span></div>
+        <h3>AI Data Governance, Privacy, Retention &amp; DLP</h3>
+        <p>Data flows and derivatives, provider reuse, RAG/memory authorization, deletion propagation, and DLP.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">Privacy</span><span class="chip">DLP</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/24-ai-resilience-continuity-decommissioning.md">
+        <div class="gcard-top"><span class="gcard-num">24</span><span class="gcard-cat">AI · Resilience</span></div>
+        <h3>AI Resilience, Continuity &amp; Decommissioning</h3>
+        <p>Safe degraded modes, scoped kill controls, approved failover, recovery, and complete retirement.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">RTO/RPO</span><span class="chip">Recover</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/25-pq-key-management-data-at-rest.md">
+        <div class="gcard-top"><span class="gcard-num">25</span><span class="gcard-cat">PQ · Key Management</span></div>
+        <h3>PQ Key Management &amp; Data-at-Rest Migration</h3>
+        <p>PQ seed lifecycle, KMS/HSM controls, rewrap and re-encryption waves, backup, recovery, and destruction.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">KMS/HSM</span><span class="chip">HNDL</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/26-pq-enterprise-identity-messaging-trust.md">
+        <div class="gcard-top"><span class="gcard-num">26</span><span class="gcard-cat">PQ · Trust</span></div>
+        <h3>PQ Enterprise Identity, Messaging &amp; Trust</h3>
+        <p>PIV and FIDO, S/MIME, document signing, DNSSEC, RPKI, relying-party validation, and recovery.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">T1553</span><span class="chip">T1600</span></div>
+          <span class="gcard-link">Open <span class="arrow">→</span></span>
+        </div>
+      </a>
+
+      <a class="gcard" href="https://github.com/GreyNOC/Playbooks/blob/main/27-pq-capacity-interoperability-vendor-assurance.md">
+        <div class="gcard-top"><span class="gcard-num">27</span><span class="gcard-cat">PQ · Readiness</span></div>
+        <h3>PQ Capacity, Interoperability &amp; Vendor Assurance</h3>
+        <p>Artifact growth, network and HSM headroom, interop matrices, procurement controls, and dated vendor evidence.</p>
+        <div class="gcard-foot">
+          <div class="mitre-chips"><span class="chip">Interop</span><span class="chip">Supply Chain</span></div>
           <span class="gcard-link">Open <span class="arrow">→</span></span>
         </div>
       </a>

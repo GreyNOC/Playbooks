@@ -409,6 +409,13 @@ CLEANUP:           marker files / memory entries / registered tools planted → 
                    deletion method · removal verified from a clean session: Y/N
 ```
 
+## Stop conditions
+
+Stop on any non-test external action, real credential, third-party data, effect in another user's
+session/cost, uncontrolled delegation, or tool path that cannot be bounded to an inert no-op.
+Disable the test agent if safe, preserve the transcript, and follow
+[CONVENTIONS §6–§7](CONVENTIONS.md).
+
 ## Summary
 
 Work the catalog by class, keep the agent under test least-privileged and fully logged, and hold the

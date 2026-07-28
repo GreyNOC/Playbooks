@@ -33,8 +33,13 @@ AI tooling drives attacker effort toward zero and creates new exposure on the de
 |-----------|----|-------------|
 | LLM Prompt Injection | AML.T0051 | Manipulate model via crafted input. |
 | LLM Jailbreak | AML.T0054 | Bypass model safety controls. |
-| LLM Plugin Compromise | AML.T0053 | Abuse tool/function calls. |
-| Erode Dataset Integrity / Poisoning | AML.T0020 | Tamper with training or RAG corpora. |
+| AI Agent Tool Invocation | AML.T0053 | Abuse tool/function calls. |
+| RAG Poisoning | AML.T0070 | Tamper with retrieval corpora. |
+| False RAG Entry Injection | AML.T0071 | Add malicious retrieval entries. |
+| AI Agent Context Poisoning | AML.T0080 | Persist malicious state in agent context or memory. |
+
+*ATLAS names and IDs are cited against collection 2026.06 per
+[CONVENTIONS §4](CONVENTIONS.md); re-map them when deploying to a later collection.*
 
 ---
 
