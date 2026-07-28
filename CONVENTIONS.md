@@ -13,7 +13,7 @@ before operational use, because this space is still moving.
 | Standard | Name | Basis | Parameter sets | Notes |
 | --- | --- | --- | --- | --- |
 | FIPS 203 | ML-KEM (Kyber) | Module-LWE lattice | 512 / 768 / 1024 | Primary KEM. ML-KEM-768 ciphertext ~1088 B |
-| (2026–27) | HQC | Code-based (quasi-cyclic) | TBD | Backup KEM selected Mar 2025; diversity hedge vs. lattice break |
+| In development (final expected 2027) | HQC | Code-based (quasi-cyclic) | TBD | Backup KEM selected Mar 2025; **not yet a standard**; diversity hedge vs. lattice break |
 
 **Signatures — replaces RSA / ECDSA / EdDSA**
 
@@ -21,15 +21,17 @@ before operational use, because this space is still moving.
 | --- | --- | --- | --- | --- |
 | FIPS 204 | ML-DSA (Dilithium) | Module-LWE/SIS lattice | 44 / 65 / 87 | **ML-DSA-65 is the recommended default.** Sig ~3309 B, pubkey ~1952 B |
 | FIPS 205 | SLH-DSA (SPHINCS+) | Hash-based | many | Conservative backup; large sigs (~7.8–49.9 KB) |
-| FIPS 206 | FN-DSA (Falcon) | NTRU lattice + FFT | — | Compact sigs (~666 B); sampling-sensitive, hardest to implement safely |
+| FIPS 206 (in development) | FN-DSA (Falcon) | NTRU lattice + FFT | — | Selected algorithm and expected standard name; **do not claim FIPS 206 compliance until final publication** |
 | SP 800-208 | LMS / XMSS | Hash-based, stateful | — | Use **now** for firmware/code-signing per NSA guidance |
 
 **Security levels:** L1 ≈ AES-128, L3 ≈ AES-192, L5 ≈ AES-256. Grover halves symmetric
 strength, so for long-retention data prefer **AES-256** and **SHA-384** over AES-128/SHA-256.
 
-**Naming discipline.** Use standardized names (ML-KEM, ML-DSA, SLH-DSA, FN-DSA) in all
-reports, tickets, and findings. Submission names (Kyber, Dilithium, SPHINCS+, Falcon) are
-acceptable only as parenthetical aliases. Never use them alone in a compliance artifact.
+**Naming discipline.** Use standardized names (ML-KEM, ML-DSA, SLH-DSA) in all reports,
+tickets, and findings. Submission names (Kyber, Dilithium, SPHINCS+) are acceptable only as
+parenthetical aliases. For Falcon, write **Falcon / expected FN-DSA (FIPS 206 in development)**
+until FIPS 206 is final. Never represent a selected algorithm, draft, or reserved standard name
+as a completed compliance target.
 
 ---
 
@@ -211,7 +213,7 @@ class ID is globally unambiguous in a report, a ticket, or a triage queue. Never
 
 | Prefix | Range | Owning playbook | Domain |
 | --- | --- | --- | --- |
-| `C` | C1–C8 | PB-08 | Cryptographic implementation & PQ migration defects |
+| `C` | C1–C15 | PB-08 | Cryptographic implementation & PQ migration defects |
 | `L` | L1–L14 | PB-16 | LLM application layer |
 | `S` | S1–S10 | PB-17 | AI supply chain & model artifacts |
 | `G` | G1–G12 | PB-18 | Agentic systems, tools & the MCP boundary |
@@ -254,6 +256,39 @@ rate-limited engagement can afford, a normal-approximation interval is wrong at 
 bare percentage is meaningless. `2/50` is reported as `2/50`, and is still a real finding when
 the consequence is real and the attacker's retry cost is low; severity comes from consequence and
 retry economics, not from the rate alone.
+
+---
+
+## 9. Versioned reference baseline
+
+These sources are the audit baseline for the collection. Record the retrieval date in any
+compliance evidence package and re-check status before deployment:
+
+- [NIST Post-Quantum Cryptography project](https://csrc.nist.gov/Projects/post-quantum-cryptography)
+  — authoritative status for FIPS 203/204/205, FIPS 206 development, HQC selection, and future
+  PQ standards.
+- [NIST SP 800-227](https://csrc.nist.gov/pubs/sp/800/227/final) — KEM construction and
+  implementation guidance.
+- [NIST CSWP 39-upd1](https://doi.org/10.6028/NIST.CSWP.39-upd1) — final June 2026
+  crypto-agility guidance.
+- [IETF ECDHE-MLKEM TLS draft](https://datatracker.ietf.org/doc/draft-ietf-tls-ecdhe-mlkem/)
+  and the [IANA TLS Supported Groups registry](https://www.iana.org/assignments/tls-parameters/)
+  — current protocol status and code points; an Internet-Draft is not an RFC.
+- [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework) and
+  [NIST AI 600-1 GenAI Profile](https://doi.org/10.6028/NIST.AI.600-1) — enterprise AI
+  governance, mapping, measurement, and management baseline.
+- [NIST CSF 2.0](https://doi.org/10.6028/NIST.CSWP.29) — Govern, Identify, Protect, Detect,
+  Respond, and Recover outcomes.
+- [CISA JCDC AI Cybersecurity Collaboration Playbook](https://www.cisa.gov/news-events/alerts/2025/01/14/cisa-releases-jcdc-ai-cybersecurity-collaboration-playbook-and-fact-sheet)
+  — AI incident coordination and information-sharing baseline.
+- [OWASP Top 10 for LLM Applications 2025](https://genai.owasp.org/llm-top-10/) and
+  [OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)
+  — application and agentic risk cross-checks.
+- [Executive Order 14412 fact sheet](https://www.whitehouse.gov/fact-sheets/2026/06/fact-sheet-president-donald-j-trump-secures-the-nation-against-advanced-cryptographic-attacks/)
+  and [OMB M-23-02](https://www.whitehouse.gov/wp-content/uploads/2022/11/M-23-02-M-Memo-on-Migrating-to-Post-Quantum-Cryptography.pdf)
+  — federal PQ migration direction; determine applicability before treating either as binding.
+- [PCI SSC FAQ 1491](https://www.pcisecuritystandards.org/faqs/1491/) — PQ TLS is described as
+  best practice; PCI DSS does not currently impose a general PQ migration mandate.
 
 ---
 

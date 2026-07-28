@@ -186,9 +186,10 @@ Pre-plan it so it is a config action, not a code project:
 1. **Scope from the CBOM (PB-01).** Query every service, key, cert, and call site using the
    broken primitive; rank by exposure and data shelf-life (PB-02).
 2. **Swap by policy, not by code.** Publish a new versioned cipher policy that removes the
-   broken primitive and promotes its pre-selected successor (e.g., ML-KEM→HQC as the
-   code-based diversity hedge, or the mandated ML-DSA parameter set). The provider layer picks
-   it up on config reload — no redeploy for agile services.
+   broken primitive and promotes a pre-selected successor that is finalized, approved for the
+   asset's authority set, implemented, and interoperability-tested. HQC is a future code-based
+   diversity candidate after standardization, not a current emergency compliance target. The
+   provider layer picks the approved successor up on config reload — no redeploy for agile services.
 3. **Wave it, but compressed.** Even in an emergency, run canary → fleet with the health gates
    above; a broken-primitive panic that takes production down helps no one.
 4. **Hardcoded call sites are the incident.** Any site that cannot swap via config is the long
@@ -222,3 +223,10 @@ to a provider layer and versioned policy, roll out hybrid-by-default in waves ga
 not forget the data plane: re-encrypt at-rest data to close the HNDL window (PB-02), keep the
 KMS/HSM ahead of the waves (PB-10), and keep the emergency algorithm-break runbook rehearsed so
 the day a primitive falls is a governed swap (PB-14), not a fire.
+
+## Standards baseline
+
+This playbook operationalizes the final June 2026
+[NIST CSWP 39-upd1](https://doi.org/10.6028/NIST.CSWP.39-upd1). Re-check that publication and
+[CONVENTIONS §9](CONVENTIONS.md) when changing provider boundaries, transition policy, or
+algorithm-break procedures.

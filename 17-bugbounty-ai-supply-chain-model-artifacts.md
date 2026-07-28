@@ -349,6 +349,13 @@ CLEANUP:          artifacts / canaries / cache objects removed: Y/N · what, whe
 UNREMOVABLE:      markers the program must purge (S5 corpus ingress): ____
 ```
 
+## Stop conditions
+
+Stop before loading or executing an untrusted artifact, on any live production credential or
+third-party data, when a write could reach a shared model/registry/serving path, or when provenance
+cannot be assessed without fetching an out-of-scope dependency. Preserve static evidence and
+follow [CONVENTIONS §6–§7](CONVENTIONS.md).
+
 ## Summary
 
 The discipline that makes a submission here credible is narrow and concrete: static-only inspection of

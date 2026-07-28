@@ -373,6 +373,13 @@ CONSUMPTION:      requests: N · tokens: N · est. cost: $N · limit crossed: Y/
 EVIDENCE-BASIS:   demonstrated | argued-from-documentation (state which, per class)
 ```
 
+## Stop conditions
+
+Stop on any real cross-tenant content, production secret or model material, shared-service
+degradation, worker/accelerator access outside explicit host scope, or timing/load experiment that
+would exceed the pre-approved request budget. Preserve correlation identifiers and invoke the
+program contact under [CONVENTIONS §6–§7](CONVENTIONS.md).
+
 ## Summary
 
 The serving plane is high-yield for an unglamorous reason: multi-tenant inference stacks are deployed

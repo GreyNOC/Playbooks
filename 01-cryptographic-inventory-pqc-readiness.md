@@ -22,7 +22,7 @@ feeds every other playbook in the collection.
 
 ## Detection / discovery strategy
 
-Three discovery planes, correlated into one inventory:
+Six discovery planes, correlated into one inventory:
 
 1. **Network plane** — passive observation of negotiated TLS/SSH/IPsec parameters and
    certificate signature algorithms across the estate. Answers "what is actually in use."
@@ -30,6 +30,15 @@ Three discovery planes, correlated into one inventory:
    manifests for crypto primitives, hardcoded algorithm choices, and non-agile call sites.
 3. **Key/PKI plane** — enumeration of certificates, keys, HSM-resident material, and signing
    pipelines, with algorithm and expiry metadata.
+4. **Data-at-rest plane** — databases, object stores, file/block encryption, application
+   envelopes, backups, archives, recovery copies, wrapping chains, and retention dependencies
+   (PB-25).
+5. **Identity/trust plane** — PIV/smart cards, device/workload identity, FIDO/WebAuthn
+   attestation, S/MIME, document signing, DNSSEC, RPKI, timestamping, and every relying party
+   (PB-26).
+6. **Supplier/business-process plane** — SaaS, managed termination, appliances, firmware,
+   outsourced signing, procurement/contract commitments, process owners, and exit dependencies
+   (PB-14/PB-27).
 
 For each discovered crypto asset, compute a **quantum-risk score** from: algorithm class
 (quantum-broken vs. quantum-reduced vs. PQ), data shelf-life it protects, exposure
@@ -120,8 +129,9 @@ a regex misses. Use it as a **triage amplifier feeding human review**, never as 
 
 - Tune at the **scoring/priority** layer, not by suppressing the underlying discovery. Lowering
   a base detector's sensitivity to reduce CBOM noise blinds you to real exposure elsewhere.
-- Re-baseline the CBOM on a fixed cadence (network plane continuously; code plane per build;
-  PKI plane weekly) so "drift" toward weak crypto is itself an alert.
+- Re-baseline the CBOM on a fixed cadence (network continuously; code per build; PKI/key weekly;
+  data-at-rest and identity per change plus monthly reconciliation; suppliers at least quarterly
+  and at renewal) so "drift" toward weak crypto is itself an alert.
 
 ## Response actions
 
@@ -144,7 +154,8 @@ a regex misses. Use it as a **triage amplifier feeding human review**, never as 
 ```
 CBOM-ID:            CBOM-____
 Asset / owner:      ____ / ____
-Plane(s):           [ ] network  [ ] code  [ ] key/PKI
+Plane(s):           [ ] network  [ ] code  [ ] key/PKI  [ ] data-at-rest
+                    [ ] identity/trust  [ ] supplier/business-process
 Algorithm / class:  ____  (quantum-broken | quantum-reduced | pq/hybrid)
 Exposure / shelf:   ____ / ____ yrs    Priority score: ____
 Agility:            config-swappable | hardcoded (call site: ____)
@@ -156,7 +167,8 @@ Disposition:        ticketed | accepted-risk | escalated
 
 ## Summary
 
-The CBOM is the foundation. Build it across network, code, and PKI planes; score every asset
+The CBOM is the foundation. Build it across network, code, key/PKI, data-at-rest,
+identity/trust, and supplier/business-process planes; score every asset
 by algorithm risk × shelf-life × exposure × agility; use LLM-assisted analysis as a reviewed
 triage amplifier, not an oracle. Everything downstream — HNDL prioritization, downgrade
 detection, token integrity, bug-bounty scoping — depends on the accuracy and freshness of

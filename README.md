@@ -2,14 +2,17 @@
 
 Production-grade detection, response, and authorized-testing playbooks authored by the GreyNOC detection-engineering team. The library spans two complementary collections:
 
-- **Detection & Response** — behavior-based SOC playbooks across the intrusion lifecycle, from initial access to impact.
-- **AI · Post-Quantum · E2EE** — playbooks re-centered on the cryptographic transition and on AI-system security: post-quantum (PQ) migration, end-to-end-encrypted (E2EE) protocol security, AI-augmented detection, plus eight dedicated to authorized bug-bounty methodology — two against PQ/E2EE attack surface and six against AI systems (methodology, application layer, supply chain, agentic/MCP boundary, model behavior, and inference infrastructure).
+- **Detection & Response** — behavior-based SOC playbooks across the intrusion lifecycle, from initial access to impact, including AI incident response and inference-serving isolation.
+- **AI · Post-Quantum · E2EE** — 27 playbooks covering the cryptographic transition, E2EE protocol security, enterprise AI governance/development/data/resilience, and eight authorized bug-bounty playbooks — two against PQ/E2EE attack surface and six against AI systems.
 
 Every detection playbook follows the same GreyNOC structure: overview, MITRE ATT&CK / ATLAS mapping, detection strategy, indicators, sample logic, example data, investigation steps, false positives, tuning, response actions, escalation criteria, an analyst-notes template, and a closing summary. The authorized-testing playbooks (07–08, 15–20) follow the bug-bounty structure instead: overview, MITRE mapping, surface map or defect-class catalog, phased methodology or hunting workflow, anti-patterns, validation discipline, report template, stop conditions, and summary. Written for SOC analysts, IR, detection engineers, and authorized offensive operators. Behavior-based over signature-based; operational clarity over theory.
 
-> **Why the crypto collection.** NIST finalized the first PQ standards in August 2024 (FIPS 203 ML-KEM, FIPS 204 ML-DSA, FIPS 205 SLH-DSA), with FN-DSA (FIPS 206) and the HQC backup KEM following. Hybrid TLS (`X25519MLKEM768`, NamedGroup `0x11EC`) is now default or near-default across Chrome, Firefox, Cloudflare, Akamai, and AWS, and E2EE messengers (Signal PQXDH, iMessage PQ3) ship PQ key establishment in production. The window where "crypto detection" meant "expired certs and weak ciphers" is closed. The dominant risk is now **harvest-now-decrypt-later (HNDL)**, **downgrade of hybrid handshakes**, and **migration-defect classes** introduced while organizations swap primitives under deadline.
+> **Why the crypto collection.** NIST finalized the first PQ standards in August 2024 (FIPS 203 ML-KEM, FIPS 204 ML-DSA, FIPS 205 SLH-DSA). Falcon / expected FN-DSA (FIPS 206) remains in development, and HQC has been selected as a backup KEM but is not yet standardized. Hybrid TLS (`X25519MLKEM768`, NamedGroup `0x11EC`) is deployed across major browsers and edge providers while its IETF specification progresses; verify current protocol status before making a standards claim. E2EE messengers (Signal PQXDH, iMessage PQ3) ship PQ key establishment in production. The dominant risks are now **harvest-now-decrypt-later (HNDL)**, **downgrade of hybrid handshakes**, and **migration-defect classes** introduced while organizations swap primitives under deadline.
 
-A visual index of the full library is available in [index.html](index.html).
+A visual index of the full library is available in [index.html](index.html). The current compiled
+AI/PQC/E2EE field reference is
+[output/pdf/GreyNOC_AI_PQC_Playbooks.pdf](output/pdf/GreyNOC_AI_PQC_Playbooks.pdf); rebuild it with
+`node scripts/build_ai_pqc_pdf.mjs`.
 
 ---
 
@@ -35,6 +38,8 @@ A visual index of the full library is available in [index.html](index.html).
 | 16 | [Web Shell](16-web-shell.md) | Post-exploitation implants in the webroot |
 | 17 | [Data Exfiltration](17-data-exfiltration.md) | Staging and egress anomalies to cloud, C2, and alt protocols |
 | 18 | [Ransomware](18-ransomware.md) | Recovery-inhibition precursors and mass-encryption impact |
+| 19 | [AI Security Incident Response & Evidence](19-ai-security-incident-response.md) | AI-specific triage, evidence, containment, provider coordination, and recovery |
+| 20 | [AI Serving Plane & Multi-Tenant Isolation](20-ai-serving-plane-isolation.md) | Gateway authz, cache/batch isolation, model routing, quotas, and inference telemetry |
 
 ---
 
@@ -62,8 +67,15 @@ A visual index of the full library is available in [index.html](index.html).
 | 18 | [Bug Bounty: Agentic Systems, Tools & the MCP Boundary](18-bugbounty-agentic-systems-mcp.md) | `G1–G12` — tool poisoning, confused deputy, connector scope, autonomy limits |
 | 19 | [Bug Bounty: Model Behavior & Safety-Boundary Testing](19-bugbounty-model-behavior-safety-boundaries.md) | Routing, measurement standard, proof without harm — model-safety channel |
 | 20 | [Bug Bounty: Inference Infrastructure & Multi-Tenant Isolation](20-bugbounty-inference-infrastructure-isolation.md) | `I1–I10` — control plane, tenant routing, caches, quotas, inference transport |
+| 21 | [AI Governance, Asset Inventory & Third-Party Risk](21-ai-governance-asset-third-party-risk.md) | AI-BOM, risk tiers, shadow AI, approval, supplier assurance, and lifecycle ownership |
+| 22 | [AI Secure Development, TEVV & Change Management](22-ai-secure-development-tev-v-change-management.md) | Threat modeling, evaluation gates, immutable release identity, regression and drift |
+| 23 | [AI Data Governance, Privacy, Retention & DLP](23-ai-data-governance-privacy-retention.md) | End-to-end AI data flows, provider use, RAG/memory governance, deletion and DLP |
+| 24 | [AI Resilience, Business Continuity & Decommissioning](24-ai-resilience-continuity-decommissioning.md) | Safe degraded modes, scoped kill controls, failover, recovery and complete retirement |
+| 25 | [PQ Key Management & Data-at-Rest Migration](25-pq-key-management-data-at-rest.md) | PQ key/seed lifecycle, KMS/HSM, rewrap/re-encryption, backup and recovery |
+| 26 | [PQ Enterprise Identity, Messaging & Trust Infrastructure](26-pq-enterprise-identity-messaging-trust.md) | PIV/FIDO, S/MIME, document signing, DNSSEC, RPKI and relying-party migration |
+| 27 | [PQ Capacity, Interoperability & Vendor Assurance](27-pq-capacity-interoperability-vendor-assurance.md) | Artifact growth, HSM/network capacity, interop matrix, procurement and vendor evidence |
 
-See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named groups, documentation address space, **rules of engagement** (§6) that bind every bug-bounty playbook, the **AI-system testing addendum** (§7) that binds 15–20, and the **defect-class registry and AI evidence notation** (§8).
+See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named groups, documentation address space, **rules of engagement** (§6) that bind every bug-bounty playbook, the **AI-system testing addendum** (§7) that binds 15–20, the **defect-class registry and AI evidence notation** (§8), and the **versioned reference baseline** (§9).
 
 ---
 

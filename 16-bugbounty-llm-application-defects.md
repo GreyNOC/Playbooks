@@ -364,6 +364,13 @@ ROUTING:        security-queue | PB-19 model-safety — with the §7.1 consequen
 CLEANUP:        canaries / documents / memory entries removed: Y/N — details
 ```
 
+## Stop conditions
+
+Stop on real third-party data, effects outside either self-controlled tenant, uncontrolled memory
+or RAG propagation, live credentials, shared-service degradation, or any proof that would require
+harmful content or an irreversible action. Preserve the minimum evidence and follow
+[CONVENTIONS §6–§7](CONVENTIONS.md).
+
 ## Summary
 
 Nearly everything reportable at this layer reduces to a familiar class — broken access control, injection into
