@@ -140,6 +140,7 @@ a fabrication under the house rule, whether or not the logic itself is sound.
 | Ultrasonic / acoustic covert channels | **None** | **still open** — see §5 |
 | NFC / RFID | **None** | **still open** — see §5 |
 | Power-line / conducted emissions | **None** | **still open** — see §5 |
+| **Below the medium** — the silicon executing the cryptography | **None** | TX-03 (added after this audit; see §7) |
 
 ---
 
@@ -208,6 +209,36 @@ during remediation; see §6.5.)*
    `CONVENTIONS.md` §5/§8.1 edits it carries as a source. The new
    `GreyNOC_Transmission_Physical_Layer_Playbooks.pdf` is 39 pages with 80 outline entries.
 6. Logged residual gaps in §5 above rather than implying the medium is now fully covered.
+
+---
+
+## 7. Addendum — the track extended below the medium (TX-03)
+
+This audit scoped *transmission media*. A subsequent review found the adjacent gap that scoping
+missed: the library had no coverage of the **silicon in which the post-quantum algorithms actually
+execute** — the layer below every medium, where a key is a voltage rather than an integer.
+
+[`TX-03`](TX-03-pq-nanometer-silicon-physical-attack.md) closes it, and carries two findings that
+change positions taken elsewhere in the library:
+
+- **A FIPS 140-3 validated ML-KEM module carries no side-channel assurance.** FIPS 140-3 introduced
+  a "non-invasive security" requirement area; CMVP never populated it. SP 800-140F approves no test
+  metrics, its Revision 1 draft was never finalized, and the Implementation Guidance's Section 8 and
+  Annex F are empty. Any procurement or vendor-assurance artifact (`PB-27`) that treats FIPS
+  validation as evidence of physical resistance is overstating it.
+- **The most damaging published break of a NIST PQC implementation was caused by a compiler and is
+  network-reachable** (CVE-2024-37880, CVSS 7.5, `AV:N`). Constant-time source, variable-time
+  binary. This makes "verify the binary, not the source" a build-pipeline control rather than a
+  research curiosity.
+
+TX-03 also settles the **physical floor** of the track: Planck-scale intrusion is not an attack
+surface, the claim is recorded as a fabrication indicator rather than a threat, and the reproducible
+negative search behind that conclusion is published with it. That question is now closed and should
+not be re-litigated.
+
+TX-03 introduces an evidence-grading convention (`[hw]`/`[sim]`/`[norm]`/`[adv]`/`[relayed]`/
+`[vendor]`) now recorded in `CONVENTIONS.md` §8.1. The residual gaps in §5 above are unaffected —
+TX-03 covers a different axis (depth), not the media still missing.
 
 ---
 

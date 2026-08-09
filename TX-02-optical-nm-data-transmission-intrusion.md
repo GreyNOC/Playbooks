@@ -133,7 +133,7 @@ knowing what the chain does. Transmit side:
 | Supply Chain Compromise: Compromise Hardware Supply Chain | T1195.003 | Enterprise | Initial Access |
 | Exfiltration Over Other Network Medium | T1011 | Enterprise | Exfiltration |
 | Exfiltration Over Physical Medium | T1052 | Enterprise | Exfiltration |
-| Weaken Encryption | T1600 | Enterprise | Defense Evasion |
+| Weaken Encryption | T1600 | Enterprise | Defense Impairment |
 | Network Denial of Service | T1498 | Enterprise | Impact |
 | Network Sniffing | T0842 | ICS | — verify against your ATT&CK version |
 | Adversary-in-the-Middle | T0830 | ICS | — verify against your ATT&CK version |

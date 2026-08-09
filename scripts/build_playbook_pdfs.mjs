@@ -62,13 +62,13 @@ const PUBLICATIONS = [
     key: "transmission",
     docId: "GN-PUB-TXPHY-001",
     fileStem: "GreyNOC_Transmission_Physical_Layer_Playbooks",
-    version: "v1.0.0",
+    version: "v1.1.0",
     publicationDate: "2026-08-09",
     documentTitle: "GreyNOC Transmission & Physical Layer Security Playbooks",
     coverTitleHtml: "Transmission &amp;<br>Physical Layer Playbooks",
     runningTitleHtml: "Transmission &amp; Physical Layer Security Playbooks",
-    subtitleHtml: `Radio-frequency spectrum and nanometer-scale optical media - detection,
-      response, and the coverage audit behind the collection.`,
+    subtitleHtml: `Radio-frequency spectrum, nanometer-scale optical media, and post-quantum
+      cryptography in silicon - detection, response, and the coverage audit behind the collection.`,
     disciplineLabel: "Baseline-derived, locally calibrated",
     noticeHtml: `<strong>Detection is bounded by what you instrument.</strong> Passive interception
       of RF and optical media is undetectable in principle - the control is cryptographic, not
@@ -79,6 +79,7 @@ const PUBLICATIONS = [
       "QAQC-physical-layer-coverage.md",
       "TX-01-rf-spectrum-intrusion.md",
       "TX-02-optical-nm-data-transmission-intrusion.md",
+      "TX-03-pq-nanometer-silicon-physical-attack.md",
       "CONVENTIONS.md",
     ],
   },

@@ -76,7 +76,7 @@ normal signal-quality range.
 | Exfiltration Over Other Network Medium: Exfiltration Over Bluetooth | T1011.001 | Enterprise | Exfiltration |
 | Exfiltration Over Physical Medium | T1052 | Enterprise | Exfiltration |
 | Network Denial of Service | T1498 | Enterprise | Impact |
-| Network Boundary Bridging | T1599 | Enterprise | Defense Evasion |
+| Network Boundary Bridging | T1599 | Enterprise | Defense Impairment |
 | Wireless Compromise | T0860 | ICS | Initial Access |
 | Wireless Sniffing | T0887 | ICS | — verify against your ATT&CK version |
 | Adversary-in-the-Middle | T0830 | ICS | — verify against your ATT&CK version |

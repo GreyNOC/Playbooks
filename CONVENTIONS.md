@@ -126,7 +126,8 @@ mitigations against key-substitution MITM; monitoring them is a detection opport
   (AI · Post-Quantum · E2EE). A playbook in the Detection & Response collection is written `D&R-NN`
   — e.g. `D&R-09` is AI / Automated Agent Abuse, while `PB-09` is PQ VPN, IPsec & SSH. A playbook in
   the Transmission & Physical Layer collection is written `TX-NN` — `TX-01` is RF & radio spectrum,
-  `TX-02` is nanometer-scale optical. Never cite a bare number across collections.
+  `TX-02` is nanometer-scale optical, `TX-03` is PQC at the nanometer scale in silicon. Never cite a
+  bare number across collections.
 
 ---
 
@@ -229,13 +230,21 @@ their findings carry the class of whichever catalog the defect belongs to. **PB-
 *behavior*, which routes to a program's model-safety channel rather than its security queue (§7.1);
 giving those findings a class ID would invite a triager to treat them as security defects.
 
-**The TX (Transmission & Physical Layer) collection owns no prefix either.** `TX-01` and `TX-02` are
-detection and response playbooks, not bug-bounty catalogs; their intrusion classes are descriptive
-(*bend-tap*, *rogue-lambda*, *ROADM/monitor*, *impersonation*, *reception-anomaly*) and are cited by
-name. A registry prefix would invite a triager to read a physical-medium event as an application
-defect. Note also that `C10` in PB-08 covers **computational** side channels — timing, fault, and
-secret residue. Electromagnetic emanation (`TX-01 §5.7`) and optical emission (`TX-02 §6.7`) are
-different physical phenomena and are deliberately not filed under `C10`.
+**The TX (Transmission & Physical Layer) collection owns no prefix either.** `TX-01`, `TX-02` and
+`TX-03` are detection and response playbooks, not bug-bounty catalogs; their intrusion classes are
+descriptive (*bend-tap*, *rogue-lambda*, *ROADM/monitor*, *impersonation*, *reception-anomaly*) and
+are cited by name. A registry prefix would invite a triager to read a physical-medium event as an
+application defect. Note also that `C10` in PB-08 covers **computational** side channels — timing,
+fault, and secret residue. Electromagnetic emanation (`TX-01 §5.7`), optical emission
+(`TX-02 §6.7`), and the silicon-level physical attacks in `TX-03` are different physical phenomena
+and are deliberately not filed under `C10`.
+
+**Evidence grading in the TX track.** `TX-03` grades every cited result — `[hw]` measured on named
+hardware, `[sim]` leakage-model or simulation only, `[norm]` normative standard text, `[adv]`
+advisory standard text, `[relayed]` the citing authors quote a third party, `[vendor]` unaudited
+vendor claim. Any artifact reusing that material carries the grade with it. A `[sim]` result
+tabulated beside a `[hw]` result without its grade visible is a reporting defect, because it
+overstates demonstrated capability — the same fabrication concern §6.3 addresses for findings.
 
 ### 8.2 Canary tokens
 
