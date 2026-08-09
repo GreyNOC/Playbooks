@@ -121,10 +121,12 @@ mitigations against key-substitution MITM; monitoring them is a detection opport
   and **RFC 3849** (`2001:db8::/32`) documentation address space.
 - Identities, domains, and tokens in examples are illustrative and non-attributable.
 - Detection logic is **JSON-shaped pseudocode**, not a SIEM query. Translate per platform.
-- **Cross-reference notation.** The two collections number independently, so `PB-NN` always means
-  *this* collection (AI · Post-Quantum · E2EE). A playbook in the Detection & Response collection is
-  written `D&R-NN` — e.g. `D&R-09` is AI / Automated Agent Abuse, while `PB-09` is PQ VPN, IPsec
-  & SSH. Never cite a bare number across collections.
+- **Cross-reference notation.** The library holds **three independently numbered collections**, so a
+  bare number is never a valid citation. `PB-NN` always means *this* collection
+  (AI · Post-Quantum · E2EE). A playbook in the Detection & Response collection is written `D&R-NN`
+  — e.g. `D&R-09` is AI / Automated Agent Abuse, while `PB-09` is PQ VPN, IPsec & SSH. A playbook in
+  the Transmission & Physical Layer collection is written `TX-NN` — `TX-01` is RF & radio spectrum,
+  `TX-02` is nanometer-scale optical. Never cite a bare number across collections.
 
 ---
 
@@ -226,6 +228,14 @@ Three playbooks own no prefix by design. **PB-07** and **PB-15** are methodology
 their findings carry the class of whichever catalog the defect belongs to. **PB-19** covers model
 *behavior*, which routes to a program's model-safety channel rather than its security queue (§7.1);
 giving those findings a class ID would invite a triager to treat them as security defects.
+
+**The TX (Transmission & Physical Layer) collection owns no prefix either.** `TX-01` and `TX-02` are
+detection and response playbooks, not bug-bounty catalogs; their intrusion classes are descriptive
+(*bend-tap*, *rogue-lambda*, *ROADM/monitor*, *impersonation*, *reception-anomaly*) and are cited by
+name. A registry prefix would invite a triager to read a physical-medium event as an application
+defect. Note also that `C10` in PB-08 covers **computational** side channels — timing, fault, and
+secret residue. Electromagnetic emanation (`TX-01 §5.7`) and optical emission (`TX-02 §6.7`) are
+different physical phenomena and are deliberately not filed under `C10`.
 
 ### 8.2 Canary tokens
 
