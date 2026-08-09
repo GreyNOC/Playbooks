@@ -1,18 +1,27 @@
 # GreyNOC Security Playbooks
 
-Production-grade detection, response, and authorized-testing playbooks authored by the GreyNOC detection-engineering team. The library spans two complementary collections:
+Production-grade detection, response, and authorized-testing playbooks authored by the GreyNOC detection-engineering team. The library spans three complementary collections:
 
 - **Detection & Response** — behavior-based SOC playbooks across the intrusion lifecycle, from initial access to impact, including AI incident response and inference-serving isolation.
 - **AI · Post-Quantum · E2EE** — 27 playbooks covering the cryptographic transition, E2EE protocol security, enterprise AI governance/development/data/resilience, and eight authorized bug-bounty playbooks — two against PQ/E2EE attack surface and six against AI systems.
+- **Transmission & Physical Layer** — 2 playbooks covering the media everything else runs on: radio-frequency spectrum and nanometer-scale optical. Where the adversary never touches a network port, and where harvest-now-decrypt-later capture actually happens.
 
 Every detection playbook follows the same GreyNOC structure: overview, MITRE ATT&CK / ATLAS mapping, detection strategy, indicators, sample logic, example data, investigation steps, false positives, tuning, response actions, escalation criteria, an analyst-notes template, and a closing summary. The authorized-testing playbooks (07–08, 15–20) follow the bug-bounty structure instead: overview, MITRE mapping, surface map or defect-class catalog, phased methodology or hunting workflow, anti-patterns, validation discipline, report template, stop conditions, and summary. Written for SOC analysts, IR, detection engineers, and authorized offensive operators. Behavior-based over signature-based; operational clarity over theory.
 
 > **Why the crypto collection.** NIST finalized the first PQ standards in August 2024 (FIPS 203 ML-KEM, FIPS 204 ML-DSA, FIPS 205 SLH-DSA). Falcon / expected FN-DSA (FIPS 206) remains in development, and HQC has been selected as a backup KEM but is not yet standardized. Hybrid TLS (`X25519MLKEM768`, NamedGroup `0x11EC`) is deployed across major browsers and edge providers while its IETF specification progresses; verify current protocol status before making a standards claim. E2EE messengers (Signal PQXDH, iMessage PQ3) ship PQ key establishment in production. The dominant risks are now **harvest-now-decrypt-later (HNDL)**, **downgrade of hybrid handshakes**, and **migration-defect classes** introduced while organizations swap primitives under deadline.
 
-A visual index of the full library is available in [index.html](index.html). The current compiled
-AI/PQC/E2EE field reference is
-[output/pdf/GreyNOC_AI_PQC_Playbooks.pdf](output/pdf/GreyNOC_AI_PQC_Playbooks.pdf); rebuild it with
-`node scripts/build_ai_pqc_pdf.mjs`.
+A visual index of the full library is available in [index.html](index.html). Two compiled field
+references are published:
+
+| Publication | Key | Contents |
+| --- | --- | --- |
+| [GreyNOC_AI_PQC_Playbooks.pdf](output/pdf/GreyNOC_AI_PQC_Playbooks.pdf) | `ai-pqc` | The AI · Post-Quantum · E2EE collection, three AI D&R playbooks, and `CONVENTIONS.md` |
+| [GreyNOC_Transmission_Physical_Layer_Playbooks.pdf](output/pdf/GreyNOC_Transmission_Physical_Layer_Playbooks.pdf) | `transmission` | The Transmission & Physical Layer collection, its coverage audit, and `CONVENTIONS.md` |
+
+Rebuild both with `node scripts/build_playbook_pdfs.mjs`, one with
+`node scripts/build_playbook_pdfs.mjs <key>`, or list the available publications with
+`node scripts/build_playbook_pdfs.mjs --list`. Adding a collection means adding an entry to the
+`PUBLICATIONS` array in that script — the Markdown-to-PDF pipeline itself is shared.
 
 ---
 
@@ -74,6 +83,29 @@ AI/PQC/E2EE field reference is
 | 25 | [PQ Key Management & Data-at-Rest Migration](25-pq-key-management-data-at-rest.md) | PQ key/seed lifecycle, KMS/HSM, rewrap/re-encryption, backup and recovery |
 | 26 | [PQ Enterprise Identity, Messaging & Trust Infrastructure](26-pq-enterprise-identity-messaging-trust.md) | PIV/FIDO, S/MIME, document signing, DNSSEC, RPKI and relying-party migration |
 | 27 | [PQ Capacity, Interoperability & Vendor Assurance](27-pq-capacity-interoperability-vendor-assurance.md) | Artifact growth, HSM/network capacity, interop matrix, procurement and vendor evidence |
+
+---
+
+## Transmission & Physical Layer Playbooks
+
+The media every other playbook assumes and none of them examined. Both are detection-and-response
+playbooks; neither is a bug-bounty playbook, and neither owns a defect-class prefix.
+
+| #  | Playbook | Focus |
+| --- | --- | --- |
+| TX-01 | [RF & Radio-Spectrum Intrusion](TX-01-rf-spectrum-intrusion.md) | Wi-Fi, BLE, cellular, GNSS spoofing, LPWAN implants, jamming, backhaul; RF-BOM and sensing tiers |
+| TX-02 | [Nanometer-Scale Optical Data Transmission, Reception & Intrusion Handling](TX-02-optical-nm-data-transmission-intrusion.md) | Optical create/receive chain, fiber tapping, ROADM abuse, rogue wavelengths, FSO/laser links, optical air-gap channels |
+
+Two structural limits are stated in both playbooks and should be carried into any report built on
+them: **passive interception is undetectable in principle** (the answer is cryptographic, not
+telemetric), and **detection is bounded by the bands and spans you actually instrument** — an empty
+alert queue for an uninstrumented medium is a coverage gap, not a clean result.
+
+The physical-layer coverage audit that produced this collection, including the reproducible term
+sweep and the residual gaps it does **not** close, is in
+[QAQC-physical-layer-coverage.md](QAQC-physical-layer-coverage.md).
+
+---
 
 See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named groups, documentation address space, **rules of engagement** (§6) that bind every bug-bounty playbook, the **AI-system testing addendum** (§7) that binds 15–20, the **defect-class registry and AI evidence notation** (§8), and the **versioned reference baseline** (§9).
 
