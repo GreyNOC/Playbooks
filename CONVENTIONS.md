@@ -75,9 +75,37 @@ mitigations against key-substitution MITM; monitoring them is a detection opport
 
 ## 4. MITRE mapping conventions
 
-- **ATT&CK** technique IDs are referenced where an enterprise technique applies
-  (e.g., T1040 Network Sniffing, T1557 Adversary-in-the-Middle, T1600 Weaken Encryption,
-  T1556 Modify Authentication Process, T1110 Brute Force, T1552 Unsecured Credentials).
+- **ATT&CK** is referenced as **name + ID + content version**, on the same terms as ATLAS below —
+  e.g. *Weaken Encryption* (`T1600`, ATT&CK Enterprise v19.2). **Technique names, technique IDs,
+  and tactic assignments all change between versions**, so none of the three is cited bare, and
+  every playbook carrying an ATT&CK mapping table states the version it was verified against in a
+  *Mapping discipline* note directly under the table.
+  - The tables in this library are verified against **ATT&CK Enterprise v19.2** (site content
+    v19.2, website v5.0.0), checked against `attack.mitre.org` on **2026-08-09**.
+  - **v19 retired the "Defense Evasion" tactic.** `TA0005` was renamed to **Stealth**, and a new
+    **`TA0112` Defense Impairment** was split out of it. Concealment stayed on the Stealth side
+    (`T1027`, `T1070`, `T1620`, `T1564.008`, `T1134`, `T1542.001`, `T1078`); tampering with the
+    controls themselves moved to Defense Impairment (`T1553` and its sub-techniques, `T1556`,
+    `T1484`, `T1599`, `T1600`, `T1601`). **Neither substitution is automatic** — see the next two
+    bullets. Any artifact still carrying a "Defense Evasion" tag is mapped against a pre-v19
+    collection and must be re-mapped.
+  - **v19 renumbered and renamed techniques, not just tactics.** `T1562 Impair Defenses` no longer
+    exists: the concept was elevated to the Defense Impairment *tactic*, and its tool-tampering
+    sub-technique was promoted to the top-level **`T1685 Disable or Modify Tools`**.
+    `T1070.001 Indicator Removal: Clear Windows Event Logs` was renumbered and reparented to
+    **`T1685.005 Disable or Modify Tools: Clear Windows Event Logs`** (parent `T1070 Indicator
+    Removal` still exists, under Stealth). `T1484` was renamed **Domain or Tenant Policy
+    Modification**, and `T1484.002` to **Trust Modification**. `attack.mitre.org` redirects a
+    retired ID to its replacement — that redirect is the authoritative remapping.
+  - **v19 also *removed* a tactic from some techniques rather than renaming it.** `T1550.001`,
+    `T1550.002`, and `T1550.003` are now **Lateral Movement only**; rewriting their old
+    "Defense Evasion / Lateral Movement" tag as "Stealth / …" would be wrong. Verify each
+    technique individually; never sweep a rename across a table.
+  - A table may cite a **subset** of a technique's tactics — the one operative for that playbook —
+    provided the cited tactic is still assigned in the stated version. Say so in the note so the
+    subset is not later "corrected" into an error.
+  - ICS techniques (`T0xxx`) use the ICS tactic set, which is distinct from Enterprise; cite the
+    ICS tactic and re-verify separately.
 - **ATLAS** is referenced as **name + ID + collection version** — e.g. *LLM Prompt Injection*
   (`AML.T0051`, ATLAS 2026.06). **Both the ID and the name are versioned and both do change**, so
   neither is cited bare: the collection version is what makes a citation checkable. Any playbook
@@ -93,8 +121,10 @@ mitigations against key-substitution MITM; monitoring them is a detection opport
     name: `AML.T0010` is *AI Supply Chain Compromise*, `AML.T0018` is *Manipulate AI Model*
     (formerly *Backdoor ML Model*), `AML.T0053` is *AI Agent Tool Invocation* (formerly *LLM Plugin
     Compromise*), and `AML.T0014` is *Discover AI Model Family* — **not** the older *Discover ML
-    Artifacts*, which is a different concept. Pre-2026.06 artifacts in this library (D&R-09) still
-    carry the older names; re-map them before reuse rather than assuming they match.
+    Artifacts*, which is a different concept. Every ATLAS-citing playbook in this library has been
+    re-mapped to the 2026.06 names and states the collection it was written against; treat any
+    artifact that does neither as pre-2026.06 and re-map it before reuse rather than assuming the
+    names match.
   - **2026.06 added purpose-built RAG and agentic techniques — map to them instead of forcing an
     older tag** (§4's "say so rather than forcing a tag" cuts both ways). The ones this collection
     leans on: *RAG Poisoning* (`AML.T0070`), *False RAG Entry Injection* (`AML.T0071`), *Data from

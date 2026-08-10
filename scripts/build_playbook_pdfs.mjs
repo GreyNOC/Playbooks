@@ -13,8 +13,8 @@ const PUBLICATIONS = [
     key: "ai-pqc",
     docId: "GN-PUB-AIPQC-001",
     fileStem: "GreyNOC_AI_PQC_Playbooks",
-    version: "v2.0.0",
-    publicationDate: "2026-07-27",
+    version: "v2.1.0",
+    publicationDate: "2026-08-09",
     documentTitle: "GreyNOC AI, Post-Quantum & E2EE Security Playbooks",
     coverTitleHtml: "AI, Post-Quantum &amp;<br>E2EE Security Playbooks",
     runningTitleHtml: "AI, Post-Quantum &amp; E2EE Security Playbooks",
@@ -23,7 +23,10 @@ const PUBLICATIONS = [
     disciplineLabel: "Evidence-backed, authorized use",
     noticeHtml: `<strong>Authorized testing only.</strong> Bug-bounty sections are bound by
       CONVENTIONS Sections 6-8. Standards and regulatory status must be re-verified against the
-      versioned reference baseline before operational or compliance use.`,
+      versioned reference baseline before operational or compliance use. MITRE mappings are pinned
+      to <strong>ATT&amp;CK Enterprise v19.2</strong> and <strong>ATLAS collection 2026.06</strong>;
+      both frameworks version their technique names, IDs, and tactic assignments, so re-map to the
+      collections your platform carries (CONVENTIONS Section 4).`,
     sources: [
       "09-ai-automated-agent-abuse.md",
       "19-ai-security-incident-response.md",
@@ -62,7 +65,7 @@ const PUBLICATIONS = [
     key: "transmission",
     docId: "GN-PUB-TXPHY-001",
     fileStem: "GreyNOC_Transmission_Physical_Layer_Playbooks",
-    version: "v1.1.0",
+    version: "v1.2.0",
     publicationDate: "2026-08-09",
     documentTitle: "GreyNOC Transmission & Physical Layer Security Playbooks",
     coverTitleHtml: "Transmission &amp;<br>Physical Layer Playbooks",
@@ -74,7 +77,10 @@ const PUBLICATIONS = [
       of RF and optical media is undetectable in principle - the control is cryptographic, not
       telemetric. Every threshold in these playbooks is a deviation from a locally recorded
       baseline; published absolute values are not portable between sites. An empty alert queue for
-      an uninstrumented band or span is a coverage gap, not a clean result.`,
+      an uninstrumented band or span is a coverage gap, not a clean result. MITRE mappings are
+      pinned to <strong>ATT&amp;CK v19.2</strong> (Enterprise and ICS); the ICS tactic set is
+      distinct from Enterprise, and both version their technique names, IDs, and tactic
+      assignments - re-map to the collection your platform carries (CONVENTIONS Section 4).`,
     sources: [
       "QAQC-physical-layer-coverage.md",
       "TX-01-rf-spectrum-intrusion.md",

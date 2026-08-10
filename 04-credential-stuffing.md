@@ -20,6 +20,13 @@ Credential stuffing is the dominant attack against consumer-facing logins, custo
 | Valid Accounts | T1078 | Initial Access / Persistence |
 | Account Access Removal | T1531 | Impact (post-takeover) |
 
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. All three rows are current. `T1078` cites the two tactics operative
+> for a takeover; its full v19.2 assignment also includes **Stealth** and **Privilege Escalation**.
+> The version is stated because v19 retired the "Defense Evasion" tactic — TA0005 was renamed
+> **Stealth** and **TA0112 Defense Impairment** was split out — and renumbered several techniques.
+> Re-verify against the version your platform carries.
+
 ---
 
 ### 3. Detection Strategy

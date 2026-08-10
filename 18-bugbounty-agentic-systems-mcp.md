@@ -83,7 +83,10 @@ defensive twin cited below is [D&R-09 AI / Automated Agent Abuse](09-ai-automate
 | Confused deputy (delegation) | — | Named pattern behind G3; no single technique ID is cited for it |
 | Tool namespace shadowing | — | Named pattern behind G5 |
 
-*Cited against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names
+*ATT&CK citations in this table were verified against ATT&CK Enterprise v19.2 on 2026-08-09. v19
+retired the "Defense Evasion" tactic — TA0005 was renamed Stealth and TA0112 Defense Impairment was
+split out — and renumbered several techniques, so ATT&CK carries its own stated version exactly as
+ATLAS does. Cited against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names
 are both versioned — re-map to your platform's collection at deployment. Techniques without a cited
 ID appear by name only. Where an ID is cited to support severity or plausibility, quote that
 technique's `maturity` value from your collection rather than implying in-the-wild use (§4).*

@@ -19,6 +19,14 @@ Spraying remains a primary initial-access technique against identity providers (
 | Brute Force: Password Spraying | T1110.003 | Credential Access |
 | Valid Accounts | T1078 | Initial Access / Persistence |
 
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. Both rows are current. `T1078` cites the two tactics operative for a
+> spray; its full v19.2 assignment also includes **Stealth** and **Privilege Escalation**, so the
+> pair here is a deliberate subset, not an omission. The version is stated because v19 retired the
+> "Defense Evasion" tactic — TA0005 was renamed **Stealth** and **TA0112 Defense Impairment** was
+> split out — and renumbered several techniques. Re-verify against the version your platform
+> carries.
+
 ---
 
 ### 3. Detection Strategy

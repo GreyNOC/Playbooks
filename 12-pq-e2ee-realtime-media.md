@@ -28,6 +28,13 @@ PQ/hybrid is expected, E2EE-to-transport downgrade, participant key-substitution
 - **T1556** — Modify Authentication Process (subverting the participant-verification / roster
   trust step that gates who holds the media key).
 
+> **Mapping discipline (`CONVENTIONS §4`).** Verified against **ATT&CK Enterprise v19.2** on
+> **2026-08-09**. All names and IDs are current. Tactics: `T1557` **Credential Access,
+> Collection**; `T1040` **Credential Access, Discovery**; `T1600` **Defense Impairment**; `T1556`
+> **Defense Impairment, Persistence, Credential Access**. `TA0112 Defense Impairment` is the
+> tactic v19 split out when it retired "Defense Evasion" — TA0005 became **Stealth**. Re-verify
+> against the version your platform carries.
+
 ## Detection strategy
 
 The media crypto is improving; **who holds the key** and **whether PQ was actually negotiated**

@@ -21,6 +21,13 @@ vulnerable exposure of long-shelf-life data* as a standing finding from the CBOM
   (bulk ciphertext leaving the estate to be stored for later decryption).
 - **T1600** — Weaken Encryption (forcing classical-only so harvested traffic is future-decryptable).
 
+> **Mapping discipline (`CONVENTIONS §4`).** Verified against **ATT&CK Enterprise v19.2** on
+> **2026-08-09**. All names and IDs are current. Tactics: `T1040` **Credential Access, Discovery**;
+> `T1557` **Credential Access, Collection**; `T1074` **Collection**; `T1041` and `T1567`
+> **Exfiltration**; `T1600` **Defense Impairment** (`TA0112`), the tactic v19 split out when it
+> retired "Defense Evasion" — TA0005 became **Stealth**. Re-verify against the version your
+> platform carries.
+
 ## Detection strategy
 
 Two complementary detectors plus one posture signal:

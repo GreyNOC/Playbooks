@@ -192,11 +192,13 @@ Two entries deserve emphasis because both have caused published errors:
 | Forge Web Credentials | T1606 | Enterprise | Credential Access |
 
 > **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
-> v19.2**. That version matters: **v19 retired the "Defense Evasion" tactic**, renaming TA0005 to
-> **Stealth** and splitting out **TA0112 Defense Impairment**. Any artifact carrying a
-> "Defense Evasion" tag for `T1600`, `T1553.002` or `T1599` is mapped against a pre-v19 collection
-> and must be re-mapped, exactly as `CONVENTIONS §4` requires for ATLAS. Re-verify against the
-> version your platform carries.
+> v19.2** on **2026-08-09**, row by row. That version matters: **v19 retired the "Defense Evasion"
+> tactic**, renaming TA0005 to **Stealth** and splitting out **TA0112 Defense Impairment**. Any
+> artifact carrying a "Defense Evasion" tag for `T1600`, `T1553.002` or `T1599` is mapped against a
+> pre-v19 collection and must be re-mapped, exactly as `CONVENTIONS §4` requires for ATLAS. Note
+> that `T1542.001` and `T1553.002` landed on **opposite sides** of that split, so neither can be
+> inferred from the other — and that v19 also renumbered techniques outright (`T1562` and
+> `T1070.001` no longer exist). Re-verify against the version your platform carries.
 
 **Deliberately unmapped.** Per `CONVENTIONS §4`, these have no clean technique and are described
 rather than tagged: **side-channel key extraction** (power/EM/timing/photonic — `T1552.004` covers

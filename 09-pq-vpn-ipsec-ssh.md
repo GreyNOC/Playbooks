@@ -33,6 +33,13 @@ the hybrid-group story from PB-03 — this playbook does not re-derive it.
   (a proxy that wasn't configured for PPK is misconfiguration, not an intrusion). Per CONVENTIONS
   §4, we say so rather than force a tag.
 
+> **Mapping discipline (`CONVENTIONS §4`).** Verified against **ATT&CK Enterprise v19.2** on
+> **2026-08-09**. All names and IDs are current. Tactics: `T1600` and `T1600.001` **Defense
+> Impairment** (`TA0112`, the tactic v19 split out when it retired "Defense Evasion" — TA0005
+> became **Stealth**); `T1557` **Credential Access, Collection**; `T1040` **Credential Access,
+> Discovery**; `T1021.004` **Lateral Movement**; `T1133` **Persistence, Initial Access**.
+> Re-verify against the version your platform carries.
+
 ## Detection strategy
 
 Compare **negotiated** tunnel crypto against a per-endpoint policy baseline (from PB-01's CBOM),

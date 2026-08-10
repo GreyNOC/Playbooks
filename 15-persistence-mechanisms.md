@@ -25,6 +25,13 @@ The detection problem is volume, not visibility. Task creation (4698), service i
 | Account Manipulation | T1098 | Persistence / Privilege Escalation |
 | Scheduled Task/Job: Cron | T1053.003 | Persistence / Privilege Escalation |
 
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. All eight rows are current. `T1053.005` and `T1053.003` cite the two
+> tactics operative for persistence hunting; both also carry **Execution** in v19.2, so that pair
+> is a deliberate subset. The version is stated because v19 retired the "Defense Evasion" tactic —
+> TA0005 was renamed **Stealth** and **TA0112 Defense Impairment** was split out — and renumbered
+> several techniques. Re-verify against the version your platform carries.
+
 ---
 
 ### 3. Detection Strategy

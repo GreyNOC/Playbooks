@@ -78,13 +78,18 @@ normal signal-quality range.
 | Network Denial of Service | T1498 | Enterprise | Impact |
 | Network Boundary Bridging | T1599 | Enterprise | Defense Impairment |
 | Wireless Compromise | T0860 | ICS | Initial Access |
-| Wireless Sniffing | T0887 | ICS | — verify against your ATT&CK version |
-| Adversary-in-the-Middle | T0830 | ICS | — verify against your ATT&CK version |
+| Wireless Sniffing | T0887 | ICS | Discovery, Collection |
+| Adversary-in-the-Middle | T0830 | ICS | Collection |
 | Denial of Service | T0814 | ICS | Inhibit Response Function |
 
-> **Mapping discipline (`CONVENTIONS §4`).** ICS tactic placement differs from Enterprise and both
-> IDs and tactic assignments move between ATT&CK versions. Re-verify every row against the version
-> your platform carries before you tag a detection with it.
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK v19.2**
+> (Enterprise and ICS) on **2026-08-09**. **v19 retired the "Defense Evasion" tactic**, renaming
+> TA0005 to **Stealth** and splitting out **TA0112 Defense Impairment**; `T1599` landed on the
+> Defense Impairment side, because bridging a network boundary tampers with the control rather
+> than hiding from it. The ICS rows previously left as "verify against your ATT&CK version" are
+> now filled in from the same check — ICS tactic placement is a **separate tactic set** from
+> Enterprise and still has to be re-verified on its own terms. Re-verify every row against the
+> version your platform carries before you tag a detection with it.
 
 **Deliberately unmapped.** The following have no clean ATT&CK technique, and this playbook says so
 rather than forcing a tag: **RF jamming as a distinct technique** (`T1498` describes network-layer

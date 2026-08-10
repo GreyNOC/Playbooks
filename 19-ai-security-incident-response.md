@@ -29,7 +29,10 @@ serving-plane isolation failures, or material model-safety events with a securit
 | Valid Accounts / Unsecured Credentials | T1078 / T1552 | Compromised identities or inference keys |
 | Data from Information Repositories | T1213 | RAG, vector, training, prompt, or transcript stores |
 
-ATLAS citations use collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md).
+ATLAS citations use collection 2026.06, and ATT&CK citations **ATT&CK Enterprise v19.2** (verified
+2026-08-09), per [CONVENTIONS §4](CONVENTIONS.md). This table has no tactic column, so v19's
+retirement of "Defense Evasion" does not reach it, but the ATT&CK names and IDs above were
+re-verified against v19.2. Re-verify against the versions your platform carries.
 
 ### 3. Preconditions and Readiness
 

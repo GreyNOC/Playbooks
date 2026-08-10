@@ -24,6 +24,12 @@ The second major driver is the insider: a departing employee copying customer li
 | Data Transfer Size Limits | T1030 | Exfiltration |
 | Automated Exfiltration | T1020 | Exfiltration |
 
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. All seven rows are current, with names, IDs, and tactics matching
+> exactly — no row carries a subset. The version is stated because v19 retired the "Defense
+> Evasion" tactic — TA0005 was renamed **Stealth** and **TA0112 Defense Impairment** was split out
+> — and renumbered several techniques. Re-verify against the version your platform carries.
+
 ---
 
 ### 3. Detection Strategy

@@ -21,11 +21,19 @@ AI tooling drives attacker effort toward zero and creates new exposure on the de
 |-----------|----|--------|
 | Brute Force: Credential Stuffing | T1110.004 | Credential Access |
 | Phishing | T1566 | Initial Access |
-| Spearphishing via Service | T1566.003 | Initial Access |
+| Phishing: Spearphishing via Service | T1566.003 | Initial Access |
 | Active Scanning | T1595 | Reconnaissance |
 | Gather Victim Identity Information | T1589 | Reconnaissance |
 | Application Layer Protocol: Web Protocols | T1071.001 | Command and Control |
 | Exfiltration Over Web Service | T1567 | Exfiltration |
+
+> **Mapping discipline (`CONVENTIONS §4`).** This ATT&CK table was verified against **ATT&CK
+> Enterprise v19.2** on **2026-08-09**. All seven rows are current; `T1566.003` was relabelled to
+> its full ATT&CK name, **Phishing: Spearphishing via Service**. The version is stated because v19
+> retired the "Defense Evasion" tactic — TA0005 was renamed **Stealth** and **TA0112 Defense
+> Impairment** was split out — and renumbered several techniques. ATT&CK and ATLAS version
+> independently; each needs its own stated collection. Re-verify against the versions your
+> platform carries.
 
 **MITRE ATLAS** (for AI-system-specific techniques):
 

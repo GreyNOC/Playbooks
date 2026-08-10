@@ -23,6 +23,13 @@ These techniques are the pivot point of almost every domain compromise. They con
 | Steal or Forge Kerberos Tickets: Kerberoasting | T1558.003 | Credential Access |
 | Steal or Forge Kerberos Tickets: AS-REP Roasting | T1558.004 | Credential Access |
 
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. All six rows are current, with names, IDs, and tactics matching
+> exactly — every technique here is Credential Access only, so no row carries a subset. The
+> version is stated because v19 retired the "Defense Evasion" tactic — TA0005 was renamed
+> **Stealth** and **TA0112 Defense Impairment** was split out — and renumbered several techniques.
+> Re-verify against the version your platform carries.
+
 ---
 
 ### 3. Detection Strategy

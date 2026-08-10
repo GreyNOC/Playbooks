@@ -14,8 +14,15 @@ that silently disable PQ protection.
 
 - **T1600** — Weaken Encryption (forcing classical-only key exchange).
 - **T1557** — Adversary-in-the-Middle (in-path manipulation of `ClientHello`/`ServerHello`).
-- **T1562** — Impair Defenses (misconfiguration that disables PQ negotiation as a "defense").
+- **T1685** — Disable or Modify Tools (misconfiguration that disables PQ negotiation as a "defense").
 - Downstream link to **T1040** Network Sniffing / HNDL (PB-02) — the payoff of a successful downgrade.
+
+> **Mapping discipline (`CONVENTIONS §4`).** Verified against **ATT&CK Enterprise v19.2** on
+> **2026-08-09**. `T1600` and `T1685` both sit under **TA0112 Defense Impairment**, the tactic v19
+> split out when it retired "Defense Evasion" (TA0005 became **Stealth**). `T1562 Impair Defenses`,
+> which this section previously cited, **no longer exists** — v19 elevated it to that tactic and
+> promoted its tool-tampering sub-technique to the top-level `T1685`. Re-verify against the version
+> your platform carries.
 
 ## Detection strategy
 

@@ -21,9 +21,20 @@ The detection priority is therefore inverted from intuition: **precursors are wo
 | Data Encrypted for Impact | T1486 | Impact |
 | Inhibit System Recovery | T1490 | Impact |
 | Service Stop | T1489 | Impact |
-| Impair Defenses: Disable or Modify Tools | T1562.001 | Defense Evasion |
+| Disable or Modify Tools | T1685 | Defense Impairment |
 | File and Directory Discovery | T1083 | Discovery |
 | Remote Services: SMB/Windows Admin Shares | T1021.002 | Lateral Movement |
+
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. That version matters: **v19 retired the "Defense Evasion" tactic**,
+> renaming TA0005 to **Stealth** and splitting out **TA0112 Defense Impairment**. Defensive-tool
+> tampering — the precursor §3 leans on — landed on the **Defense Impairment** side of that split,
+> and it was **renumbered as well as retagged**: the pre-v19 sub-technique
+> `T1562.001 Impair Defenses: Disable or Modify Tools` is now the top-level technique
+> `T1685 Disable or Modify Tools`, because `T1562 Impair Defenses` was itself elevated to the
+> tactic. Any artifact still carrying `T1562.001`, or a "Defense Evasion" tag, is mapped against a
+> pre-v19 collection and must be re-mapped — exactly as `CONVENTIONS §4` requires for ATLAS.
+> Re-verify against the version your platform carries.
 
 ---
 
@@ -89,7 +100,7 @@ The reliable signal is a short, dense burst of preparatory actions on a single h
     ]
   },
   "severity": "critical",
-  "tags": ["T1490", "T1489", "T1562.001", "T1486", "impact", "ransomware"]
+  "tags": ["T1490", "T1489", "T1685", "T1486", "impact", "ransomware"]
 }
 ```
 

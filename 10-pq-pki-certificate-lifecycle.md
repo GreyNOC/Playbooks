@@ -29,6 +29,14 @@ PB-01 CBOM; its signature findings share tuning with PB-05 (PQ signatures/tokens
 - Much PQ-migration *defect* work (classical roots, non-FIPS providers in a CA path) is
   pre-ATT&CK posture, not adversary behavior — flagged as a gap, not tagged to a technique.
 
+> **Mapping discipline (`CONVENTIONS §4`).** Verified against **ATT&CK Enterprise v19.2** on
+> **2026-08-09**. All names and IDs are current. Tactics: `T1649` **Credential Access**;
+> `T1553.004` **Defense Impairment**; `T1587.003` and `T1588.004` **Resource Development**;
+> `T1556` **Defense Impairment, Persistence, Credential Access**. `TA0112 Defense Impairment` is
+> the tactic v19 split out when it retired "Defense Evasion" — TA0005 became **Stealth**, and the
+> trust-control techniques cited here went to Defense Impairment rather than following that
+> rename. Re-verify against the version your platform carries.
+
 ## Detection strategy
 
 Four planes, correlated against PKI policy and the CBOM baseline:

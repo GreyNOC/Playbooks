@@ -8,15 +8,29 @@ Production-grade detection, response, and authorized-testing playbooks authored 
 
 Every detection playbook follows the same GreyNOC structure: overview, MITRE ATT&CK / ATLAS mapping, detection strategy, indicators, sample logic, example data, investigation steps, false positives, tuning, response actions, escalation criteria, an analyst-notes template, and a closing summary. The authorized-testing playbooks (07–08, 15–20) follow the bug-bounty structure instead: overview, MITRE mapping, surface map or defect-class catalog, phased methodology or hunting workflow, anti-patterns, validation discipline, report template, stop conditions, and summary. Written for SOC analysts, IR, detection engineers, and authorized offensive operators. Behavior-based over signature-based; operational clarity over theory.
 
+> **MITRE mapping baseline.** Every ATT&CK mapping in the library is pinned to **ATT&CK Enterprise
+> v19.2** (and ICS v19.2 for the TX collection), verified technique-by-technique against
+> `attack.mitre.org` on **2026-08-09**; ATLAS citations are pinned to **collection 2026.06**. Each
+> mapping table carries a *Mapping discipline* note naming the version it was checked against,
+> because **names, IDs, and tactic assignments all move between releases**. ATT&CK v19 in
+> particular retired the **Defense Evasion** tactic — `TA0005` became **Stealth** and `TA0112`
+> **Defense Impairment** was split out — and renumbered techniques along the way: `T1562 Impair
+> Defenses` and `T1070.001 Indicator Removal: Clear Windows Event Logs` no longer exist, and they
+> do **not** resolve to the same replacement. `T1562` maps to the parent `T1685 Disable or Modify
+> Tools`; `T1070.001` maps to the sub-technique **`T1685.005`**, so log-clearing detections keep
+> their specificity instead of collapsing into the generic parent. Re-map to
+> the collections your platform carries before deploying anything here. The rules are
+> [CONVENTIONS §4](CONVENTIONS.md).
+
 > **Why the crypto collection.** NIST finalized the first PQ standards in August 2024 (FIPS 203 ML-KEM, FIPS 204 ML-DSA, FIPS 205 SLH-DSA). Falcon / expected FN-DSA (FIPS 206) remains in development, and HQC has been selected as a backup KEM but is not yet standardized. Hybrid TLS (`X25519MLKEM768`, NamedGroup `0x11EC`) is deployed across major browsers and edge providers while its IETF specification progresses; verify current protocol status before making a standards claim. E2EE messengers (Signal PQXDH, iMessage PQ3) ship PQ key establishment in production. The dominant risks are now **harvest-now-decrypt-later (HNDL)**, **downgrade of hybrid handshakes**, and **migration-defect classes** introduced while organizations swap primitives under deadline.
 
 A visual index of the full library is available in [index.html](index.html). Two compiled field
 references are published:
 
-| Publication | Key | Contents |
-| --- | --- | --- |
-| [GreyNOC_AI_PQC_Playbooks.pdf](output/pdf/GreyNOC_AI_PQC_Playbooks.pdf) | `ai-pqc` | The AI · Post-Quantum · E2EE collection, three AI D&R playbooks, and `CONVENTIONS.md` |
-| [GreyNOC_Transmission_Physical_Layer_Playbooks.pdf](output/pdf/GreyNOC_Transmission_Physical_Layer_Playbooks.pdf) | `transmission` | The Transmission & Physical Layer collection, its coverage audit, and `CONVENTIONS.md` |
+| Publication | Key | Version | Contents |
+| --- | --- | --- | --- |
+| [GreyNOC_AI_PQC_Playbooks.pdf](output/pdf/GreyNOC_AI_PQC_Playbooks.pdf) | `ai-pqc` | v2.1.0 (2026-08-09) | The AI · Post-Quantum · E2EE collection, three AI D&R playbooks, and `CONVENTIONS.md` |
+| [GreyNOC_Transmission_Physical_Layer_Playbooks.pdf](output/pdf/GreyNOC_Transmission_Physical_Layer_Playbooks.pdf) | `transmission` | v1.2.0 (2026-08-09) | The Transmission & Physical Layer collection, its coverage audit, and `CONVENTIONS.md` |
 
 Rebuild both with `node scripts/build_playbook_pdfs.mjs`, one with
 `node scripts/build_playbook_pdfs.mjs <key>`, or list the available publications with
@@ -109,7 +123,7 @@ sweep and the residual gaps it does **not** close, is in
 
 ---
 
-See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named groups, documentation address space, **rules of engagement** (§6) that bind every bug-bounty playbook, the **AI-system testing addendum** (§7) that binds 15–20, the **defect-class registry and AI evidence notation** (§8), and the **versioned reference baseline** (§9).
+See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named groups, documentation address space, the **MITRE mapping conventions** (§4) that pin and version every ATT&CK and ATLAS citation, **rules of engagement** (§6) that bind every bug-bounty playbook, the **AI-system testing addendum** (§7) that binds 15–20, the **defect-class registry and AI evidence notation** (§8), and the **versioned reference baseline** (§9).
 
 ---
 
@@ -118,9 +132,10 @@ See [CONVENTIONS.md](CONVENTIONS.md) for shared algorithm reference, named group
 1. Read the playbook end-to-end before deploying any rule.
 2. Map data sources to your environment; verify telemetry sufficiency before relying on a detection. PQ/E2EE detection in particular depends on handshake- and key-level visibility that many estates do not yet log — confirm you have it before trusting the absence of alerts.
 3. Translate the JSON-shaped sample logic to your platform (KQL, SPL, EQL, Sigma, etc.); validate on historical data where possible.
-4. Adopt the analyst-notes template into your case-management workflow.
-5. For the bug-bounty playbooks (crypto collection 07–08 and 15–20), do not begin any activity without a signed authorization / program scope on file. GreyNOC operates as the submitting firm; ROE in CONVENTIONS §6 is mandatory, and §7 adds non-negotiable rules for AI targets — self-scoped tenancy, inert canaries, capped request budgets, trial ledgers, and never generating genuinely harmful content as proof.
-6. Revisit tuning after every confirmed true positive and false positive.
+4. Re-map every MITRE citation to the collection your platform actually carries before you tag a detection with it. The baseline here is ATT&CK v19.2 / ATLAS 2026.06, stated in each table's *Mapping discipline* note; a SIEM still on a pre-v19 ATT&CK will not recognize `T1685`, and one on v19+ will not recognize `T1562`. Never sweep a tactic rename across a table — v19 renamed some assignments, renumbered others, and removed a few outright.
+5. Adopt the analyst-notes template into your case-management workflow.
+6. For the bug-bounty playbooks (crypto collection 07–08 and 15–20), do not begin any activity without a signed authorization / program scope on file. GreyNOC operates as the submitting firm; ROE in CONVENTIONS §6 is mandatory, and §7 adds non-negotiable rules for AI targets — self-scoped tenancy, inert canaries, capped request budgets, trial ledgers, and never generating genuinely harmful content as proof.
+7. Revisit tuning after every confirmed true positive and false positive.
 
 ---
 

@@ -19,11 +19,23 @@ Privilege escalation is the bridge between initial foothold and meaningful impac
 | Privilege Escalation (tactic) | TA0004 | — |
 | Abuse Elevation Control Mechanism | T1548 | Privilege Escalation |
 | Account Manipulation | T1098 | Persistence / Privilege Escalation |
-| Domain Policy Modification | T1484 | Privilege Escalation |
-| Domain Policy Modification: Domain Trust Modification | T1484.002 | Privilege Escalation |
+| Domain or Tenant Policy Modification | T1484 | Privilege Escalation |
+| Domain or Tenant Policy Modification: Trust Modification | T1484.002 | Privilege Escalation |
 | Exploitation for Privilege Escalation | T1068 | Privilege Escalation |
-| Cloud Account Manipulation | T1098.003 | Persistence / Privilege Escalation |
-| Token Impersonation/Theft | T1134 | Privilege Escalation |
+| Account Manipulation: Additional Cloud Roles | T1098.003 | Persistence / Privilege Escalation |
+| Access Token Manipulation | T1134 | Privilege Escalation |
+
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. Three names in it were stale and have been corrected: `T1484` is now
+> **Domain or Tenant Policy Modification** (and `T1484.002` is **Trust Modification**, not "Domain
+> Trust Modification"), and `T1098.003` is **Account Manipulation: Additional Cloud Roles**, not
+> "Cloud Account Manipulation". `T1134` is **Access Token Manipulation** — the previous label
+> "Token Impersonation/Theft" is the sub-technique `T1134.001`, not this ID. Every row cites the
+> tactic operative for privilege escalation, which for three of them is a **subset** of the
+> technique's full assignment: `T1484` and `T1484.002` also carry **Defense Impairment**
+> (`TA0112`, split out of the retired "Defense Evasion" in v19), and `T1134` also carries
+> **Stealth** (`TA0005`, the renamed remainder). Re-verify against the version your platform
+> carries.
 
 ---
 

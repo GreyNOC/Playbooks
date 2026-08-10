@@ -28,8 +28,16 @@ negotiation feed (PB-03) for rollout health, and reports up to governance (PB-14
   in-path downgrade payoff (the operational fix loop for PB-03 findings).
 - Denies **T1040** Network Sniffing / HNDL — re-encryption of at-rest data and rotation close
   the harvest-now-decrypt-later window (data ops below; prioritized via PB-02).
-- Prevents **T1562** Impair Defenses — a botched wave or template drift that silently disables
-  PQ *is* a self-inflicted defense-impairment; the health gates and rollback exist to catch it.
+- Prevents **T1685** Disable or Modify Tools — a botched wave or template drift that silently
+  disables PQ *is* a self-inflicted defense-impairment; the health gates and rollback exist to
+  catch it.
+
+> **Mapping discipline (`CONVENTIONS §4`).** Verified against **ATT&CK Enterprise v19.2** on
+> **2026-08-09**. `T1562 Impair Defenses`, cited here previously, **no longer exists**: v19 retired
+> the "Defense Evasion" tactic, renamed TA0005 to **Stealth**, split out **TA0112 Defense
+> Impairment**, and promoted the old `T1562.001` tool-tampering sub-technique to the top-level
+> `T1685 Disable or Modify Tools`. `T1600` also sits under Defense Impairment. Re-verify against
+> the version your platform carries.
 
 ## Detection strategy
 
