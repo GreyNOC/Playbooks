@@ -18,11 +18,21 @@ Nothing in the kill chain triggers malware telemetry. Every action is a legitima
 |-----------|----|--------|
 | Email Collection: Remote Email Collection | T1114.002 | Collection |
 | Email Collection: Email Forwarding Rule | T1114.003 | Collection |
-| Hide Artifacts: Email Hiding Rules | T1564.008 | Defense Evasion |
+| Hide Artifacts: Email Hiding Rules | T1564.008 | Stealth |
 | Account Manipulation: Additional Email Delegate Permissions | T1098.002 | Persistence |
 | Steal Application Access Token | T1528 | Credential Access |
 | Internal Spearphishing | T1534 | Lateral Movement |
 | Valid Accounts: Cloud Accounts | T1078.004 | Initial Access / Persistence |
+
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. That version matters: **v19 retired the "Defense Evasion" tactic**,
+> renaming TA0005 to **Stealth** and splitting out **TA0112 Defense Impairment**. `T1564.008`
+> moved to **Stealth** — hiding mail is concealment, not defense tampering, so it did *not* go to
+> Defense Impairment. Two rows deliberately cite a **subset** of the technique's tactics, naming
+> the one that applies to BEC: `T1098.002` also carries Privilege Escalation, and `T1078.004` also
+> carries Stealth and Privilege Escalation. Any artifact carrying a "Defense Evasion" tag is
+> mapped against a pre-v19 collection and must be re-mapped — exactly as `CONVENTIONS §4` requires
+> for ATLAS. Re-verify against the version your platform carries.
 
 ---
 
@@ -91,7 +101,7 @@ The mailbox operations are authorized by design; the signal is configuration cha
     ]
   },
   "severity": "high_when_escalated_else_medium",
-  "tags": ["T1114.002", "T1114.003", "T1564.008", "T1098.002", "T1528", "T1534", "T1078.004", "collection", "defense_evasion", "identity"]
+  "tags": ["T1114.002", "T1114.003", "T1564.008", "T1098.002", "T1528", "T1534", "T1078.004", "collection", "stealth", "identity"]
 }
 ```
 

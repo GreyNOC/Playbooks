@@ -19,6 +19,14 @@ detection lineage in the GreyNOC catalog.
   **T1213** (data from information repositories the agent can read), **T1556** (auth-process
   changes an over-permissioned agent could trigger).
 
+> **Mapping discipline (`CONVENTIONS §4`).** ATT&CK citations verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**; ATLAS citations use collection 2026.06, as stated above. The two
+> version independently. All ATT&CK names and IDs here are current. Tactics: `T1059` **Execution**;
+> `T1552` **Credential Access**; `T1213` **Collection**; `T1556` **Defense Impairment, Persistence,
+> Credential Access** — `TA0112 Defense Impairment` being the tactic v19 split out when it retired
+> "Defense Evasion" (TA0005 became **Stealth**). Re-verify against the versions your platform
+> carries.
+
 ## Detection strategy
 
 ### A. Using AI to improve detection (safely)

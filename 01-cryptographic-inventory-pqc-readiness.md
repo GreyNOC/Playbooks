@@ -20,6 +20,11 @@ feeds every other playbook in the collection.
 - AI-assisted scanning step: guard against ATLAS-style **prompt injection** in scanned content
   (a source comment that tries to steer the model) — see PB-06.
 
+> **Mapping discipline (`CONVENTIONS §4`).** Verified against **ATT&CK Enterprise v19.2** on
+> **2026-08-09**. Both names and IDs are current: `T1040` is **Credential Access, Discovery**;
+> `T1600` is **Defense Impairment** (`TA0112`), the tactic v19 split out when it retired "Defense
+> Evasion" — TA0005 became **Stealth**. Re-verify against the version your platform carries.
+
 ## Detection / discovery strategy
 
 Six discovery planes, correlated into one inventory:

@@ -159,13 +159,19 @@ Both new playbooks were checked against every convention the library enforces:
 | No defect-class prefix invented outside the §8.1 registry | §8.1 | Pass — no prefix | Pass — no prefix |
 | ROE §6/§7 applicability | §6, §7 | N/A — neither is a bug-bounty playbook | N/A |
 
-**Two conformance notes carried forward as deliberate deviations:**
+**Two conformance notes from the original audit — the first has since been closed:**
 
-1. **ATT&CK tactic placement is annotated, not asserted.** Both playbooks map ICS-matrix
-   techniques (`T0860`, `T0887`, `T0830`, `T0814`) alongside Enterprise ones. ICS tactic
-   placement differs from Enterprise and both move between ATT&CK versions, so each mapping
-   table carries a re-verification note rather than a bare tactic claim. This follows §4's
-   "say so rather than forcing a tag."
+1. **ATT&CK tactic placement — annotated at audit time, asserted since 2026-08-09.** Both
+   playbooks map ICS-matrix techniques alongside Enterprise ones: `T0860`, `T0887`, `T0830` and
+   `T0814` in TX-01, `T0842` and `T0830` in TX-02. At audit time the ICS rows carried
+   "verify against your ATT&CK version" in place of a tactic, per §4's "say so rather than forcing
+   a tag." **That deviation is now closed.** The library-wide re-verification against
+   **ATT&CK v19.2** filled every one in (`T0887` Discovery/Collection, `T0830` Collection,
+   `T0842` Discovery), and corrected two Enterprise rows that the audit did not catch: `T1599`
+   (TX-01) and `T1600` (TX-02) were tagged to the retired "Defense Evasion" tactic and are now
+   **Defense Impairment** (`TA0112`). Both tables assert tactics against a pinned version and keep
+   the re-verification note. §4 was strengthened at the same time to *require* that pinned
+   version rather than permit a bare annotation — so what was a deviation is now the rule.
 2. **Physical-measurement thresholds are parameterized, never hardcoded as universal.** Optical
    tap-loss and RF noise-floor thresholds depend entirely on link budget, hardware, and
    environment. Both playbooks require the reader to establish a local baseline and state the

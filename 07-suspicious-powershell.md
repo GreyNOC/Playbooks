@@ -17,11 +17,22 @@ PowerShell is signed, present by default, and commonly allowlisted. Detection ca
 | Technique | ID | Tactic |
 |-----------|----|--------|
 | Command and Scripting Interpreter: PowerShell | T1059.001 | Execution |
-| Obfuscated Files or Information | T1027 | Defense Evasion |
-| Indicator Removal: Clear Windows Event Logs | T1070.001 | Defense Evasion |
-| Reflective Code Loading | T1620 | Defense Evasion |
+| Obfuscated Files or Information | T1027 | Stealth |
+| Disable or Modify Tools: Clear Windows Event Logs | T1685.005 | Defense Impairment |
+| Reflective Code Loading | T1620 | Stealth |
 | Ingress Tool Transfer | T1105 | Command and Control |
-| Remote Services: WinRM | T1021.006 | Lateral Movement |
+| Remote Services: Windows Remote Management | T1021.006 | Lateral Movement |
+
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. That version matters: **v19 retired the "Defense Evasion" tactic**,
+> renaming TA0005 to **Stealth** and splitting out **TA0112 Defense Impairment**. `T1027` and
+> `T1620` moved to **Stealth**. Log clearing moved further than the tactic rename — the pre-v19
+> `T1070.001 Indicator Removal: Clear Windows Event Logs` **was renumbered** to
+> `T1685.005 Disable or Modify Tools: Clear Windows Event Logs` under **Defense Impairment**; the
+> parent `T1070 Indicator Removal` still exists under Stealth, but this sub-technique no longer
+> hangs off it. Any artifact still carrying `T1070.001`, or a "Defense Evasion" tag, is mapped
+> against a pre-v19 collection and must be re-mapped — exactly as `CONVENTIONS §4` requires for
+> ATLAS. Re-verify against the version your platform carries.
 
 ---
 

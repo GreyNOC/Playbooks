@@ -6,7 +6,7 @@
 
 ### 1. Overview
 
-A coordinated multi-stage attack is an intrusion in which an adversary chains discrete techniques across the kill chain — reconnaissance → initial access → execution → privilege escalation → defense evasion → credential access → lateral movement → collection → exfiltration → impact — sometimes spread over hours, sometimes days or weeks. Each individual stage may be subtle enough to pass an isolated rule; the attack is recognizable only when the stages are **stitched together** by identity, host, infrastructure, or time.
+A coordinated multi-stage attack is an intrusion in which an adversary chains discrete techniques across the kill chain — reconnaissance → initial access → execution → privilege escalation → stealth → credential access → lateral movement → collection → exfiltration → impact — sometimes spread over hours, sometimes days or weeks. Each individual stage may be subtle enough to pass an isolated rule; the attack is recognizable only when the stages are **stitched together** by identity, host, infrastructure, or time.
 
 Real intrusions look like this. Single-event detections produce alerts; chain detection produces incidents. SOCs that cannot correlate stages tend to see fragments of the same campaign as unrelated low-severity alerts, and miss the intrusion until the impact stage forces it into view.
 
@@ -24,7 +24,7 @@ This playbook is a **chain detector** spanning multiple tactics. Representative 
 | Execution | Command and Scripting Interpreter | T1059 |
 | Persistence | Account Manipulation | T1098 |
 | Privilege Escalation | Valid Accounts | T1078 |
-| Defense Evasion | Impair Defenses | T1562 |
+| Defense Impairment | Disable or Modify Tools | T1685 |
 | Credential Access | OS Credential Dumping | T1003 |
 | Discovery | Domain Trust Discovery | T1482 |
 | Lateral Movement | Remote Services | T1021 |
@@ -32,6 +32,18 @@ This playbook is a **chain detector** spanning multiple tactics. Representative 
 | Command and Control | Application Layer Protocol | T1071 |
 | Exfiltration | Exfiltration Over Web Service | T1567 |
 | Impact | Data Encrypted for Impact | T1486 |
+
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. That version matters: **v19 retired the "Defense Evasion" tactic**,
+> renaming TA0005 to **Stealth** and splitting out **TA0112 Defense Impairment**. The stage
+> formerly written "Defense Evasion" here is now **Defense Impairment**, and its representative
+> technique changed with it: `T1562 Impair Defenses` **no longer exists** — v19 elevated that
+> concept to the tactic itself and promoted its tool-tampering sub-technique to the top-level
+> `T1685 Disable or Modify Tools`. Stage order in this table follows the v19 tactic sequence
+> (… Privilege Escalation → Stealth → Defense Impairment → Credential Access …). Any artifact
+> still carrying `T1562`, or a "Defense Evasion" tag, is mapped against a pre-v19 collection and
+> must be re-mapped — exactly as `CONVENTIONS §4` requires for ATLAS. Re-verify against the
+> version your platform carries.
 
 ---
 

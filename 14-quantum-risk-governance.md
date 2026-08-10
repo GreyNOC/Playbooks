@@ -46,6 +46,11 @@ threat-class techniques handled operationally elsewhere:
 No other ATT&CK IDs are claimed. If a governance-gap review uncovers active exploitation,
 it exits governance and enters the relevant detection playbook.
 
+> **Mapping discipline (`CONVENTIONS §4`).** Verified against **ATT&CK Enterprise v19.2** on
+> **2026-08-09**. Both names and IDs are current: `T1040` is **Credential Access, Discovery**;
+> `T1600` is **Defense Impairment** (`TA0112`), the tactic v19 split out when it retired "Defense
+> Evasion" — TA0005 became **Stealth**. Re-verify against the version your platform carries.
+
 ## Detection strategy
 
 "Detection" here is continuous measurement of **program and compliance posture** — the gap

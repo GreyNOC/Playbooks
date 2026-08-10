@@ -56,7 +56,11 @@ collection, per [CONVENTIONS §5](CONVENTIONS.md); the standing defensive twin c
 | Data from Information Repositories · Data from Local System | T1213, T1005 | Model stores, snapshot buckets, log tiers; device residue and on-host reads (I4, I9, I10) |
 | Adversary-in-the-middle on internal hops · harvest-now-decrypt-later capture | — | Plaintext gateway→router→worker transport; classical-only key exchange on a prompt path (I10) |
 
-*Cited against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names
+*ATT&CK citations in this table were verified against ATT&CK Enterprise v19.2 on 2026-08-09. Note
+that T1550.001 is now Lateral Movement only — v19 retired the "Defense Evasion" tactic (TA0005
+renamed Stealth, TA0112 Defense Impairment split out) and, for the T1550 family, dropped the second
+tactic outright rather than renaming it. Cited against ATLAS collection 2026.06 per
+[CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names
 are both versioned — re-map to your platform's collection at deployment. Techniques without a cited ID
 appear by name only.*
 

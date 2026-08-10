@@ -34,6 +34,14 @@ the state-management failures unique to stateful hash-based schemes.
 - Note: no ATT&CK technique captures the *state-reuse* hazard of LMS/XMSS (§ below) — it is a
   crypto-implementation defect, pre-ATT&CK. Tag by impact (T1553.002) and describe the mechanism.
 
+> **Mapping discipline (`CONVENTIONS §4`).** Verified against **ATT&CK Enterprise v19.2** on
+> **2026-08-09**. All names and IDs are current. Tactics: `T1553.002` and `T1601` **Defense
+> Impairment** (`TA0112`, the tactic v19 split out when it retired "Defense Evasion" — TA0005
+> became **Stealth**); `T1587.002` **Resource Development**; `T1542.001` **Stealth, Persistence**;
+> `T1195.002` **Initial Access**. Note that `T1542.001` and `T1553.002` landed on *opposite* sides
+> of the v19 split, so neither can be inferred from the other. Re-verify against the version your
+> platform carries.
+
 ## Detection strategy
 
 Four surfaces, all reconciled against the CBOM (PB-01) and the signing inventory (PB-05):

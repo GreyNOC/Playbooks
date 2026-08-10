@@ -101,8 +101,11 @@ self-scoped, or report what you actually proved.
 | Exploit Public-Facing Application | T1190 | Serving-plane and app-layer exposure |
 | Valid Accounts | T1078 | Self-owned test tenancy; also the tenancy-crossing classes |
 
-*Cited against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); both IDs and names are
-versioned — re-map to your platform's collection at deployment.*
+*ATT&CK citations in this table were verified against ATT&CK Enterprise v19.2 on 2026-08-09. v19
+retired the "Defense Evasion" tactic — TA0005 was renamed Stealth and TA0112 Defense Impairment was
+split out — and renumbered several techniques, so ATT&CK carries its own stated version exactly as
+ATLAS does. Cited against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); both IDs
+and names are versioned in both frameworks — re-map to your platform's collections at deployment.*
 
 ## Methodology (phased)
 

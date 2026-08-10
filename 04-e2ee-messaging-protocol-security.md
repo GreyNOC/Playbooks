@@ -18,6 +18,14 @@ negotiation anomalies, applicable whether you operate an E2EE service or defend 
 - **T1606** — Forge Web Credentials / trust material (forged key bundles in a directory).
 - **T1600** — Weaken Encryption (forcing a non-PQ or weaker ciphersuite in negotiation).
 
+> **Mapping discipline (`CONVENTIONS §4`).** Verified against **ATT&CK Enterprise v19.2** on
+> **2026-08-09**. All names and IDs are current. Tactics: `T1557` **Credential Access,
+> Collection**; `T1606` **Credential Access**; `T1556` **Defense Impairment, Persistence,
+> Credential Access**; `T1600` **Defense Impairment**. `TA0112 Defense Impairment` is the tactic
+> v19 split out when it retired "Defense Evasion" — TA0005 became **Stealth**, and the
+> trust-and-crypto tampering techniques cited here went to Defense Impairment, not Stealth.
+> Re-verify against the version your platform carries.
+
 ## Detection strategy
 
 The cryptography is sound; the **trust distribution** is where attacks live. Three detectors:

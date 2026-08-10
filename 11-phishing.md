@@ -24,6 +24,12 @@ Detection cannot stop at the gateway. A meaningful fraction of malicious mail is
 | User Execution: Malicious File | T1204.002 | Execution |
 | Steal Web Session Cookie | T1539 | Credential Access |
 
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. All seven rows are current, with names, IDs, and tactics matching
+> exactly — no row carries a subset. The version is stated because v19 retired the "Defense
+> Evasion" tactic — TA0005 was renamed **Stealth** and **TA0112 Defense Impairment** was split out
+> — and renumbered several techniques. Re-verify against the version your platform carries.
+
 ---
 
 ### 3. Detection Strategy

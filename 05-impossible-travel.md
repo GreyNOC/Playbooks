@@ -21,6 +21,14 @@ It is one of the few high-confidence post-authentication signals available witho
 | Steal Web Session Cookie | T1539 | Credential Access |
 | Forge Web Credentials | T1606 | Credential Access |
 
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. All four rows are current. `T1078` and `T1078.004` each cite the
+> tactic(s) operative for an anomalous sign-in; both carry the same fuller v19.2 assignment —
+> **Stealth, Persistence, Privilege Escalation, Initial Access**. The version is stated because
+> v19 retired the "Defense Evasion" tactic — TA0005 was renamed **Stealth** and **TA0112 Defense
+> Impairment** was split out — and renumbered several techniques. Re-verify against the version
+> your platform carries.
+
 ---
 
 ### 3. Detection Strategy

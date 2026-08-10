@@ -133,14 +133,18 @@ knowing what the chain does. Transmit side:
 | Supply Chain Compromise: Compromise Hardware Supply Chain | T1195.003 | Enterprise | Initial Access |
 | Exfiltration Over Other Network Medium | T1011 | Enterprise | Exfiltration |
 | Exfiltration Over Physical Medium | T1052 | Enterprise | Exfiltration |
-| Weaken Encryption | T1600 | Enterprise | Defense Evasion |
+| Weaken Encryption | T1600 | Enterprise | Defense Impairment |
 | Network Denial of Service | T1498 | Enterprise | Impact |
-| Network Sniffing | T0842 | ICS | — verify against your ATT&CK version |
-| Adversary-in-the-Middle | T0830 | ICS | — verify against your ATT&CK version |
+| Network Sniffing | T0842 | ICS | Discovery |
+| Adversary-in-the-Middle | T0830 | ICS | Collection |
 
-> **Mapping discipline (`CONVENTIONS §4`).** ICS tactic placement differs from Enterprise, and both
-> IDs and tactic assignments move between ATT&CK versions. Re-verify each row against the version
-> your platform carries.
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK v19.2**
+> (Enterprise and ICS) on **2026-08-09**. **v19 retired the "Defense Evasion" tactic**, renaming
+> TA0005 to **Stealth** and splitting out **TA0112 Defense Impairment**; `T1600` landed on the
+> Defense Impairment side, as did its sub-technique `T1600.001 Reduce Key Space` cited in PB-09.
+> The ICS rows previously left as "verify against your ATT&CK version" are now filled in from the
+> same check — ICS tactic placement is a **separate tactic set** from Enterprise and still has to
+> be re-verified on its own terms. Re-verify each row against the version your platform carries.
 
 **Deliberately unmapped.** Per `CONVENTIONS §4`, these have no clean technique and are described
 rather than tagged: **passive fiber tapping as a distinct technique** (`T1040` is the closest

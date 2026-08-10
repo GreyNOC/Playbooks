@@ -21,11 +21,22 @@ The detection problem is a graph problem, not a per-host problem. Every remote a
 | Remote Services: Distributed Component Object Model | T1021.003 | Lateral Movement |
 | Remote Services: SSH | T1021.004 | Lateral Movement |
 | Remote Services: Windows Remote Management | T1021.006 | Lateral Movement |
-| Use Alternate Authentication Material: Pass the Hash | T1550.002 | Defense Evasion / Lateral Movement |
-| Use Alternate Authentication Material: Pass the Ticket | T1550.003 | Defense Evasion / Lateral Movement |
+| Use Alternate Authentication Material: Pass the Hash | T1550.002 | Lateral Movement |
+| Use Alternate Authentication Material: Pass the Ticket | T1550.003 | Lateral Movement |
 | Lateral Tool Transfer | T1570 | Lateral Movement |
 | Windows Management Instrumentation | T1047 | Execution |
 | System Services: Service Execution | T1569.002 | Execution |
+
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. That version matters: **v19 retired the "Defense Evasion" tactic**,
+> renaming TA0005 to **Stealth** and splitting out **TA0112 Defense Impairment**. Note that
+> `T1550.002` and `T1550.003` did **not** simply inherit the rename: v19 **dropped** their second
+> tactic outright, and both are now **Lateral Movement only** (technique version 2.0, last
+> modified 12 May 2026). Rewriting their old "Defense Evasion / Lateral Movement" tag as
+> "Stealth / Lateral Movement" would be wrong — a renamed tactic and a removed tactic are not the
+> same edit. Any artifact carrying a "Defense Evasion" tag is mapped against a pre-v19 collection
+> and must be re-mapped — exactly as `CONVENTIONS §4` requires for ATLAS. Re-verify against the
+> version your platform carries.
 
 ---
 

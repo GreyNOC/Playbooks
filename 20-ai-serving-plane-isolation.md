@@ -24,10 +24,15 @@ tenancy, request/batch contamination, and response-path timing channels.
 | Exfiltration via Cyber Means | AML.T0044 | Model/weight extraction |
 | Denial of AI Service / Cost Harvesting | AML.T0029 / AML.T0034 | Capacity and spend abuse |
 | Exploit Public-Facing Application | T1190 | Exposed gateway or serving control plane |
-| Valid Accounts / Application Access Token | T1078 / T1528 | Over-scoped inference credentials |
-| Endpoint DoS / Resource Hijacking | T1499 / T1496 | Serving capacity exhaustion |
+| Valid Accounts / Steal Application Access Token | T1078 / T1528 | Over-scoped inference credentials |
+| Endpoint Denial of Service / Resource Hijacking | T1499 / T1496 | Serving capacity exhaustion |
 
-ATLAS citations use collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md).
+ATLAS citations use collection 2026.06, and ATT&CK citations **ATT&CK Enterprise v19.2** (verified
+2026-08-09), per [CONVENTIONS §4](CONVENTIONS.md). This table has no tactic column, so v19's
+retirement of "Defense Evasion" does not reach it, but the ATT&CK names and IDs above were
+re-verified against v19.2 — `T1528` is *Steal* Application Access Token, distinct from `T1550.001`
+*Use Alternate Authentication Material: Application Access Token* cited in §5. Re-verify against
+the versions your platform carries.
 
 ### 3. Required Telemetry
 

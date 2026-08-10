@@ -21,6 +21,13 @@ Brute force remains a primary access vector for SSH, RDP, VPN concentrators, dat
 | Brute Force: Credential Stuffing | T1110.004 | Credential Access |
 | External Remote Services | T1133 | Initial Access |
 
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. All four rows are current. `T1133` cites the tactic operative here;
+> its full v19.2 assignment is **Persistence, Initial Access**. The version is stated because v19
+> retired the "Defense Evasion" tactic — TA0005 was renamed **Stealth** and **TA0112 Defense
+> Impairment** was split out — and renumbered several techniques. Re-verify against the version
+> your platform carries.
+
 ---
 
 ### 3. Detection Strategy

@@ -21,6 +21,12 @@ Port scanning precedes most targeted intrusions. It identifies exploitable servi
 | Active Scanning: Scanning IP Blocks | T1595.001 | Reconnaissance |
 | Active Scanning: Vulnerability Scanning | T1595.002 | Reconnaissance |
 
+> **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
+> v19.2** on **2026-08-09**. All four rows are current, with names, IDs, and tactics matching
+> exactly — no row carries a subset. The version is stated because v19 retired the "Defense
+> Evasion" tactic — TA0005 was renamed **Stealth** and **TA0112 Defense Impairment** was split out
+> — and renumbered several techniques. Re-verify against the version your platform carries.
+
 ---
 
 ### 3. Detection Strategy

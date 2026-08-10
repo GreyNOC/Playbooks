@@ -18,6 +18,13 @@ signed material across the JWT/SAML/X.509/code-signing surface during and after 
 - **T1553** — Subvert Trust Controls (code-signing abuse, rogue CA/cert with weak/forged sig).
 - **T1600** — Weaken Encryption (forcing a downgrade from PQ/hybrid to a forgeable classical sig).
 
+> **Mapping discipline (`CONVENTIONS §4`).** Verified against **ATT&CK Enterprise v19.2** on
+> **2026-08-09**. All names and IDs are current. Tactics: `T1606` **Credential Access**; `T1556`
+> **Defense Impairment, Persistence, Credential Access**; `T1553` and `T1600` **Defense
+> Impairment** (`TA0112`), the tactic v19 split out when it retired "Defense Evasion" — TA0005
+> became **Stealth**. Subverting trust controls is impairment, not concealment, so `T1553` did
+> *not* follow the Stealth rename. Re-verify against the version your platform carries.
+
 ## Detection strategy
 
 Watch for verifiers being tricked into accepting something they shouldn't, and signers/issuers

@@ -60,7 +60,10 @@ twin cited throughout is [D&R-09 AI / Automated Agent Abuse](09-ai-automated-age
 | Obfuscated Files or Information | T1027 | L13 — the ATT&CK analogue for the same channel |
 | Resource Hijacking | T1496 | L12 where free inference is consumed for the caller's workload |
 
-*Cited against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names are
+*ATT&CK citations in this table were verified against ATT&CK Enterprise v19.2 on 2026-08-09 —
+including T1027, which v19 moved to the Stealth tactic when it retired "Defense Evasion" (TA0005
+renamed Stealth, TA0112 Defense Impairment split out). Cited against ATLAS collection 2026.06 per
+[CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names are
 versioned — re-map to your platform's collection at deployment. Where an ID is cited to support
 severity or plausibility, quote that technique's `maturity` value from your collection alongside it
 (§4). Cross-site scripting (`L5`), SSRF (`L10`), and IDOR (`L9`) appear by name only — no ATLAS or
