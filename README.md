@@ -4,7 +4,7 @@ Production-grade detection, response, and authorized-testing playbooks authored 
 
 - **Detection & Response** — behavior-based SOC playbooks across the intrusion lifecycle, from initial access to impact, including AI incident response and inference-serving isolation.
 - **AI · Post-Quantum · E2EE** — 27 playbooks covering the cryptographic transition, E2EE protocol security, enterprise AI governance/development/data/resilience, and eight authorized bug-bounty playbooks — two against PQ/E2EE attack surface and six against AI systems.
-- **Transmission & Physical Layer** — 2 playbooks covering the media everything else runs on: radio-frequency spectrum and nanometer-scale optical. Where the adversary never touches a network port, and where harvest-now-decrypt-later capture actually happens.
+- **Transmission & Physical Layer** — 3 playbooks covering the media everything else runs on and the silicon underneath them: radio-frequency spectrum, nanometer-scale optical, and post-quantum cryptography as it actually executes in fabricated logic. Where the adversary never touches a network port, where harvest-now-decrypt-later capture actually happens, and where a compiler can undo a constant-time implementation.
 
 Every detection playbook follows the same GreyNOC structure: overview, MITRE ATT&CK / ATLAS mapping, detection strategy, indicators, sample logic, example data, investigation steps, false positives, tuning, response actions, escalation criteria, an analyst-notes template, and a closing summary. The authorized-testing playbooks (07–08, 15–20) follow the bug-bounty structure instead: overview, MITRE mapping, surface map or defect-class catalog, phased methodology or hunting workflow, anti-patterns, validation discipline, report template, stop conditions, and summary. Written for SOC analysts, IR, detection engineers, and authorized offensive operators. Behavior-based over signature-based; operational clarity over theory.
 
@@ -27,7 +27,7 @@ references are published:
 | Publication | Key | Version | Contents |
 | --- | --- | --- | --- |
 | [GreyNOC_AI_PQC_Playbooks.pdf](output/pdf/GreyNOC_AI_PQC_Playbooks.pdf) | `ai-pqc` | v2.1.0 (2026-08-09) | The AI · Post-Quantum · E2EE collection, three AI D&R playbooks, and `CONVENTIONS.md` |
-| [GreyNOC_Transmission_Physical_Layer_Playbooks.pdf](output/pdf/GreyNOC_Transmission_Physical_Layer_Playbooks.pdf) | `transmission` | v1.1.0 (2026-08-09) | The Transmission & Physical Layer collection, its coverage audit, and `CONVENTIONS.md` |
+| [GreyNOC_Transmission_Physical_Layer_Playbooks.pdf](output/pdf/GreyNOC_Transmission_Physical_Layer_Playbooks.pdf) | `transmission` | v1.2.0 (2026-08-09) | The Transmission & Physical Layer collection, its coverage audit, and `CONVENTIONS.md` |
 
 Rebuild both with `node scripts/build_playbook_pdfs.mjs`, one with
 `node scripts/build_playbook_pdfs.mjs <key>`, or list the available publications with
@@ -99,13 +99,15 @@ Rebuild both with `node scripts/build_playbook_pdfs.mjs`, one with
 
 ## Transmission & Physical Layer Playbooks
 
-The media every other playbook assumes and none of them examined. Both are detection-and-response
-playbooks; neither is a bug-bounty playbook, and neither owns a defect-class prefix.
+The media every other playbook assumes and none of them examined, plus the silicon beneath them.
+All three are detection-and-response playbooks; none is a bug-bounty playbook, and none owns a
+defect-class prefix.
 
 | #  | Playbook | Focus |
 | --- | --- | --- |
 | TX-01 | [RF & Radio-Spectrum Intrusion](TX-01-rf-spectrum-intrusion.md) | Wi-Fi, BLE, cellular, GNSS spoofing, LPWAN implants, jamming, backhaul; RF-BOM and sensing tiers |
 | TX-02 | [Nanometer-Scale Optical Data Transmission, Reception & Intrusion Handling](TX-02-optical-nm-data-transmission-intrusion.md) | Optical create/receive chain, fiber tapping, ROADM abuse, rogue wavelengths, FSO/laser links, optical air-gap channels |
+| TX-03 | [PQC at the Nanometer Scale: Silicon, Physical Attack & the Physics Floor](TX-03-pq-nanometer-silicon-physical-attack.md) | ML-KEM/ML-DSA in silicon — compiler-induced timing defects, Rowhammer, laser FI, optical probing, hardware trojans, the FIPS side-channel assurance gap, and the Planck-scale scope floor |
 
 Two structural limits are stated in both playbooks and should be carried into any report built on
 them: **passive interception is undetectable in principle** (the answer is cryptographic, not
