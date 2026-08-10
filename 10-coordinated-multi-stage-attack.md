@@ -24,6 +24,7 @@ This playbook is a **chain detector** spanning multiple tactics. Representative 
 | Execution | Command and Scripting Interpreter | T1059 |
 | Persistence | Account Manipulation | T1098 |
 | Privilege Escalation | Valid Accounts | T1078 |
+| Stealth | Obfuscated Files or Information | T1027 |
 | Defense Impairment | Disable or Modify Tools | T1685 |
 | Credential Access | OS Credential Dumping | T1003 |
 | Discovery | Domain Trust Discovery | T1482 |
@@ -35,11 +36,15 @@ This playbook is a **chain detector** spanning multiple tactics. Representative 
 
 > **Mapping discipline (`CONVENTIONS §4`).** This table was verified against **ATT&CK Enterprise
 > v19.2** on **2026-08-09**. That version matters: **v19 retired the "Defense Evasion" tactic**,
-> renaming TA0005 to **Stealth** and splitting out **TA0112 Defense Impairment**. The stage
-> formerly written "Defense Evasion" here is now **Defense Impairment**, and its representative
-> technique changed with it: `T1562 Impair Defenses` **no longer exists** — v19 elevated that
-> concept to the tactic itself and promoted its tool-tampering sub-technique to the top-level
-> `T1685 Disable or Modify Tools`. Stage order in this table follows the v19 tactic sequence
+> renaming TA0005 to **Stealth** and splitting out **TA0112 Defense Impairment**. For a chain
+> detector that split is not a rename — it is **one stage becoming two**, so this table now carries
+> a row for each. Concealment is `T1027`, which the §6 timeline already evidences twice (HTML
+> smuggling at T+02:14, `-enc` PowerShell at T+02:21); control-tampering is `T1685`. Folding both
+> into the Defense Impairment row would drop the concealment half of the chain, which is usually
+> the earlier and more detectable signal. The old representative technique went with the split:
+> `T1562 Impair Defenses` **no longer exists** — v19 elevated that concept to the tactic itself and
+> promoted its tool-tampering sub-technique to the top-level `T1685 Disable or Modify Tools`. Stage
+> order in this table follows the v19 tactic sequence
 > (… Privilege Escalation → Stealth → Defense Impairment → Credential Access …). Any artifact
 > still carrying `T1562`, or a "Defense Evasion" tag, is mapped against a pre-v19 collection and
 > must be re-mapped — exactly as `CONVENTIONS §4` requires for ATLAS. Re-verify against the

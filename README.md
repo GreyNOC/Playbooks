@@ -14,8 +14,11 @@ Every detection playbook follows the same GreyNOC structure: overview, MITRE ATT
 > mapping table carries a *Mapping discipline* note naming the version it was checked against,
 > because **names, IDs, and tactic assignments all move between releases**. ATT&CK v19 in
 > particular retired the **Defense Evasion** tactic — `TA0005` became **Stealth** and `TA0112`
-> **Defense Impairment** was split out — and renumbered techniques along the way (`T1562` and
-> `T1070.001` no longer exist; both now resolve into `T1685 Disable or Modify Tools`). Re-map to
+> **Defense Impairment** was split out — and renumbered techniques along the way: `T1562 Impair
+> Defenses` and `T1070.001 Indicator Removal: Clear Windows Event Logs` no longer exist, and they
+> do **not** resolve to the same replacement. `T1562` maps to the parent `T1685 Disable or Modify
+> Tools`; `T1070.001` maps to the sub-technique **`T1685.005`**, so log-clearing detections keep
+> their specificity instead of collapsing into the generic parent. Re-map to
 > the collections your platform carries before deploying anything here. The rules are
 > [CONVENTIONS §4](CONVENTIONS.md).
 
