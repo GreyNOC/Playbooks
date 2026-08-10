@@ -240,9 +240,10 @@ fault, and secret residue. Electromagnetic emanation (`TX-01 §5.7`), optical em
 and are deliberately not filed under `C10`.
 
 **Evidence grading in the TX track.** `TX-03` grades every cited result — `[hw]` measured on named
-hardware, `[sim]` leakage-model or simulation only, `[norm]` normative standard text, `[adv]`
-advisory standard text, `[relayed]` the citing authors quote a third party, `[vendor]` unaudited
-vendor claim. Any artifact reusing that material carries the grade with it. A `[sim]` result
+hardware, `[sim]` leakage-model or simulation only, `[analysis]` an analytical or formal result
+(proof, model, or standards analysis) with no implementation demonstrated, `[norm]` normative
+standard text, `[adv]` advisory standard text, `[relayed]` the citing authors quote a third party,
+`[vendor]` unaudited vendor claim. Any artifact reusing that material carries the grade with it. A `[sim]` result
 tabulated beside a `[hw]` result without its grade visible is a reporting defect, because it
 overstates demonstrated capability — the same fabrication concern §6.3 addresses for findings.
 

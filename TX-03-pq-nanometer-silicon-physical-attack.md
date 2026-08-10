@@ -14,9 +14,17 @@ radiates.
 The organizing fact is this: **the post-quantum migration replaced algorithms whose implementation
 security had twenty-five years of attack literature behind it with algorithms whose implementation
 security is being written right now.** The mathematics of ML-KEM and ML-DSA is the most scrutinized
-part of the transition. The silicon is the least. Every published attack in §7–§9 targets a
-*correct* implementation of a *standardized* algorithm — none of them break the lattice problem, and
-none of them care whether a quantum computer exists.
+part of the transition. The silicon is the least.
+
+**None of the attacks in §7–§9 break the lattice problem, and none of them care whether a quantum
+computer exists.** Beyond that shared property they divide three ways, and the distinction matters
+when you decide what to fix: some target a *correct* implementation of a standardized algorithm
+(the side-channel and fault work in §7.2–§7.4, §8 and §10); some exploit a *defective*
+implementation, whether written that way (KyberSlash) or produced that way by a compiler (Clangover,
+§7.1); and some subvert the implementation or the silicon outright, so no algorithm is being
+attacked at all (§9's trojans and malicious key generation). Note also that §7.3's software-reachable
+power and frequency channels have no published application to ML-KEM or ML-DSA specifically — that
+is recorded there as a gap, not extrapolated.
 
 Three findings drive everything below, and each is verifiable from a primary source:
 
@@ -831,8 +839,14 @@ nothing streaming to watch.
 
 - ML-DSA configured for deterministic signing on a platform whose physical exposure is not
   controlled.
-- An LMS/XMSS leaf-index observation at or below the last recorded value — one-time key reuse, and
-  a cryptographic break rather than a hygiene issue.
+- Two LMS/XMSS signatures sharing a `(keypair, leaf index)` pair over **different message digests** —
+  definitive one-time-key reuse, a cryptographic break rather than a hygiene issue. Note the
+  persisted index legitimately runs *ahead* of the last signature emitted, because SP 800-208 §8.1
+  mandates persisting before export; a signature at index N alongside a persisted index of N+1 is
+  the correct state, not a finding.
+- The persisted leaf index moving **backwards** between observations — state rollback from a
+  restore, clone, or corrupted state store.
+- A signature exported while the persisted index had *not* yet advanced past it.
 - A signature emitted after a state-store write failure, or state persisted *after* rather than
   before export.
 - Any HSS/XMSS^MT signer re-signing a subtree root more than once.
@@ -962,8 +976,11 @@ nothing streaming to watch.
   "logic": {
     "halt_signing_immediately": {
       "_comment": "Cryptographic-break conditions only. These are unambiguous and justify stopping production signing.",
+      "_leaf_index_semantics": "SP 800-208 8.1 requires the state to be persisted BEFORE the signature is exported, so a HEALTHY signature using index N is observed only once the persisted state already reads N+1. A naive 'observed <= persisted' test is therefore true for every correct signature and would halt the entire fleet. Detect reuse, not the mandated advance.",
       "trigger_any": [
-        "hbs.signer observed_leaf_index <= last_recorded_leaf_index",
+        "exists two signatures with same (keypair_id, leaf_index) over DIFFERENT message digests   // definitive one-time-key reuse",
+        "hbs.persisted_leaf_index decreased between observations   // state rollback: restore, clone, or corrupted state store",
+        "hbs.signer observed_leaf_index >= hbs.persisted_leaf_index at export time   // state was not advanced before export, violating SP 800-208 8.1",
         "hbs.tree_root signed more_than_once",
         "signature emitted after a state-store write failure",
         "hbs.state_update_ordering != 'persist_before_export'",
@@ -1026,10 +1043,17 @@ DRAM fleet exposure
   -> In CVE-2025-6202 exposure window; ODECC is not a mitigation; host performs
      exactly the operation SLasH-DSA forges. Escalate.
 
-LMS/XMSS state-store anomaly
-  signer: fw-sign-01  leaf_index_recorded: 40961  leaf_index_observed: 40960
-  preceding event: snapshot_restore  2026-08-09T03:12Z
-  -> One-time key reuse. Signing halted. This is the realistic HBS failure mode.
+LMS/XMSS state-store — HEALTHY, shown first because it is misread constantly
+  signer: fw-sign-01  persisted_leaf_index: 40961  last_signature_leaf_index: 40960
+  -> NOT a finding. SP 800-208 8.1 mandates persisting before export, so the persisted
+     index correctly runs one ahead of the last emitted signature.
+
+LMS/XMSS state-store anomaly — ACTUAL one-time-key reuse
+  2026-08-09T03:12Z  event: snapshot_restore  persisted_leaf_index: 40961 -> 40900   <-- rollback
+  2026-08-09T03:14Z  signature emitted  keypair: fw-sign-01  leaf_index: 40900
+                     digest: 9f2c...a10   (index 40900 previously signed digest 41bd...77e)
+  -> Same (keypair, leaf_index) over two DIFFERENT digests. Definitive reuse.
+     Signing halted, state store preserved. This is the realistic HBS failure mode.
 
 ML-DSA signing configuration audit
   service: token-issuer  mode: deterministic  platform: shared_cloud_host
@@ -1128,8 +1152,9 @@ Entropy health
   key class, and treat network-reachable long-term-key holders as urgent.
 - For a device suspected of physical compromise: do not re-power, preserve custody, and assume key
   disclosure.
-- Halt signing on any HBS signer showing a leaf-index regression, and preserve the state store
-  before remediation.
+- Halt signing on any HBS signer showing a **persisted-index rollback** or a `(keypair, leaf index)`
+  pair reused over different digests, and preserve the state store before remediation. Do not halt
+  on the persisted index leading the last emitted signature — that is the mandated ordering.
 - Where entropy health tests are failing, stop generating keys on that device.
 
 **Short-term**
@@ -1183,7 +1208,8 @@ Escalate to incident when **any** of the following are true:
 - Binary constant-time verification finds a variable-time instruction on a secret operand in a
   shipped artifact.
 - Hammer-pattern telemetry fires on a host performing PQC signing or holding a code-signing key.
-- Any LMS/XMSS leaf-index regression, or any evidence of one-time key reuse.
+- Any LMS/XMSS persisted-index rollback, or any `(keypair, leaf index)` pair observed signing two
+  different digests.
 - A signature was emitted after a state-store write failure.
 - A device holding a long-lived private key returns from a period outside verified custody.
 - Tamper evidence is broken on a module holding a code-signing, device-identity or root key.
@@ -1218,7 +1244,8 @@ Implementation / version / commit:
 Compiler + version + optimization flags:
 Binary constant-time verified? Y/N  tool: ____  at flags: ____  findings: ____
 Signing mode (ML-DSA):        deterministic | hedged
-HBS state ordering verified:  Y/N   leaf index recorded/observed: ____ / ____
+HBS state ordering verified:  Y/N   persisted / last-emitted leaf index: ____ / ____
+  (persisted SHOULD lead by one — flag rollback, or same index over differing digests)
 Keypair seed-regenerable:     Y/N   independently verified: Y/N
 Entropy source / SP 800-90B validated / health failures: ____ / Y/N / ____
 --- Exposure ---
@@ -1338,13 +1365,13 @@ light-years. That is a scaling estimate to convey magnitude, not an engineering 
 
 Reported as nulls with exclusion bounds, per §3:
 
-- **Fermi-LAT / GRB 090510** set 95% CL limits of *E*<sub>QG,1</sub> > 7.6 *E*<sub>Planck</sub>
-  (linear) and *E*<sub>QG,2</sub> > 1.3 × 10¹¹ GeV (quadratic) — the most constraining limits in
+- **Fermi-LAT / GRB 090510** set 95% CL limits of *E*(QG,1) > 7.6 *E*(Planck)
+  (linear) and *E*(QG,2) > 1.3 × 10¹¹ GeV (quadratic) — the most constraining limits in
   that paper's own 2013 four-GRB sample, for the **subluminal** case, **without** correction for
   intrinsic source-frame dispersion. Both qualifiers must travel with the number, and the linear
   limit has since been superseded by LHAASO below.
-- **LHAASO / GRB 221009A** (2024) gives *E*<sub>QG,1</sub> > 10 *E*<sub>Planck</sub> and
-  *E*<sub>QG,2</sub> > 6 × 10⁻⁸ *E*<sub>Planck</sub>, both 95% CL. The correct statement is: *no
+- **LHAASO / GRB 221009A** (2024) gives *E*(QG,1) > 10 *E*(Planck) and
+  *E*(QG,2) > 6 × 10⁻⁸ *E*(Planck), both 95% CL. The correct statement is: *no
   linear energy-dependence of the vacuum speed of light has been observed; linear LIV is excluded up
   to 10× the Planck energy at 95% CL.* Not "no such effect exists."
 - **The Fermilab Holometer** reached 2.1 × 10⁻²⁰ m/√Hz and, for signal *bandwidths* greater than

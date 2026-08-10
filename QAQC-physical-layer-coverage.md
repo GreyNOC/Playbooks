@@ -236,8 +236,8 @@ surface, the claim is recorded as a fabrication indicator rather than a threat, 
 negative search behind that conclusion is published with it. That question is now closed and should
 not be re-litigated.
 
-TX-03 introduces an evidence-grading convention (`[hw]`/`[sim]`/`[norm]`/`[adv]`/`[relayed]`/
-`[vendor]`) now recorded in `CONVENTIONS.md` §8.1. The residual gaps in §5 above are unaffected —
+TX-03 introduces an evidence-grading convention (`[hw]`/`[sim]`/`[analysis]`/`[norm]`/`[adv]`/
+`[relayed]`/`[vendor]`) now recorded in `CONVENTIONS.md` §8.1. The residual gaps in §5 above are unaffected —
 TX-03 covers a different axis (depth), not the media still missing.
 
 ---

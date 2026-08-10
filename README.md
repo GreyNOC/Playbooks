@@ -88,8 +88,9 @@ Rebuild both with `node scripts/build_playbook_pdfs.mjs`, one with
 
 ## Transmission & Physical Layer Playbooks
 
-The media every other playbook assumes and none of them examined. Both are detection-and-response
-playbooks; neither is a bug-bounty playbook, and neither owns a defect-class prefix.
+The media every other playbook assumes and none of them examined, plus the silicon beneath them.
+All three are detection-and-response playbooks; none is a bug-bounty playbook, and none owns a
+defect-class prefix.
 
 | #  | Playbook | Focus |
 | --- | --- | --- |
