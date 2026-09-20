@@ -1,6 +1,15 @@
 # GreyNOC Security Playbooks
 
-Production-grade detection, response, and authorized-testing playbooks authored by the GreyNOC detection-engineering team. The library spans three complementary collections:
+Production-grade detection, response, and authorized-testing playbooks authored by the GreyNOC detection-engineering team.
+
+**Start here: the [GreyNOC Operator Handbook](OPERATOR-HANDBOOK.md).** One reference for the whole
+operator job — doctrine and readiness, the workstation and field platform, defensive scripting,
+detection engineering, incident response, wireless and perimeter defense, AI-assisted operations,
+and post-quantum readiness. The handbook carries the *practice*; the playbooks below carry the
+detection logic, defect-class catalogs, and technique-level mappings it points at. Section 43 of the
+handbook is the index that maps every playbook to the sections that use it.
+
+The library itself spans three complementary collections:
 
 - **Detection & Response** — behavior-based SOC playbooks across the intrusion lifecycle, from initial access to impact, including AI incident response and inference-serving isolation.
 - **AI · Post-Quantum · E2EE** — 28 playbooks covering the cryptographic transition, E2EE protocol security, enterprise AI governance/development/data/resilience, eight authorized bug-bounty playbooks — two against PQ/E2EE attack surface and six against AI systems — and an operator prompt library for AI-assisted security work.
@@ -24,18 +33,20 @@ Every detection playbook follows the same GreyNOC structure: overview, MITRE ATT
 
 > **Why the crypto collection.** NIST finalized the first PQ standards in August 2024 (FIPS 203 ML-KEM, FIPS 204 ML-DSA, FIPS 205 SLH-DSA). Falcon / expected FN-DSA (FIPS 206) remains in development, and HQC has been selected as a backup KEM but is not yet standardized. Hybrid TLS (`X25519MLKEM768`, NamedGroup `0x11EC`) is deployed across major browsers and edge providers while its IETF specification progresses; verify current protocol status before making a standards claim. E2EE messengers (Signal PQXDH, iMessage PQ3) ship PQ key establishment in production. The dominant risks are now **harvest-now-decrypt-later (HNDL)**, **downgrade of hybrid handshakes**, and **migration-defect classes** introduced while organizations swap primitives under deadline.
 
-A visual index of the full library is available in [index.html](index.html). Two compiled field
+A visual index of the full library is available in [index.html](index.html). Three compiled field
 references are published:
 
 | Publication | Key | Version | Contents |
 | --- | --- | --- | --- |
+| [GreyNOC_Operator_Handbook.pdf](output/pdf/GreyNOC_Operator_Handbook.pdf) | `handbook` | v1.0.0 (2026-09-20) | [OPERATOR-HANDBOOK.md](OPERATOR-HANDBOOK.md) and `CONVENTIONS.md` |
 | [GreyNOC_AI_PQC_Playbooks.pdf](output/pdf/GreyNOC_AI_PQC_Playbooks.pdf) | `ai-pqc` | v2.2.0 | The AI · Post-Quantum · E2EE collection, three AI D&R playbooks, and `CONVENTIONS.md` |
 | [GreyNOC_Transmission_Physical_Layer_Playbooks.pdf](output/pdf/GreyNOC_Transmission_Physical_Layer_Playbooks.pdf) | `transmission` | v1.2.0 (2026-08-09) | The Transmission & Physical Layer collection, its coverage audit, and `CONVENTIONS.md` |
 
-Rebuild both with `node scripts/build_playbook_pdfs.mjs`, one with
+Rebuild all three with `node scripts/build_playbook_pdfs.mjs`, one with
 `node scripts/build_playbook_pdfs.mjs <key>`, or list the available publications with
-`node scripts/build_playbook_pdfs.mjs --list`. Adding a collection means adding an entry to the
-`PUBLICATIONS` array in that script — the Markdown-to-PDF pipeline itself is shared.
+`node scripts/build_playbook_pdfs.mjs --list`. Adding a publication means adding an entry to the
+`PUBLICATIONS` array in that script — the Markdown-to-PDF pipeline itself is shared. An entry may
+set `eyebrow` to override the cover label, which defaults to `GREYNOC SECURITY PLAYBOOKS`.
 
 ---
 

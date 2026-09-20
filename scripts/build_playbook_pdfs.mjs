@@ -10,6 +10,34 @@ const TMP_DIR = path.join(ROOT, "tmp", "pdfs");
 // One entry per compiled field reference. Add a collection here rather than forking this script.
 const PUBLICATIONS = [
   {
+    key: "handbook",
+    docId: "GN-PUB-OPHB-001",
+    fileStem: "GreyNOC_Operator_Handbook",
+    version: "v1.0.0",
+    publicationDate: "2026-09-20",
+    documentTitle: "GreyNOC Operator Handbook",
+    eyebrow: "GREYNOC OPERATOR REFERENCE",
+    coverTitleHtml: "Operator<br>Handbook",
+    runningTitleHtml: "Operator Handbook",
+    subtitleHtml: `Doctrine and readiness, the operator platform, defensive scripting, detection
+      and incident response, and the AI and post-quantum frontier - with the shared conventions
+      the playbook library runs on.`,
+    disciplineLabel: "Authorized, evidence-backed operations",
+    noticeHtml: `<strong>Authorization first. Least impact. No fabrication.</strong> Every
+      procedure here applies only to systems you own or are explicitly, in writing, permitted to
+      administer, monitor, assess, or test, and every finding must be independently reproducible
+      from evidence. This handbook is the practice around the playbook library, not a replacement
+      for it: cross-references use the three-collection notation in CONVENTIONS Section 5
+      (<code>D&amp;R-NN</code>, <code>PB-NN</code>, <code>TX-NN</code>). MITRE mappings are pinned
+      to <strong>ATT&amp;CK Enterprise v19.2</strong> and <strong>ATLAS collection 2026.06</strong>;
+      re-map to the collections your platform carries (CONVENTIONS Section 4). Standards, platform
+      settings, and framework identifiers move - re-verify before relying on any of them.`,
+    sources: [
+      "OPERATOR-HANDBOOK.md",
+      "CONVENTIONS.md",
+    ],
+  },
+  {
     key: "ai-pqc",
     docId: "GN-PUB-AIPQC-001",
     fileStem: "GreyNOC_AI_PQC_Playbooks",
@@ -365,7 +393,7 @@ function buildHtml(publication) {
 </head>
 <body>
   <section class="cover" aria-labelledby="publication-title">
-    <div class="eyebrow">GREYNOC SECURITY PLAYBOOKS</div>
+    <div class="eyebrow">${publication.eyebrow ?? "GREYNOC SECURITY PLAYBOOKS"}</div>
     <h1 id="publication-title">${publication.coverTitleHtml}</h1>
     <div class="subtitle">${publication.subtitleHtml}</div>
     <div class="meta">
