@@ -813,7 +813,9 @@ umask 077                       # new files are owner-only
 
 WORKDIR="$(mktemp -d)"          # private temp directory
 cleanup() { rm -rf "$WORKDIR"; }
-trap cleanup EXIT INT TERM      # runs however the script ends
+trap cleanup EXIT               # runs however the script ends
+trap 'exit 130' INT             # 128 + SIGINT(2)  - EXIT trap then cleans up
+trap 'exit 143' TERM            # 128 + SIGTERM(15)
 trap 'echo "ERROR line=$LINENO command=$BASH_COMMAND" >&2' ERR
 
 main() {
@@ -824,9 +826,24 @@ main "$@"
 
 - `set -e`, `-u`, and `-o pipefail` turn silent failures into loud, early ones. `-E` makes the `ERR`
   trap fire inside functions and subshells.
-- `trap cleanup EXIT INT TERM` guarantees temporary data is removed on success, error, or Ctrl+C.
+- `trap cleanup EXIT` guarantees temporary data is removed however the script ends.
 - `IFS=$'\n\t'` prevents space-splitting surprises on filenames and log lines.
 - `umask 077` matters whenever the script writes evidence or logs.
+
+**Why the signal traps exit rather than clean up.** Handling `INT` or `TERM` does *not* terminate a
+Bash script. Once the handler returns, execution resumes at the next command. The common
+`trap cleanup EXIT INT TERM` is therefore a trap in both senses: on Ctrl+C the working directory is
+deleted and the script **keeps running against state that no longer exists**, then exits 0 and
+reports success for a run the operator cancelled. Put cleanup on `EXIT` only, and let the signal
+handlers exit — the `EXIT` trap still fires, so cleanup runs exactly once and the exit status
+honestly reports how the run ended.
+
+```bash
+# Demonstrates the defect: cleanup runs, then the script continues and exits 0
+trap cleanup EXIT INT TERM      # WRONG
+# Correct: cleanup once, on EXIT; signals terminate with a truthful status
+trap cleanup EXIT; trap 'exit 130' INT; trap 'exit 143' TERM
+```
 
 Strict mode occasionally needs a local exception — a command whose non-zero exit is expected. Make
 the exception explicit and narrow rather than disabling strict mode for the whole script:
@@ -1316,16 +1333,35 @@ Detect, Respond, Recover) so automation ties back to a recognized control struct
 set -Eeuo pipefail
 AUTH_LOG="${1:-/var/log/auth.log}"
 THRESHOLD="${2:-10}"
-[[ -r "$AUTH_LOG" ]] || { echo "ERROR: cannot read $AUTH_LOG" >&2; exit 1; }
+[[ -r "$AUTH_LOG" ]] || { echo "ERROR: cannot read $AUTH_LOG" >&2; exit 2; }
 
-grep -a "Failed password" "$AUTH_LOG" \
-  | grep -aoE "from [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" \
-  | awk '{print $2}' | sort | uniq -c | sort -rn \
-  | while read -r count ip; do
-        (( count >= THRESHOLD )) && echo "[ALERT] $ip -- $count failed attempts"
-    done
-echo "[INFO] Scan complete"
+# grep exits 1 on "no matches", which is the normal quiet-night result, not an error.
+# Collect first so strict mode does not abort the run before it reports.
+counts="$(grep -a "Failed password" "$AUTH_LOG" \
+            | grep -aoE "from [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" \
+            | awk '{print $2}' | sort | uniq -c | sort -rn || true)"
+
+alerts=0
+while read -r count ip; do
+    [[ -z "${count:-}" ]] && continue
+    if (( count >= THRESHOLD )); then
+        echo "[ALERT] $ip -- $count failed attempts"
+        alerts=$(( alerts + 1 ))
+    fi
+done <<< "$counts"
+
+echo "[INFO] Scan complete (${alerts} over threshold)"
+exit $(( alerts > 0 ? 1 : 0 ))    # 0 = clean scan, 1 = alerting, 2 = could not scan
 ```
+
+**Exit codes are the contract, so get the quiet case right.** The obvious one-pipeline version of
+this script is wrong in a way that only shows up in production: under `pipefail`, a log with no
+matching failures makes `grep` return 1, and a run where every source is below the threshold leaves
+the `while` loop carrying the false arithmetic test's status. Both are *normal, healthy* results,
+and both abort the script under `set -e` before it prints anything — so a scheduler records the
+monitor as failed every quiet night and healthy only while an attack is in progress. Collect the
+counts first, tolerate the empty case explicitly, and return a status that distinguishes "clean
+scan" from "alerting" from "broken."
 
 For automated blocking, pair this with a maintained, purpose-built tool rather than scripting bans
 by hand — the edge cases (allowlists, lockout windows, shared egress addresses) are easy to get
@@ -1599,16 +1635,27 @@ def main() -> int:
         print(f"[INFO] Baseline written ({len(cur)} files)")
         return 0
     old = json.loads(bf.read_text()); drift = 0
-    for f, h in cur.items():
-        if old.get(f) != h:
+    for f in sorted(cur.keys() - old.keys()):          # appeared since baseline
+        drift += 1
+        print(f"[ALERT] ADDED {f}")
+    for f in sorted(old.keys() - cur.keys()):          # baselined file now missing
+        drift += 1
+        print(f"[ALERT] REMOVED {f}")
+    for f in sorted(cur.keys() & old.keys()):          # present in both, content changed
+        if cur[f] != old[f]:
             drift += 1
             print(f"[ALERT] DRIFT {f}")
-    print("[OK] No drift" if not drift else f"[INFO] {drift} drifted file(s)")
+    print("[OK] No drift" if not drift else f"[INFO] {drift} change(s)")
     return 1 if drift else 0
 
 if __name__ == "__main__":
     sys.exit(main())
 ```
+
+**Report removal as loudly as modification.** Iterating only over the files that currently exist is
+the easy mistake here: a baselined configuration that has been *deleted* never appears in `cur`, so
+the comparison skips it and prints `[OK] No drift` for exactly the destructive change the detector
+exists to catch. Compare in all three directions — added, removed, changed — the way `§21.2` does.
 
 **21.10 New-account and privilege auditor (Bash).**
 
@@ -1650,8 +1697,10 @@ echo "[INFO] SUID/SGID audit complete"
 set -Eeuo pipefail
 BASE="${1:-cron_baseline.txt}"
 collect() {
-    cat /etc/crontab 2>/dev/null
-    find /etc/cron.d /etc/cron.daily /etc/cron.hourly -type f 2>/dev/null
+    sha256sum /etc/crontab 2>/dev/null
+    # Hash the contents, not just the paths: a job file can be rewritten in place.
+    find /etc/cron.d /etc/cron.daily /etc/cron.hourly /etc/cron.weekly /etc/cron.monthly \
+         -type f -print0 2>/dev/null | xargs -0 -r sha256sum 2>/dev/null
     for u in $(cut -f1 -d: /etc/passwd); do
         crontab -l -u "$u" 2>/dev/null | sed "s/^/[$u] /"
     done
@@ -1661,9 +1710,15 @@ cur="$(collect | sort)"
 if [[ ! -f "$BASE" ]]; then
     echo "$cur" > "$BASE"; echo "[INFO] Baseline written"; exit 0
 fi
-diff <(echo "$cur") "$BASE" | grep '^<' | sed 's/^< /[ALERT] NEW JOB: /' \
+diff <(echo "$cur") "$BASE" | grep '^<' | sed 's/^< /[ALERT] NEW OR CHANGED JOB: /' \
     || echo "[OK] No scheduled-job changes"
 ```
+
+**Baseline the contents, not the filenames.** Listing the job directories with `find` alone records
+only paths, so rewriting an existing job to call a different binary leaves the snapshot byte-for-byte
+identical and the auditor reports no change — while the persistence mechanism has in fact been
+repointed. Hashing each job file makes an in-place edit visible, which is the whole point of the
+check.
 
 **21.13 Web availability and certificate probe (Python).**
 
@@ -1688,8 +1743,10 @@ def probe(url: str) -> int:
     try:
         with urlopen(url, timeout=10) as r:
             ms = (time.time() - t0) * 1000
-            host = urlparse(url).hostname
-            days = cert_days(host) if url.startswith("https") else "n/a"
+            parts = urlparse(url)
+            # Check the certificate on the port the URL actually uses, not always 443.
+            days = (cert_days(parts.hostname, parts.port or 443)
+                    if parts.scheme == "https" else "n/a")
             print(f"[OK] {url} {r.status} {ms:.0f}ms cert={days}d")
             return 0
     except Exception as e:
@@ -1822,11 +1879,20 @@ REL="$ROOT/releases/$VERSION"
 [[ -e "$REL" ]] && { echo "release $VERSION already exists" >&2; exit 1; }
 mkdir -p "$REL"
 cp -a build/. "$REL/"
-( cd "$REL" && find . -type f -print0 | xargs -0 sha256sum > SHA256SUMS )
+# Exclude the manifest from its own digest, or it hashes itself while still empty.
+( cd "$REL" && find . -type f ! -name SHA256SUMS -print0 | sort -z \
+    | xargs -0 sha256sum > SHA256SUMS )
 ( cd "$REL" && sha256sum -c SHA256SUMS >/dev/null )
 ln -sfn "$REL" "$ROOT/current"
 echo "[INFO] released $VERSION -> $ROOT/current"
 ```
+
+**The manifest must not be inside its own manifest.** The redirection creates `SHA256SUMS` before
+`find` walks the tree, so an unfiltered `find . -type f` includes the manifest and records the
+digest of its empty self. Writing the remaining lines immediately invalidates that entry, the
+verification step fails, and under strict mode *every* release aborts before the symlink switch —
+a release pipeline that can only ever fail. Excluding it by name fixes the ordering; `sort -z` also
+makes the manifest deterministic so two builds of identical content produce identical manifests.
 
 **Deployment rings.** Stage the rollout: a canary host, then a small representative group, then the
 fleet. Define the promotion criterion before you start — what must be true to move to the next ring
@@ -1884,12 +1950,18 @@ cleanup() {
     rm -rf "$WORK" 2>/dev/null || true
     unset GN_API_TOKEN 2>/dev/null || true
 }
-trap cleanup EXIT INT TERM
+trap cleanup EXIT               # cleanup runs exactly once, however the script ends
+trap 'exit 130' INT             # signals terminate; the EXIT trap still cleans up
+trap 'exit 143' TERM
 
 echo "[INFO] Working in $WORK"
 # --- sensitive work confined to $WORK ---
 echo "[INFO] Done; cleanup runs automatically on exit"
 ```
+
+Cleanup is bound to `EXIT` alone for the reason given in `§14`: handling `INT` or `TERM` does not
+end the script, so a combined `EXIT INT TERM` handler wipes the working directory and then lets the
+script carry on against deleted state.
 
 ```python
 #!/usr/bin/env python3
@@ -1914,7 +1986,7 @@ if __name__ == "__main__":
 until overwritten. The classic advice to "overwrite with random data" no longer holds on modern
 storage, and getting this wrong gives false confidence. On solid-state and flash media,
 wear-levelling and over-provisioning mean an overwrite may never touch the original cells. On
-journalling and copy-on-write filesystems, and anywhere snapshots or backups exist, single-file
+journaling and copy-on-write filesystems, and anywhere snapshots or backups exist, single-file
 overwrite tools are unreliable.
 
 NIST SP 800-88 Rev. 2 (effective September 2025), which defers technique selection to
@@ -3335,7 +3407,8 @@ Designed as a pull-out. Print it and keep it at the console.
 ```bash
 # Bash
 set -Eeuo pipefail; IFS=$'\n\t'; umask 077
-WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT INT TERM
+WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
+trap 'exit 130' INT; trap 'exit 143' TERM   # signals must exit; EXIT still cleans up
 ```
 
 ```python
@@ -3371,7 +3444,8 @@ the command that produces every claim.
 
 **Cleanup and secrets reflexes.** Encrypt sensitive data at rest; cryptographic erase by destroying
 the key. Never put secrets in `argv`; redact before logging; rotate after any exposure. Overwrite
-tools are unreliable on solid-state and journalling storage. Trap-based cleanup on `EXIT INT TERM`.
+tools are unreliable on solid-state and journaling storage. Cleanup on `EXIT`; `INT` and `TERM`
+handlers exit (130 / 143) so a cancelled run cannot continue against deleted state.
 
 **Debug one-liners.**
 
@@ -3416,7 +3490,8 @@ if __name__ == "__main__":
 #!/usr/bin/env bash
 # GreyNOC Script -- Name / Purpose / Author / Version / Date / Usage
 set -Eeuo pipefail
-trap 'rm -rf "${WORK:-}" 2>/dev/null || true' EXIT INT TERM
+trap 'rm -rf "${WORK:-}" 2>/dev/null || true' EXIT
+trap 'exit 130' INT; trap 'exit 143' TERM
 # --- logic ---
 exit 0
 ```
