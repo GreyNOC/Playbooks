@@ -10,7 +10,10 @@ AI incidents cross application, model, data, agent, identity, and provider bound
 web incident runbook is necessary but insufficient: responders must preserve prompts, retrieved
 context, model/version metadata, tool traces, model and corpus provenance, and the policy state
 that governed the decision. This playbook provides the corporate incident-response twin for
-PB-16 through PB-20 and operationalizes the CISA JCDC AI Cybersecurity Collaboration Playbook.
+PB-16 through PB-20. Its **external coordination and information-sharing** section aligns to the CISA
+JCDC AI Cybersecurity Collaboration Playbook, which is a *voluntary* coordination and sharing framework
+between AI developers, providers, and government — it does not prescribe internal evidence preservation,
+containment, or recovery, and the rest of this playbook is GreyNOC practice rather than JCDC content.
 
 Use it for confirmed or suspected prompt-injection consequences, cross-tenant exposure, poisoned
 RAG or model artifacts, agent actions outside user intent, model theft, inference-key compromise,
@@ -25,14 +28,18 @@ serving-plane isolation failures, or material model-safety events with a securit
 | RAG Poisoning / False RAG Entry Injection | AML.T0070 / AML.T0071 | Retrieved knowledge is the persistence or delivery path |
 | AI Agent Context Poisoning | AML.T0080 | Memory or context survives into later tasks |
 | Exfiltration via AI Inference API | AML.T0024 | Output or serving path releases protected data |
-| Exfiltration via Cyber Means | AML.T0044 | Model or artifact theft |
+| Exfiltration via Cyber Means · Full AI Model Access | AML.T0025 · AML.T0044 | Model or artifact theft — the egress technique and the access level it requires |
 | Valid Accounts / Unsecured Credentials | T1078 / T1552 | Compromised identities or inference keys |
 | Data from Information Repositories | T1213 | RAG, vector, training, prompt, or transcript stores |
 
-ATLAS citations use collection 2026.06, and ATT&CK citations **ATT&CK Enterprise v19.2** (verified
-2026-08-09), per [CONVENTIONS §4](CONVENTIONS.md). This table has no tactic column, so v19's
-retirement of "Defense Evasion" does not reach it, but the ATT&CK names and IDs above were
-re-verified against v19.2. Re-verify against the versions your platform carries.
+> **Mapping discipline (`CONVENTIONS §4`).** ATLAS citations use collection **2026.06**; ATT&CK
+> citations use **ATT&CK Enterprise v19.2**, verified **2026-08-09**, per
+> [CONVENTIONS §4](CONVENTIONS.md). This table has no tactic column, so v19's retirement of "Defense
+> Evasion" (TA0005 renamed **Stealth**, **TA0112 Defense Impairment** split out) does not reach it, but
+> the ATT&CK names and IDs above were re-verified against v19.2. Note that *Exfiltration via Cyber
+> Means* is `AML.T0025`; `AML.T0044` is *Full AI Model Access*, an access-level technique, and the two
+> are cited together in that row because model theft needs both. Both frameworks version their names,
+> IDs, and tactic assignments — re-map to the collections your platform carries at deployment.
 
 ### 3. Preconditions and Readiness
 

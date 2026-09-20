@@ -247,18 +247,45 @@ class ID is globally unambiguous in a report, a ticket, or a triage queue. Never
 | Prefix | Range | Owning playbook | Domain |
 | --- | --- | --- | --- |
 | `C` | C1–C15 | PB-08 | Cryptographic implementation & PQ migration defects |
-| `L` | L1–L14 | PB-16 | LLM application layer |
-| `S` | S1–S10 | PB-17 | AI supply chain & model artifacts |
-| `G` | G1–G12 | PB-18 | Agentic systems, tools & the MCP boundary |
-| `I` | I1–I10 | PB-20 | Inference infrastructure & multi-tenant isolation |
+| `L` | L1–L19 | PB-16 | LLM application layer |
+| `S` | S1–S12 | PB-17 | AI supply chain & model artifacts |
+| `G` | G1–G14 | PB-18 | Agentic systems, tools & the MCP boundary |
+| `I` | I1–I12 | PB-20 | Inference infrastructure & multi-tenant isolation |
 
 A finding cites exactly one primary class. Chains cite the primary class and list the others in
 sequence (`L2 → L5 → L6`), because the chain is what carries the impact.
 
-Three playbooks own no prefix by design. **PB-07** and **PB-15** are methodology, not catalogs —
+**Precedence when the one-line heuristics disagree.** Each catalog carries a short routing
+heuristic, and read literally they overlap: PB-16's "delete the model and if a recognizable web or
+API bug remains it is `L`" would claim most of `I`, because a gateway authorization bug survives
+deleting the model; PB-20's "if it survives replacing the model with a stub that echoes its input it
+is `I`" would claim much of `L`. **The heuristics are aids, not the rule. Resolve in this order:**
+
+1. **This table wins.** The prefix ranges above are authoritative for ownership. A class that exists
+   in a catalog owns its subject, and no heuristic reassigns it.
+2. **Then the layer that makes the decision.** If application code decides, it is `L`. If the
+   gateway, router, scheduler, cache, or store decides, it is `I`. If the agent runtime takes an
+   action, it is `G`. If the defect is in something fetched or loaded, it is `S`.
+3. **Then the scope tables** in each catalog, which agree with each other and are more precise than
+   the one-liners.
+4. **Only then the delete-the-model test**, which is a sanity check for whether a finding is an
+   ordinary web bug in new vocabulary — not an ownership rule.
+
+Two consequences worth stating, because both are routinely mis-filed. An OAuth or connector-consent
+defect reached through an AI feature is `G4`, not `L`, even though deleting the model leaves a pure
+web bug — rule 1 settles it. And a shared artifact **cache** is `S`, while a shared **serving
+process** is `I`.
+
+Four playbooks own no prefix by design. **PB-07** and **PB-15** are methodology, not catalogs —
 their findings carry the class of whichever catalog the defect belongs to. **PB-19** covers model
 *behavior*, which routes to a program's model-safety channel rather than its security queue (§7.1);
 giving those findings a class ID would invite a triager to treat them as security defects.
+**PB-28** is a prompt library for operator tradecraft, not a defect catalog: its `P-DEF` / `P-OFF` /
+`P-BTY` / `P-BUG` / `P-REP` identifiers name *how the analyst worked*, not *what is wrong with the
+target*, and they are deliberately absent from the table above. A `P-` identifier is never cited as
+a finding class — it belongs only in the methodology or AI-assistance-disclosure section of a report
+(`P-REP-07`). Note also that PB-28's subject is the assistant *working for the tester*; driving a
+*target's* model remains PB-15/16/18 scope under §7's canary and trial-ledger discipline.
 
 **The TX (Transmission & Physical Layer) collection owns no prefix either.** `TX-01`, `TX-02` and
 `TX-03` are detection and response playbooks, not bug-bounty catalogs; their intrusion classes are

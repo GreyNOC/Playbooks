@@ -21,17 +21,21 @@ tenancy, request/batch contamination, and response-path timing channels.
 | --- | --- | --- |
 | Discover AI Model Ontology / Family | AML.T0013 / AML.T0014 | Model enumeration and routing oracles |
 | Exfiltration via AI Inference API | AML.T0024 | Cross-tenant content or model data in responses |
-| Exfiltration via Cyber Means | AML.T0044 | Model/weight extraction |
+| Exfiltration via Cyber Means · Full AI Model Access | AML.T0025 · AML.T0044 | Model/weight extraction — the egress technique and the access level it requires |
 | Denial of AI Service / Cost Harvesting | AML.T0029 / AML.T0034 | Capacity and spend abuse |
 | Exploit Public-Facing Application | T1190 | Exposed gateway or serving control plane |
 | Valid Accounts / Steal Application Access Token | T1078 / T1528 | Over-scoped inference credentials |
 | Endpoint Denial of Service / Resource Hijacking | T1499 / T1496 | Serving capacity exhaustion |
 
-ATLAS citations use collection 2026.06, and ATT&CK citations **ATT&CK Enterprise v19.2** (verified
-2026-08-09), per [CONVENTIONS §4](CONVENTIONS.md). This table has no tactic column, so v19's
-retirement of "Defense Evasion" does not reach it, but the ATT&CK names and IDs above were
-re-verified against v19.2 — `T1528` is *Steal* Application Access Token, distinct from `T1550.001`
-*Use Alternate Authentication Material: Application Access Token* cited in §5. Re-verify against
+> **Mapping discipline (`CONVENTIONS §4`).** ATLAS citations use collection **2026.06**; ATT&CK
+> citations use **ATT&CK Enterprise v19.2**, verified **2026-08-09**, per
+> [CONVENTIONS §4](CONVENTIONS.md). This table has no tactic column, so v19's retirement of "Defense
+> Evasion" (TA0005 renamed **Stealth**, **TA0112 Defense Impairment** split out) does not reach it, but
+> the ATT&CK names and IDs above were re-verified against v19.2. *Exfiltration via Cyber Means* is
+> `AML.T0025`; `AML.T0044` is *Full AI Model Access* — `T1528` is *Steal* Application Access Token, distinct from `T1550.001`
+*Use Alternate Authentication Material: Application Access Token*, which v19.2 assigns to Lateral
+Movement only and which this playbook does not itself cite — the citation lives in the bug-bounty twin,
+[PB-20](20-bugbounty-inference-infrastructure-isolation.md). Re-verify against
 the versions your platform carries.
 
 ### 3. Required Telemetry
@@ -143,7 +147,11 @@ Correlate five invariants:
 - Client or SDK stream demultiplexing bugs.
 - Approved shared public-model cache entries whose key excludes tenant by documented design and
   contains no tenant-derived state.
-- Deliberate multi-tenant batching with cryptographic/request isolation and verified correlation.
+- Deliberate multi-tenant batching whose per-request isolation is **demonstrated** — attention masking,
+  per-slot key/value bookkeeping, and memory separation between sequences — with verified correlation.
+  Isolation inside a continuous-batching worker is enforced by those mechanisms, **not by cryptography**:
+  do not close a cross-tenant signal by citing "cryptographic isolation" of co-batched requests, because
+  no such control exists at that layer and the alert stays unexplained.
 - Deployment failover to an approved digest.
 - Provider queue variability mistaken for a side channel.
 - Delayed billing exports where real-time quota enforcement remained correct.

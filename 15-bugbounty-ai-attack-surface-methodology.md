@@ -24,10 +24,10 @@ is built around getting those two right.
 
 | Catalog | Prefix | Surface | Defensive twin |
 | --- | --- | --- | --- |
-| [PB-16](16-bugbounty-llm-application-defects.md) | `L1–L14` | The app around the model: prompts, RAG, output rendering, sessions, app authz | PB-06, D&R-09 |
-| [PB-17](17-bugbounty-ai-supply-chain-model-artifacts.md) | `S1–S10` | What gets loaded and where it came from: weights, adapters, datasets, pipelines | PB-01, PB-11 |
-| [PB-18](18-bugbounty-agentic-systems-mcp.md) | `G1–G12` | What the model is allowed to *do*: tools, connectors, the MCP boundary, autonomy | PB-06, D&R-09 |
-| [PB-20](20-bugbounty-inference-infrastructure-isolation.md) | `I1–I10` | The serving plane: control plane, tenancy, caches, quotas, transport | PB-06, D&R-09; PB-02/PB-03 on `I10` |
+| [PB-16](16-bugbounty-llm-application-defects.md) | `L1–L19` | The app around the model: prompts, RAG, output rendering, sessions, app authz | PB-06, D&R-09 |
+| [PB-17](17-bugbounty-ai-supply-chain-model-artifacts.md) | `S1–S12` | What gets loaded and where it came from: weights, adapters, datasets, pipelines | PB-22 (release gate), PB-21 (AI-BOM); PB-01/PB-11 on signing. **No detection playbook owns registry- and pipeline-side telemetry — say so rather than citing a crypto playbook as a detection twin.** |
+| [PB-18](18-bugbounty-agentic-systems-mcp.md) | `G1–G14` | What the model is allowed to *do*: tools, connectors, the MCP boundary, autonomy | PB-06, D&R-09 |
+| [PB-20](20-bugbounty-inference-infrastructure-isolation.md) | `I1–I12` | The serving plane: control plane, tenancy, caches, quotas, transport | **D&R-20** (dedicated twin); PB-06, D&R-09; PB-02/PB-03 on `I10` |
 | [PB-19](19-bugbounty-model-behavior-safety-boundaries.md) | *(none)* | Model behavior and safety boundaries — routes to model-safety, not security | PB-06 |
 
 **Reference convention.** `PB-NN` means this collection (AI · Post-Quantum · E2EE), where the
@@ -101,11 +101,12 @@ self-scoped, or report what you actually proved.
 | Exploit Public-Facing Application | T1190 | Serving-plane and app-layer exposure |
 | Valid Accounts | T1078 | Self-owned test tenancy; also the tenancy-crossing classes |
 
-*ATT&CK citations in this table were verified against ATT&CK Enterprise v19.2 on 2026-08-09. v19
-retired the "Defense Evasion" tactic — TA0005 was renamed Stealth and TA0112 Defense Impairment was
-split out — and renumbered several techniques, so ATT&CK carries its own stated version exactly as
-ATLAS does. Cited against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); both IDs
-and names are versioned in both frameworks — re-map to your platform's collections at deployment.*
+> **Mapping discipline (`CONVENTIONS §4`).** ATT&CK citations in this table were verified against
+> ATT&CK Enterprise v19.2 on 2026-08-09. v19 retired the "Defense Evasion" tactic — TA0005 was
+> renamed Stealth and TA0112 Defense Impairment was split out — and renumbered several techniques,
+> so ATT&CK carries its own stated version exactly as ATLAS does. Cited against ATLAS collection
+> 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); both IDs and names are versioned in both
+> frameworks — re-map to your platform's collections at deployment.
 
 ## Methodology (phased)
 
