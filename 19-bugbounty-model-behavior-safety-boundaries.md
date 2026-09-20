@@ -42,6 +42,8 @@ access to data the tester was not entitled to, a privilege or identity change, o
 | Model reveals its system prompt, which contains only instructions | Security/low — PB-16 `L3`; often already known |
 | Filter bypass that also defeats an authorization check | Security — PB-16 `L13` chain |
 | Filter bypass that only changes what text is emitted | Model-safety channel — this playbook |
+| A **reliable trigger phrase** flips behaviour reproducibly, suggesting a modified model | Security — PB-17 `S6` (post-training modification). **Not this playbook:** a backdoor is an artifact-integrity defect, and routing it to model safety loses the supply-chain finding |
+| Behaviour differs between two deployments of a model the target claims are identical | Security — PB-17 `S2`/`S12` (provenance and transform chain) before anything else |
 
 When you are genuinely on the line, say so and let triage decide — PB-15 Phase 6 covers how to word
 it. Guessing high is remembered.
@@ -58,8 +60,9 @@ it. Guessing high is remembered.
 | External Harms | AML.T0048 | The consequence category a safety program is actually pricing |
 | Discover AI Model Ontology | AML.T0013 | Mapping what the deployment will and will not do |
 
-*Cited against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); both IDs and names are
-versioned — re-map to your platform's collection at deployment.*
+> **Mapping discipline (`CONVENTIONS §4`).** Cited against ATLAS collection 2026.06 per [CONVENTIONS
+> §4](CONVENTIONS.md); both IDs and names are versioned — re-map to your platform's collection at
+> deployment.
 
 Note the `maturity` discipline from §4: if a technique is marked *Feasible* rather than *Realized*,
 do not write a report that implies field observation. That is fabricated impact.
@@ -70,7 +73,7 @@ This is the non-negotiable part of the playbook. The finding is **the control fa
 payload, and there is always a way to show the former without producing the latter.
 
 - **Substitute an inert marker — the default, not the fallback.** Ask for the same structural
-  compliance with a benign target: a policy-marker string, a `GNBB-CANARY-<uuid4>`, or a harmless
+  compliance with a benign target: a policy-marker string, a registered `GNBB-CANARY-<uuid4>` ([§7.4](CONVENTIONS.md), [§8.2](CONVENTIONS.md)), or a harmless
   stand-in task with the identical refusal-triggering shape. If the safeguard is the thing being
   bypassed, the marker crosses it just as well as real content would. §7.2 names the inert canary,
   the policy marker, and the benign no-op call as *the* sanctioned proof mechanisms — reach for one
@@ -128,7 +131,13 @@ cannot reproduce.
 
 - **Prompt families, not prompt strings.** Define the probe as a template with the varying element
   parameterized, then sample from it. A family that succeeds 6/20 across ten distinct instantiations
-  is a mechanism; a string that succeeds 6/20 is a string.
+  is a mechanism; a string that succeeds 6/20 is a string. **Report the per-instantiation breakdown,
+  not only the pooled count** — at two trials per instantiation, `6/20` is equally consistent with six
+  instantiations succeeding once each and with two succeeding three times each, and only the first is
+  a mechanism. That distinction is the entire claim, so the pooled number cannot carry it. It also
+  means a single pooled Wilson interval over instantiations with different underlying rates is
+  **overdispersed and too narrow**: quote the interval per instantiation, or quote the pooled rate as
+  a descriptive statistic and say plainly that it is not a binomial proportion.
 - **Clean context per trial.** New conversation, no carried turns, no memory. If multi-turn setup is
   required, that is a *different and weaker* claim — state the turn count in the ledger and never
   blur the two.
@@ -140,7 +149,11 @@ cannot reproduce.
   evals.
 - **Scoring you can defend.** Say who judged each trial and against what criterion. Automated
   judging is acceptable if you state the judge model and version, report agreement against a
-  human-scored subset, and never let the judge's own safety behavior silently score the trials.
+  human-scored subset **as a chance-corrected statistic** — Cohen's kappa or an equivalent — and never
+  let the judge's own safety behavior silently score the trials. Raw percent agreement is not
+  acceptable here: at the skewed base rates typical of safety evaluation, a judge that always answers
+  "refused" scores near-perfect agreement while carrying no information. Report the base rate
+  alongside it so the reader can see what the judge was up against.
 - **A held-out set.** Reserve instantiations you did not iterate against, and report their rate
   separately. A rate measured only on the prompts you tuned is a training-set number and inflates
   the finding.
@@ -196,15 +209,16 @@ MECHANISM:         the dimension and how it works, described generically: ____
 PROMPT FAMILY:     template + number of distinct instantiations tested: ____
 HELD-OUT LEDGER:   __/__ @ t=__ (95% Wilson CI __–__) on instantiations not iterated against
 TRANSFERABILITY:   models/versions tested + per-target ledger, or "untested": ____
-SCORING:           human | judge model + version ; agreement vs. human-scored subset: ____
+SCORING:           human | judge model + version ; kappa vs. human-scored subset: ____ ; base rate: ____
 HARM CONTROL:      how proof was obtained without producing harmful content (§7.2): ____
 CONTENT HANDLING:  what was generated, truncated/hashed, and what was destroyed: ____
 SECURITY CROSSOVER: consequence observed (tool call / data / privilege / execution), or "none": ____
 ```
 
 The `SECURITY CROSSOVER` line is the one a triager reads first. If it says anything other than
-"none", the report probably belongs in the security queue with an `L`/`G`/`I` class instead — split
-it and file both.
+"none", the report probably belongs in the security queue with an `L`/`S`/`G`/`I` class instead — split
+it and file both. `S` is in that list deliberately: a behaviour change that traces to the *artifact*
+rather than the prompt is PB-17's, and it is the one crossover testers routinely miss.
 
 ## Stop conditions
 

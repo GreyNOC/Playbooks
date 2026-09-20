@@ -21,10 +21,10 @@ boundaries; PB-17, PB-18, and PB-20 own the artifact, agent, and serving-plane s
 
 | Finding shape | Owner | Prefix |
 | --- | --- | --- |
-| Prompt assembly, RAG retrieval, output rendering, conversation authz, app-level authz | PB-16 | `L1–L14` |
-| Model weights, adapters, datasets, registry provenance, artifact deserialization | PB-17 | `S1–S10` |
-| What the model may **do**: tool definitions, MCP servers, agent loops, action scope | PB-18 | `G1–G12` |
-| Serving plane: GPU/tenant isolation, KV-cache and batching cross-talk, hosting endpoints | PB-20 | `I1–I10` |
+| Prompt assembly, RAG retrieval, output rendering, conversation authz, app-level authz | PB-16 | `L1–L19` |
+| Model weights, adapters, datasets, registry provenance, artifact deserialization | PB-17 | `S1–S12` |
+| What the model may **do**: tool definitions, MCP servers, agent loops, action scope | PB-18 | `G1–G14` |
+| Serving plane: GPU/tenant isolation, KV-cache and batching cross-talk, hosting endpoints | PB-20 | `I1–I12` |
 | Jailbreak-for-content, hallucination, bias, refusal bypass with **no** security consequence | PB-19 | none |
 
 Tiebreaker: delete the model from the design, and if a recognizable web or API bug is still there, it
@@ -43,7 +43,7 @@ twin cited throughout is [D&R-09 AI / Automated Agent Abuse](09-ai-automated-age
 | LLM Jailbreak | AML.T0054 | L13 — the routing test decides if it is a security finding at all |
 | LLM Data Leakage | AML.T0057 | L3, L4, L14 |
 | AI Agent Tool Invocation | AML.T0053 | L6/L11 where the app hands model output to an integration |
-| Exfiltration via AI Inference API | AML.T0024 | L5, L14 — content leaving via the model surface |
+| Exfiltration via AI Inference API | AML.T0024 | L5 — the inference surface itself carrying content out |
 | Discover AI Model Ontology | AML.T0013 | L3 — recon on prompt, tool, and retrieval structure |
 | RAG Poisoning · False RAG Entry Injection | AML.T0070 · AML.T0071 | L7 (b) — contributor-poisoned corpus |
 | Data from AI Services: RAG Databases | AML.T0085.000 | L7 (a) — retrieval scope and store access |
@@ -60,14 +60,22 @@ twin cited throughout is [D&R-09 AI / Automated Agent Abuse](09-ai-automated-age
 | Obfuscated Files or Information | T1027 | L13 — the ATT&CK analogue for the same channel |
 | Resource Hijacking | T1496 | L12 where free inference is consumed for the caller's workload |
 
-*ATT&CK citations in this table were verified against ATT&CK Enterprise v19.2 on 2026-08-09 —
-including T1027, which v19 moved to the Stealth tactic when it retired "Defense Evasion" (TA0005
-renamed Stealth, TA0112 Defense Impairment split out). Cited against ATLAS collection 2026.06 per
-[CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names are
-versioned — re-map to your platform's collection at deployment. Where an ID is cited to support
-severity or plausibility, quote that technique's `maturity` value from your collection alongside it
-(§4). Cross-site scripting (`L5`), SSRF (`L10`), and IDOR (`L9`) appear by name only — no ATLAS or
-ATT&CK ID is cited or forced for them.*
+> **Mapping discipline (`CONVENTIONS §4`).** ATT&CK citations in this table were verified against
+> ATT&CK Enterprise v19.2 on 2026-08-09 — including T1027, which v19 moved to the Stealth tactic when
+> it retired "Defense Evasion" (TA0005 renamed Stealth, TA0112 Defense Impairment split out). Cited
+> against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names are
+> versioned — re-map to your platform's collection at deployment. Where an ID is cited to support
+> severity or plausibility, quote that technique's `maturity` value from your collection alongside it
+> (§4).
+>
+> **No ID is forced onto a web-vulnerability primitive.** Cross-site scripting (`L5`), SSRF (`L10`),
+> and IDOR (`L9`) are cited **by name only** — neither framework carries a technique for the primitive
+> itself, and inventing one would be the forced mapping §4 treats as a defect. Where a row above does
+> cite an ID against one of those class numbers, it is tagging the *outcome* that class reaches, not
+> the primitive: `T1552.001`/`T1552.005` tag the **credential exposure** SSRF arrives at in L10,
+> `T1567` tags the **egress** an L5 sink performs, and `T1078` tags the **identity** an L9 or L11
+> authorization failure acts under. Cite the outcome ID if your platform needs one; never label the
+> XSS, the SSRF, or the IDOR itself with it.
 
 ## Defect-class catalog
 
@@ -85,11 +93,18 @@ ATT&CK ID is cited or forced for them.*
 
 ### L2 — Indirect prompt injection via ingested content
 - **What:** instructions arrive inside retrieved content — RAG documents, web pages, emails, tickets,
-  calendar entries, code comments, document metadata, image alt text and OCR. The author is not the
-  caller, so the model obeys a party nobody authenticated. Consistently high-yield, because most apps
-  never model this boundary at all.
+  calendar entries, code comments, document metadata, image alt text and OCR — **and inside tool and
+  function return values**, which are model-visible text from a third party exactly as a retrieved
+  document is. The author is not the caller, so the model obeys a party nobody authenticated.
+  Consistently high-yield, because most apps never model this boundary at all.
 - **Recognize:** any "summarize this page / ticket / inbox / repo" feature; any index a lower-privileged
-  party can write to; retrieved text concatenated into the operator-instruction field.
+  party can write to; retrieved text concatenated into the operator-instruction field; a tool return
+  spliced into context with no provenance label separating it from operator text.
+- **Boundary with PB-18 `G1`:** the split is *what you are testing*, not *where the bytes came from*.
+  The **app splicing a return value into a privileged context with no provenance label is `L2`** — it is
+  content entering the context, and deleting the model leaves an ordinary trust-boundary bug. The **tool
+  definition, its description text, and the agent acting on the injected instruction are `G1`/`G3`**.
+  Test the splice here; hand the action to PB-18 and cite the chain.
 - **Confirm (least-impact):** own the content end to end — your document, your ticket from your own
   low-privilege account, your host — with an inert directive that only emits a registered canary, and
   two accounts you own as author and reader. Never plant directive text in shared or production stores:
@@ -166,7 +181,8 @@ ATT&CK ID is cited or forced for them.*
   own workspace with an inert marker; for stale ACLs, revoke your own access and re-query. Never enumerate
   the index or pull neighbors to "measure scope".
 - **Maps to:** AML.T0085.000 (a), AML.T0070 · AML.T0071 (b), T1213; PB-06, D&R-09; L2, L8, L11;
-  PB-20 `I2` if the crossing is in the store.
+  PB-20 `I11` if the crossing is in the store — `I2` covers model and
+  deployment routing, not retrieval backends.
 - **Severity:** high-to-critical for tenant crossing — plain broken access control. Poisoning severity
   depends on the reader's privilege and how open the write path is.
 
@@ -210,11 +226,19 @@ ATT&CK ID is cited or forced for them.*
 - **Confirm (least-impact):** point the fetcher at a listener you control — shown here as `203.0.113.10`
   per [CONVENTIONS §5](CONVENTIONS.md), which is documentation space and routes nowhere, so substitute
   your real host — and read your own request log for the arriving connection, its user agent, and whether
-  it followed the redirect. Prove metadata reachability with **one** request to a **non-credential path**
-  (the metadata root or an instance-identity path), recording only the status code, the response class,
-  and whether an IMDSv2-style token-requiring variant rejected the unauthenticated GET. Never request a
-  credentials path: on that path the response body *is* the secret, and "I did not keep it" is not
-  minimum capture under §7.7. Test size limits with one oversized inert file rather than a bomb.
+  it followed the redirect. Prove metadata reachability with **one** request to a **non-credential path** —
+  the metadata root, or `/latest/dynamic/instance-identity/document` — recording only the status code, the
+  response class, and whether the endpoint rejected the unauthenticated GET. Never request a credentials
+  path: on that path the response body *is* the secret, and "I did not keep it" is not minimum capture
+  under §7.7. **"Instance identity" is not a safe category wholesale:** the sibling paths
+  `instance-identity/pkcs7`, `/signature`, and `/rsa2048` return *signed* identity documents that real
+  systems accept as an authentication credential — HashiCorp Vault's `aws` auth method, `ec2` type,
+  authenticates on the PKCS7 document — so treat those three as credentials paths and do not request them.
+  When recording the rejection, note *which* gate rejected you: a token-requiring variant (IMDSv2, token via
+  `PUT /latest/api/token`) answers a tokenless GET with `401`, while a header-gated variant (GCP
+  `Metadata-Flavor: Google`, Azure `Metadata: true`) answers a bare GET with `403` for a different reason.
+  Reading a header-gate `403` as "not reachable" is a false negative. Test size limits with one oversized
+  inert file rather than a bomb.
 - **Maps to:** T1190, T1552.005; PB-06; L4; PB-18 `G8` where the fetch runs from an agent runtime
   rather than the app's ingestion path.
 - **Severity:** SSRF reaching an internal service or the metadata endpoint is high-to-critical on its own
@@ -282,10 +306,135 @@ ATT&CK ID is cited or forced for them.*
   traffic and any log surface you are authorized to read; the canary arriving at a third-party origin or an
   unauthenticated endpoint is the proof. Never access a log store you were not granted or pull other users'
   entries to size the exposure, and quote the documented statement any policy-contradiction claim rests on.
-- **Maps to:** AML.T0057, T1213; PB-06; L4, L9; PB-20 `I10` for platform-level log handling.
+- **Maps to:** AML.T0057, T1213; PB-06; L4, L9; PB-20 `I12` for platform-tier telemetry
+  tenancy — `I10` covers only whether that path is encrypted, not who can read it.
 - **Severity:** driven by who can reach the content and what conversations contain. An unauthenticated debug
   endpoint returning transcripts is high; content in a first-party log with correct access control is a hygiene
   finding, and calling that a data breach is the inflation triagers punish.
+
+### L15 — Prompt-template and role-delimiter injection in the assembler
+- **What:** caller text reaching the **prompt template itself** rather than the model's input. Two forms, both
+  server-side. **(a) Server-side template injection:** user input interpolated into a Jinja2, Handlebars, ERB,
+  or f-string template that the assembler then renders, yielding template-expression evaluation on the app
+  server — file read, environment access, or the template context object holding the system prompt, tool
+  schemas, and API credentials. **(b) Role and control-token forgery:** a concatenating assembler that does not
+  escape chat delimiters or special tokens, so caller text containing `<|im_start|>system`, `[INST]`, `</s>`, or
+  the target's channel markers closes the user turn and opens a *genuine* system turn. This is not L1's
+  probabilistic precedence problem — the forged turn is structurally real in the serialized prompt.
+- **Recognize:** template syntax echoed or evaluated in output; errors naming a template engine and line
+  number; a system prompt assembled by string concatenation or f-string rather than a typed message array;
+  user text appearing inside the operator block after a round trip; the chat template exposed as a
+  user-editable setting; special-token strings surviving into the prompt instead of being escaped.
+- **Confirm (least-impact):** for (a) submit the engine's arithmetic probe (`{{7*7}}` and its polyglot
+  equivalents) and confirm **evaluation**, not echo — `49` in the output is the finding, `{{7*7}}` is not.
+  Escalate only as far as proving evaluation: read one non-sensitive context attribute, stop, and never attempt
+  command execution to raise severity. For (b) seed a `GNBB-CANARY-<uuid4>` in your own tenant's operator block
+  and prove the forged system turn releases that exact string, then show the serialized prompt (from a debug
+  echo, an error, or your own deployment of the same template) with your delimiter intact.
+- **Not stochastic.** Both forms are **deterministic** — they are string handling, not sampling. Report
+  `TRIAL LEDGER: deterministic — n/n` and do not dress a template bug in Wilson intervals; applying the §7.6
+  stochastic apparatus to a deterministic defect invites a triager to think you did not understand it.
+- **Maps to:** T1190, T1059 where template evaluation reaches an interpreter; L3 (the context object holds the
+  system prompt), L4 (it holds credentials), L1 (the probabilistic sibling this class is *not*).
+- **Severity:** (a) is high-to-critical on ordinary web terms — it is remote code or file access on the app
+  server, and the model is incidental. (b) scores as L1 does, on consequence, but the structural forgery makes
+  the "precedence is probabilistic" defense unavailable to the vendor.
+
+### L16 — Structured-output and schema coercion
+- **What:** the app constrains the model's output **shape** and then trusts its **values**. A JSON schema,
+  function-argument spec, or constrained/grammar-guided decoder guarantees a parseable object; it guarantees
+  nothing about `recipient`, `amount`, `account_id`, `path`, `role`, `tenant`, or `is_admin` inside it. Where
+  the app performs no server-side re-authorization on those fields, injected content anywhere upstream fills
+  them and the backend acts. Second form: a **parser differential** between the validator and the consumer —
+  duplicate keys, `__proto__`, unicode escapes, numeric coercion, or leading-zero and big-integer handling
+  where the two parsers disagree about what the document says.
+- **Recognize:** strict mode, JSON mode, or a schema presented in documentation as a safety property; a
+  function-call argument used directly as an identifier, path, or authorization subject; validation that
+  checks types and required fields only; two different libraries validating and consuming the same payload.
+- **Confirm (least-impact):** with two accounts you own, produce a schema-valid object whose value field names
+  the *other* account's resource, and prove the backend acted on it rather than re-checking entitlement. The
+  finding is the **missing server-side check**, not the model's cooperation — so state the request that should
+  have been rejected and was not. For a parser differential, show the same document read two ways with both
+  outputs side by side.
+- **Maps to:** T1190; PB-18 `G3` once the coerced value becomes an *action the agent takes* — the boundary is
+  that `L16` is the app parsing and trusting, `G3` is the agent acting under the wrong authority.
+- **Severity:** scores as broken access control, because that is what it is — delete the model and this is an
+  API trusting a client-supplied field. Frequently the most triager-credible finding in an AI application,
+  precisely because it needs no AI vocabulary to explain.
+
+### L17 — Streaming and partial-output delivery ahead of the guardrail
+- **What:** the server streams tokens to a client that renders incrementally, while output moderation, DLP,
+  or redaction reads the completion as a whole. The scan verdict therefore lands **after** the bytes are in the
+  DOM — and after any markdown-image or link fetch in them has already left the browser. A time-of-check /
+  time-of-use defect on output sanitization. Related forms: abort or stop-generation leaving pre-redaction
+  content rendered and in the network log, and a redaction applied by overwriting displayed text while the
+  original remains in the response body or the client-side store.
+- **Recognize:** token-by-token rendering; server-sent events or chunked transfer on the completion endpoint;
+  a visible "removed for policy" replacement that appears *after* text was already shown; a moderation verdict
+  arriving as a separate later event; content still present in the raw stream after the UI redacts it.
+- **Confirm (least-impact):** in your own session, capture the **raw stream** alongside the rendered view and
+  show the pre-redaction bytes present in the response body. Where the chain is egress, prove the client issued
+  the request before the verdict arrived by timestamping your own listener hit against the redaction event.
+  Both halves are your own traffic, so no third-party data is involved.
+- **Deterministic enough to state plainly.** The race is timing-dependent, not sampling-dependent: report the
+  observed win rate as a plain count of attempts (`8/10 renders before verdict`) rather than a Wilson interval
+  over model sampling, and state the network conditions.
+- **Maps to:** T1567 where the pre-verdict render performs egress; L5 (this is why an L5 egress chain fires on a
+  target that *does* run an output scanner), L14.
+- **Severity:** informational where the only outcome is a briefly visible string; rises to the severity of the
+  underlying leak or egress the scanner existed to prevent. This class is usually the missing step that makes
+  an otherwise-rebutted L5 finding stand up.
+
+### L18 — Non-text input as an instruction carrier
+- **What:** instructions reaching a native multimodal encoder with **no text-extraction step** to inspect. Not
+  L2's alt text and OCR, which produce a text artifact a filter could see: here the directive exists only as
+  pixels or as a waveform, consumed directly by a vision or audio tower. Forms include text rendered into an
+  image at low contrast or in a corner, text in a visual code or chart label, instructions in an audio track or
+  ultrasonic band, and directives in document *page images* where the app rasterizes before ingesting.
+- **Recognize:** any image, audio, video, or screenshot upload feeding a model that is natively multimodal; a
+  document pipeline that rasterizes pages; a "describe this screenshot" or "listen to this" feature; a filter
+  stack that inspects the transcript or extracted text but not the raw media.
+- **Confirm (least-impact):** your own media, your own tenant, two accounts you own as author and reader. The
+  proof obligation is higher than L2's: you must show the `GNBB-CANARY-<uuid4>` **survived the encoder** rather
+  than an extraction step, so state whether the pipeline performs OCR or transcription and show that the canary
+  is not present in any extracted-text artifact the app produces. If OCR is in the path, this is L2.
+- **Route it correctly.** This is **not** a filter-evasion finding and does not belong in `L13`. The defect is
+  that content from an unauthenticated author enters a privileged instruction channel with no provenance
+  label, which is L2's shape in a medium the app never inspects. Filing it as evasion invites the model-safety
+  routing under §7.1 and loses the security finding.
+- **Maps to:** AML.T0051.001, AML.T0068 where the medium is itself the obfuscation; L2 (same boundary, text
+  medium), L5, L7, L11; PB-18 `G1` once the carried instruction reaches a tool.
+- **Severity:** as L2 — set by what the reader's session actually did, proven in its own class. The carrier
+  raises exploitability, not impact: a directive no filter can see is cheaper to deliver, which is a retry-cost
+  argument, not a severity multiplier.
+
+### L19 — Provenance loss across summarization and context compaction
+- **What:** the app compacts a long conversation to fit the window — summarizing earlier turns, or rewriting
+  them into a running state note — and the summarizer consumes operator instructions, caller text, and
+  retrieved content **together**. What re-enters the context is unlabeled prose in a single voice: text that
+  was quoted and fenced as untrusted becomes indistinguishable from operator instruction, and guard clauses can
+  be dropped outright as redundant detail. Taint is lost across a re-serialization, and the next turn inherits
+  a context whose provenance structure no longer exists.
+- **Recognize:** any long-conversation or long-document feature with a context-management step; a visible
+  "summarizing earlier messages" indicator; a running-summary or state-note field; truncation notices; behavior
+  that changes after a conversation passes a length threshold; guard instructions that stop being honored late
+  in a session but work in a fresh one.
+- **Confirm (least-impact):** in your own session, plant a fenced, explicitly-untrusted block containing a
+  registered canary directive early, drive the conversation past the compaction threshold, then show that the
+  post-compaction context treats it as operator-voice text — the canary released, or the directive followed,
+  where it was refused pre-compaction. The **pre- and post-compaction pair from the same session is the
+  evidence**; one side alone proves nothing.
+- **Tiebreaker note, stated honestly.** This passes on PB-16's scope table ("how prompts are assembled") more
+  cleanly than on the delete-the-model test, since the lossy transformation is itself model-driven. The nearest
+  ordinary analogue is taint loss across a re-serialization boundary. It is filed here because the *control*
+  that fails is the app's provenance labeling, which is app code — but expect a triager to push on that, and
+  lead with the labeling failure rather than the summarizer's behavior.
+- **Maps to:** AML.T0051.001; L1 (the flat-context sibling), L2 (the carrier that gets laundered), L3, L8 —
+  and note the distinction from L8: a compaction summary is a **context transformation**, not a persistent
+  memory store, so a finding that survives a new session is L8 and one that dies with the session is L19.
+- **Severity:** as the consequence in the post-compaction session, proven in its own class. The class is worth
+  reporting on its own where the laundered instruction defeats a guard the vendor relies on, because the fix is
+  structural — labels must survive compaction — and not another instruction.
 
 ## Chains that carry impact
 
@@ -356,16 +505,23 @@ document, and memory entry you planted is removed, with the removal and the meas
 
 ## Report template
 
-Use the **PB-15 AI report template**, and add these lines:
+Use the **PB-15 AI report template** as-is. It already carries `DEFECT-CLASS:` with its `CHAIN:`
+field, `TRIAL LEDGER:`, `CANARY:`, and the routing decision as the `channel:` element of
+`PROGRAM/SCOPE:` — do not redeclare any of them here, and do not rename `TRIAL LEDGER:` to
+`TRIAL-LEDGER:`, because a report carrying both spellings has two ledger fields and a triager cannot
+tell which is authoritative.
+
+Add only these two application-layer lines, which the canonical template does not have:
 
 ```
-DEFECT-CLASS:   L1–L14 primary (+ chain sequence, e.g. L2 → L5)
-TRIAL-LEDGER:   successes/trials @ temperature (95% CI low–high) — model + version string
-CANARY:         GNBB-CANARY-<uuid4> — planted where, expected containment, where it surfaced
 BOUNDARY:       who authored the input | whose identity the backend used | who read the output
-ROUTING:        security-queue | PB-19 model-safety — with the §7.1 consequence stated explicitly
 CLEANUP:        canaries / documents / memory entries removed: Y/N — details
 ```
+
+Fill `DEFECT-CLASS:` from this catalog's range, `L1`–`L19`, primary class first. For a deterministic
+class (`L15`, `L16`, `L17`) write `TRIAL LEDGER: deterministic — n/n` rather than leaving it blank:
+the field is there to show the reader you established reproducibility, and "not applicable" reads as
+an omission.
 
 ## Stop conditions
 

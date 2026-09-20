@@ -22,7 +22,7 @@ Work by class, form the falsifiable hypothesis at PB-15 Phase 4, validate self-s
 ## Scope boundary — what belongs here vs. elsewhere
 
 [PB-15's catalog map](15-bugbounty-ai-attack-surface-methodology.md) has the full split; this
-catalog owns `G1–G12`. Routing rule: if it changes what the model *says* it is `L` (PB-16); if it
+catalog owns `G1–G14`. Routing rule: if it changes what the model *says* it is `L` (PB-16); if it
 changes what the system *does* — a tool fires, a connector reaches something, a runtime executes —
 it is `G`. Malicious content arriving inside an artifact or dependency is `S` (PB-17); a crossing
 between tenants on shared serving infrastructure is `I` (PB-20). Model-behavior findings carry no
@@ -83,13 +83,14 @@ defensive twin cited below is [D&R-09 AI / Automated Agent Abuse](09-ai-automate
 | Confused deputy (delegation) | — | Named pattern behind G3; no single technique ID is cited for it |
 | Tool namespace shadowing | — | Named pattern behind G5 |
 
-*ATT&CK citations in this table were verified against ATT&CK Enterprise v19.2 on 2026-08-09. v19
-retired the "Defense Evasion" tactic — TA0005 was renamed Stealth and TA0112 Defense Impairment was
-split out — and renumbered several techniques, so ATT&CK carries its own stated version exactly as
-ATLAS does. Cited against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names
-are both versioned — re-map to your platform's collection at deployment. Techniques without a cited
-ID appear by name only. Where an ID is cited to support severity or plausibility, quote that
-technique's `maturity` value from your collection rather than implying in-the-wild use (§4).*
+> **Mapping discipline (`CONVENTIONS §4`).** ATT&CK citations in this table were verified against
+> ATT&CK Enterprise v19.2 on 2026-08-09. v19 retired the "Defense Evasion" tactic — TA0005 was
+> renamed Stealth and TA0112 Defense Impairment was split out — and renumbered several techniques,
+> so ATT&CK carries its own stated version exactly as ATLAS does. Cited against ATLAS collection
+> 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names are both versioned — re-map to
+> your platform's collection at deployment. Techniques without a cited ID appear by name only.
+> Where an ID is cited to support severity or plausibility, quote that technique's `maturity`
+> value from your collection rather than implying in-the-wild use (§4).
 
 ## Defect-class catalog
 
@@ -235,13 +236,18 @@ technique's `maturity` value from your collection rather than implying in-the-wi
 ### G8 — Egress and SSRF from the agent runtime
 - **What:** Fetch, browse, and webhook tools that reach whatever host they are handed — internal
   services, the cloud instance metadata endpoint, non-scoped hosts. Redirect-following and
-  DNS-rebinding behavior turn an allowlist into a suggestion when the destination is checked once
-  and not re-resolved and pinned at connect time.
+  DNS-rebinding behavior turn an allowlist into a suggestion wherever the destination is
+  validated as a *name* and then resolved again at connect time. The control is the other way round:
+  resolve once, validate the resulting **address**, then connect to that pinned address. Re-resolution
+  between check and connect is what rebinding exploits, so a fetcher that re-resolves is the defect, not
+  the fix.
 - **Recognize:** a fetch tool with no destination allowlist; documented outbound access; redirects
   followed without re-validating the target; hostname-based allowlists; fetched content rendered
   back into context, which makes this an injection channel as well.
-- **Confirm (least-impact):** point the tool at a listener you control in your own scope
-  (`192.0.2.10`, or `2001:db8::10`) with `GNBB-CANARY-<uuid4>` in the path and record the hit; for
+- **Confirm (least-impact):** point the tool at a listener you control in your own scope — shown here as
+  `192.0.2.10` / `2001:db8::10` per [CONVENTIONS §5](CONVENTIONS.md), which is documentation space and
+  **routes nowhere, so substitute your real host** or the probe is a guaranteed miss and a false
+  falsifier — with `GNBB-CANARY-<uuid4>` in the path, and record the hit; for
   internal reachability, one request to one in-scope internal address plus its status or timing
   differential is the whole proof. If a metadata endpoint responds, **stop** — record that it
   responded, do not retrieve credentials, escalate under §6. No range scanning.
@@ -334,6 +340,69 @@ technique's `maturity` value from your collection rather than implying in-the-wi
   informational when neither is demonstrated. **Commonly mis-reported:** theoretical
   denial-of-wallet with no measured cost and no shown loop, or a DoS you did not and must not cause.
 
+### G13 — Run initiation and the trigger boundary
+
+- **What:** **who can cause a privileged agent run to start, and under whose identity.** Every other
+  class in this catalog assumes a run is already happening; this one covers the entry point. Forms: an
+  inbound email, webhook, issue or pull-request comment, chat mention, calendar invite, or file drop that
+  starts an agent loop with no authentication of the initiator; a trigger authenticated as the *platform*
+  rather than the requester, so the agent runs with standing privilege on an outsider's cue; a scheduled
+  or event-driven run with no human present and no scoping to what the trigger authorized; and a trigger
+  whose payload is also the agent's instructions, which collapses the initiation boundary into `G1`.
+- **Recognize:** documentation inviting outside parties to "email the agent" or "mention the bot"; a
+  public webhook or public repository automation; an agent that acts on issues or comments from
+  non-members; a cron or queue-driven agent described as autonomous; a trigger path with no per-initiator
+  authorization check distinct from the transport's own authentication.
+- **Confirm (least-impact):** from an account or address you own that holds **no** entitlement to the
+  agent, issue the trigger and prove the run started — the canary in the resulting artifact, log, or
+  reply is the evidence. Stop at initiation. Prove the boundary, not the blast radius: do not steer the
+  run into a privileged action to raise severity, because the action belongs to `G3`/`G6`/`G7` and is a
+  separate finding with its own proof. Never trigger a run that acts on another party's data.
+- **Boundary with `G1` and `G6`:** `G1` owns instructions **inside content the run already ingested**;
+  `G6` owns the **missing gate on an action**; `G13` owns **the run existing at all** at an
+  unauthenticated party's request. A single finding often chains all three — cite `G13` primary when the
+  initiation is the control that failed.
+- **Maps to:** T1078, T1190; AML.T0051.001 where the trigger payload is also the injection; `G1`, `G3`,
+  `G6`, `G7`, `G12` (an outsider-triggerable run is also an outsider-triggerable cost); PB-16 `L11` where
+  the authorization decision is the app's rather than the agent's. Defensive side:
+  [D&R-09](09-ai-automated-agent-abuse.md) for the traffic and delegation shape.
+- **Severity:** critical where an unauthenticated outsider initiates a run holding production privilege;
+  high where an authenticated but unentitled party does; medium where initiation is over-broad within a
+  trusted population. An anonymously triggerable autonomous run with no human in the loop is the
+  highest-value finding in this catalog and the least often looked for.
+
+### G14 — Action attribution and audit integrity
+
+- **What:** the system cannot say **who caused an action** after the fact. No per-action record binding
+  the action to the initiating principal *and* the approving human *and* the tool invocation that carried
+  it; every action attributed to the agent's own service identity, so delegation is unreconstructable;
+  logs the agent itself can write, edit, or truncate through its own tool set; approval events recorded
+  without the arguments they approved; and a retention window on the action log shorter than the window
+  in which its consequences surface.
+- **Recognize:** downstream systems showing only the agent's service account as actor; no on-behalf-of or
+  delegation field; an audit log the agent has write access to via a filesystem, database, or logging
+  tool; approvals recorded as a boolean with no argument hash; no correlation id joining trigger,
+  approval, tool call, and effect; an export that cannot answer "which human approved this."
+- **Confirm (least-impact):** perform a benign, clearly-attributable action through the agent in your own
+  tenant — a no-op or echo tool where one exists — then read every record the product exposes to you and
+  show what is **absent**: the initiating principal, the approving human, the arguments, or the join
+  between them. The proof is the product's own audit output beside your known ground truth, which is why
+  this class needs no impact at all to demonstrate. Where the agent can write to its own log, show the
+  write capability from the tool schema; do not actually tamper with a log.
+- **Note on triage.** Programs frequently score this low on its own, so pair it with the class whose
+  investigation it defeats — `G3`, `G6`, or `G13` — and state the consequence plainly: an unattributable
+  action means the target cannot scope an incident, cannot prove the approval happened, and cannot
+  distinguish your authorized test from a real intrusion. That last point is also why
+  [§7.10](CONVENTIONS.md) asks you to be identifiable.
+- **Maps to:** T1070 (indicator removal, where the agent can reach its own log), T1078; `G3` (the
+  confused-deputy finding this class makes uninvestigable), `G6`, `G9`, `G13`. Defensive side:
+  [D&R-19](19-ai-security-incident-response.md) owns the evidence and action-record requirement;
+  [D&R-09](09-ai-automated-agent-abuse.md) owns delegation anomalies; PB-21 owns identity ownership.
+- **Severity:** medium on its own as a logging and non-repudiation gap; high where the agent can modify
+  or delete its own audit trail, or where the missing attribution is what prevents scoping a demonstrated
+  privileged action. Report it even when a program scores it low — it is the finding that makes every
+  other agent finding harder to fix.
+
 ## Chains that carry impact
 
 These are attacker impact paths, not test procedures: the self-scoped equivalent of each hop is in
@@ -402,7 +471,7 @@ finding.
 Use the PB-15 AI report template, then add these lines:
 
 ```
-DEFECT-CLASS:      G1–G12 primary; chain in sequence (e.g. G1 → G8 → G11)
+DEFECT-CLASS:      G1–G14 primary; chain in sequence (e.g. G1 → G8 → G11)
 AGENT-UNDER-TEST:  harness/product + version · model + version string · tool set granted
 TOOL-SURFACE:      transport + auth (local stdio | loopback HTTP | remote HTTPS + bearer) · tools invoked
 ACTION-CROSSED:    what the output actually became (call | read | write | send | spend | exec | egress)

@@ -2,8 +2,8 @@
 
 ## Overview
 
-This playbook integrates AI threat modeling, secure development, test/evaluation/validation/
-verification (TEVV), release gates, and change management. It applies to model-backed
+This playbook integrates AI threat modeling, secure development, test, evaluation,
+verification and validation (TEVV), release gates, and change management. It applies to model-backed
 applications, RAG, fine-tuning, agents, classifiers, and serving infrastructure. The objective is
 not to prove that an AI system is universally safe; it is to define its intended operating
 conditions, measure relevant failure modes, and prevent unreviewed changes from invalidating the

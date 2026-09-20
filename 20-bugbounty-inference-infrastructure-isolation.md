@@ -14,7 +14,7 @@ infrastructure security (management-surface authn, tenant binding, cache keying,
 consumption limits, transport crypto) with AI-shaped consequences, because the data is prompts and
 outputs and the shared resource is an accelerator. It is high-yield because serving stacks go up fast
 on single-tenant defaults in front of multi-tenant traffic. PB-15 is the methodology spine; this
-catalog owns `I1–I10` alongside PB-16 (`L`), PB-17 (`S`), and PB-18 (`G`).
+catalog owns `I1–I12` alongside PB-16 (`L`), PB-17 (`S`), and PB-18 (`G`).
 
 ## Scope boundary — what belongs here vs. elsewhere
 
@@ -32,7 +32,7 @@ Most wasted effort on this surface is hunting classes the engagement cannot reac
 | --- | --- | --- |
 | **Hosted multi-tenant API** | accounts, orgs/projects, keys, two self-owned tenants | I2, I3, I5, I6, I7, I8; I9 as API signal only; I10 at the edge only |
 | **Dedicated / managed endpoint** | the above plus deployment config, endpoint names, storage, private networking | I1 (deployment management API), I2, I5, I7, I9, I10 (edge + documented internals) |
-| **Self-hosted / on-prem / infra-level** | host, runtime, scheduler, model store, device, internal network | all of I1–I10 |
+| **Self-hosted / on-prem / infra-level** | host, runtime, scheduler, model store, device, internal network | all of I1–I12 |
 
 `I4` is unreachable from a hosted API, `I6` is rare everywhere, and `I10`'s internal hops are
 provable only in the third row. Name your row in the report.
@@ -56,13 +56,13 @@ collection, per [CONVENTIONS §5](CONVENTIONS.md); the standing defensive twin c
 | Data from Information Repositories · Data from Local System | T1213, T1005 | Model stores, snapshot buckets, log tiers; device residue and on-host reads (I4, I9, I10) |
 | Adversary-in-the-middle on internal hops · harvest-now-decrypt-later capture | — | Plaintext gateway→router→worker transport; classical-only key exchange on a prompt path (I10) |
 
-*ATT&CK citations in this table were verified against ATT&CK Enterprise v19.2 on 2026-08-09. Note
-that T1550.001 is now Lateral Movement only — v19 retired the "Defense Evasion" tactic (TA0005
-renamed Stealth, TA0112 Defense Impairment split out) and, for the T1550 family, dropped the second
-tactic outright rather than renaming it. Cited against ATLAS collection 2026.06 per
-[CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names
-are both versioned — re-map to your platform's collection at deployment. Techniques without a cited ID
-appear by name only.*
+> **Mapping discipline (`CONVENTIONS §4`).** ATT&CK citations in this table were verified against
+> ATT&CK Enterprise v19.2 on 2026-08-09. Note that T1550.001 is now Lateral Movement only — v19
+> retired the "Defense Evasion" tactic (TA0005 renamed Stealth, TA0112 Defense Impairment split
+> out) and, for the T1550 family, dropped the second tactic outright rather than renaming it.
+> Cited against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names
+> are both versioned — re-map to your platform's collection at deployment. Techniques without a
+> cited ID appear by name only.
 
 ## Defect-class catalog
 
@@ -100,17 +100,22 @@ appear by name only.*
   in a B-owned artifact, then from A's clean context send A's credential with B's identifier; proof
   is B's canary in A's response. A real customer's org id is a §6.6 stop condition, not a test input.
 - **Maps to:** T1078, AML.T0012, AML.T0013; PB-16 `L` owns this when the *app* resolves tenancy.
-  Defensive side: D&R-09 catches the traffic shape (calls referencing resources outside the caller's
-  scope); no playbook in this library covers gateway-side object-level authorization, and per
-  [CONVENTIONS §4](CONVENTIONS.md) that is said plainly rather than forced onto a twin.
+  Defensive side: [D&R-20](20-ai-serving-plane-isolation.md) is the dedicated twin and covers
+  gateway-side object-level authorization directly — rule `gateway_object_authorization_mismatch`.
+  D&R-09 additionally catches the traffic shape (calls referencing resources outside the caller's scope).
 - **Severity:** critical for a demonstrated cross-tenant read or inference on another tenant's
   private model; high for existence disclosure alone; medium where only the error differential leaks.
 
 ### I3 — Cross-request cache leakage
 
 - **What:** three different caches sit here and they fail differently. A **prefix/KV cache** reuses
-  attention key/value tensors for a prefix *you also supplied*, so cross-tenant it yields a hit/miss
-  and a timing oracle and nothing more — it cannot emit another tenant's tokens into your completion.
+  attention key/value tensors for a prefix *you also supplied*, so where the cache key is the verified
+  token sequence, cross-tenant it yields a hit/miss and a timing oracle and nothing more. **That
+  guarantee is a property of the key construction, not of prefix caching.** Mainstream engines key
+  blocks on a *content hash*; where an implementation trusts that hash without verifying the underlying
+  token ids, a collision — accidental or crafted — returns key/value state computed from tokens the
+  requester never supplied, which is another tenant's computed state entering your forward pass. Read
+  the block-key derivation at the pinned version before you conclude the ceiling is an oracle.
   A **semantic/response cache** stores a completion and returns it for a similar prompt; that is the
   one that can hand another caller's content to you. An **embedding cache** leaks at the vector
   level. Each is a defect when keyed on content alone rather than content plus tenant plus principal.
@@ -121,7 +126,10 @@ appear by name only.*
   context submit its prefix — the canary in A's response is proof, and the response cache is the only
   one a canary proves. *Prefix cache:* the claim is hit/miss and needs the stated design below.
   *Embedding cache:* the claim is vector-level leakage, proven at the vector. A claim that a prefix
-  cache emitted another tenant's tokens is either a response-cache finding or I6.
+  cache emitted another tenant's tokens is **usually** a response-cache finding or I6 — but a
+  demonstrated cache-key-derivation defect, where a content hash is trusted without verifying the token
+  ids behind it, is a genuine prefix-cache finding in this class. Show the key derivation; do not let
+  this heuristic misroute it.
   A latency delta or cached-token count is only an **indicator**. An indicator-only claim requires a
   design fixed before the first request — arm definitions, trial count, request interval, wall-clock
   window, interleaved ordering — and is reported as a **distribution comparison with the raw
@@ -132,8 +140,10 @@ appear by name only.*
   hit/miss decision rule, **state the threshold in advance** — §8.3 then applies to that proportion,
   at the §7.6 bar of ≥2 successes across a stated trial count. Never push volume through a shared
   cache to force evictions; that degrades other tenants (§7.5, §7.11).
-- **Maps to:** AML.T0057, AML.T0040; chains into I8. Defensive side: no playbook in this library
-  covers cache-key tenancy — the detecting control is the serving stack's own cache-key audit.
+- **Maps to:** AML.T0057, AML.T0040; chains into I8. Defensive side:
+  [D&R-20](20-ai-serving-plane-isolation.md) covers cache-key tenancy — rule
+  `cache_or_batch_tenant_contamination`, with the required key dimensions in its tuning section. The
+  serving stack's own cache-key audit remains the preventive control.
 - **Severity:** critical for canary-proven cross-tenant leakage; medium for a proven cross-tenant
   hit/miss oracle; informational for a latency observation with no design fixed in advance.
 
@@ -141,10 +151,21 @@ appear by name only.*
 
 - **What:** accelerators are shared three ways and the risk differs in each. **Hardware
   partitioning** adds enforced separation; the defect there is a partition that is nominal rather
-  than enforced. **Cross-process sharing / time-slicing** is guarded by the *driver*, which zeroes
-  device pages before reassigning them to a different process — on mainstream accelerator stacks that
-  boundary generally holds, so treat a claim against it as extraordinary and source it. The realistic
-  defect is **intra-process buffer reuse**: one serving process recycling KV-cache blocks, activation
+  than enforced. **Cross-process sharing** comes in three forms with materially
+  different guarantees, and collapsing them is the common analytic error. Default **time-slicing**
+  gives separate contexts and separate virtual address spaces, and the driver zeroes *global* device
+  memory before reassigning it to another process. **MPS** shares a scheduler; depending on
+  architecture generation it may give per-client address spaces but not fault or error isolation, and
+  older implementations shared a single context outright — do not assume driver-scrub reasoning applies
+  to an MPS deployment. **Hardware partitioning** (MIG-style) is the only form that partitions compute,
+  cache, and memory paths, and the defect there is a partition that is nominal rather than enforced.
+  **Scope the scrub claim precisely:** the driver's guarantee covers global device memory. It does not
+  cover GPU **local/shared memory, registers, or on-chip scratch**, and uninitialized local memory is
+  where the published cross-process residue affecting several mainstream vendors actually recovered
+  inference data. So a residue claim against global memory is extraordinary and must be sourced; a
+  residue claim against local memory is a known class — establish which one you are making, and record
+  the vendor, architecture, driver version, and sharing mode, because the answer is specific to all
+  four. The other realistic defect is **intra-process buffer reuse**: one serving process recycling KV-cache blocks, activation
   buffers, or padding across tenants without clearing them. That is a framework bug, and where a
   workload reads a prior tenant's activations, KV cache, or weights out of a recycled buffer, the
   boundary sits below everything else you were testing.
@@ -161,7 +182,10 @@ appear by name only.*
   writing to it*. The planted pattern is what makes residue attributable. Reading residue that is not
   yours is a §7.11 stop condition, not a proof step.
 - **Maps to:** T1005, AML.T0040; PB-17 `S` for runtime and dependency provenance. Defensive side:
-  none in this library — the detecting control is the framework's own buffer-lifecycle test.
+  [D&R-20](20-ai-serving-plane-isolation.md) scopes accelerator pools but carries **no residue
+  detection** — this is the one gap in I1–I12 that its twin genuinely does not close, and the detecting
+  control remains the framework's own buffer-lifecycle test. Say that precisely rather than "no
+  defensive coverage exists," which is false for the rest of this catalog.
 - **Severity:** critical where residue holding another workload's data is demonstrated on shared
   hardware in an authorized host engagement; low for the version disclosure that is the only
   hosted-API form — never file that at the theoretical severity.
@@ -190,10 +214,14 @@ appear by name only.*
 
 - **What:** continuous/in-flight batching and multiplexed streaming put many tenants' sequences in
   one forward pass, so indexing bugs mis-route them: a token appended to the wrong sequence, a
-  response returned against the wrong request id, a slot reused uncleared. (Speculative decoding is
-  *not* one of these mechanisms — a draft model proposes tokens for your own sequence and the target
-  verifies them inside a single request, interleaving no tenants; it matters here only if the
-  draft/verify state is itself mis-indexed.)
+  response returned against the wrong request id, a slot reused uncleared. (**Speculative decoding needs care here.** A draft
+  model proposes tokens for your own sequence and the target verifies them, so the *logical* unit is one
+  request — but in a continuous-batching engine the draft forward pass and the verification pass are
+  themselves batched across requests, so the mechanism does interleave tenants and does present the same
+  slot-indexing surface as the rest of this class. It matters where the draft/verify state is mis-indexed,
+  and also where a draft model or prompt-lookup cache is **shared across tenants**, which is a second
+  key/value surface extending I3. A further channel sits in I8, not here: the per-step accepted-token
+  count is content-dependent and observable in streaming cadence and packet sizing.)
 - **Recognize:** a coherent response answering a question you did not ask; a stream changing topic
   mid-generation; usage accounting inconsistent with your prompt. Rule out your own client first —
   most field reports of this are harness stream-merge bugs.
@@ -202,7 +230,9 @@ appear by name only.*
   ids, headers, millisecond timestamps, version string, and your in-flight set. A screenshot is not
   this finding. Report as a ledger even at 2/500; never generate load to induce it (§7.5).
 - **Maps to:** AML.T0057, AML.T0040; PB-16 `L` for session mixing inside one app. Defensive side:
-  none in this library — the detecting control is request-id correlation in the serving stack.
+  [D&R-20](20-ai-serving-plane-isolation.md) covers request and batch contamination — rule
+  `cache_or_batch_tenant_contamination`, whose batch, stream, and request-id triggers are exactly this
+  class. Request-id correlation in the serving stack remains the preventive control.
 - **Severity:** critical when another tenant's content is proven in your response with the
   correlation evidence above; not reportable at all without it.
 
@@ -241,9 +271,11 @@ appear by name only.*
   distribution comparison with the raw per-trial timings attached, and only a claim binarized against
   a threshold stated in advance is reported as a proportion under §8.3. **This class is the most
   over-reported here and routinely submitted on weak statistics**; if the arms do not separate, falsify.
-- **Maps to:** AML.T0057, AML.T0013; chains from I3 and I6. Defensive side: D&R-09 for the
-  enumeration shape of the error-differential half; no playbook here covers response-path timing
-  channels — said plainly rather than forced onto a twin ([CONVENTIONS §4](CONVENTIONS.md)).
+- **Maps to:** AML.T0057, AML.T0013; chains from I3 and I7 (see the chains section — there is no
+  `I6 → I8` chain). Defensive side: [D&R-20](20-ai-serving-plane-isolation.md) covers response-path
+  timing channels — its investigation step on pre-registered timing and error-differential thresholds,
+  and its tuning requirement to baseline timing by model, region, deployment, token shape, cache state,
+  and load band. D&R-09 additionally covers the enumeration shape of the error-differential half.
 - **Severity:** high only where the channel carries another tenant's content or a specific
   attributable fact; medium for a reliable existence oracle; informational for a bare timing delta.
 
@@ -294,6 +326,74 @@ appear by name only.*
 - **Severity:** medium to high by the shelf-life of what transits the path and whether a plaintext hop
   is third-party-reachable; high where prompt or output content is stored unencrypted under long
   retention; the classical-only-KEX component alone is a migration finding, scored as one.
+
+### I11 — Vector-store and embedding tenancy at the store
+
+- **What:** a shared index, collection, or namespace serving multiple tenants where the tenant boundary
+  is not enforced *by the store*. Forms: a tenant filter carried as ordinary metadata that the query
+  path may omit; a filter applied **after** ranking, so neighbours from other tenants are retrieved and
+  then discarded, and timing or result-count still discloses them; a namespace or collection id taken
+  from a client-supplied value; store credentials scoped to every tenant's collection because the
+  serving role needs breadth; and direct reachability of the store's own API from outside the serving
+  path. Reconstruction of source text from retrieved vectors belongs here too — an embedding is not
+  anonymous by default.
+- **Recognize:** one index name across tenants; a filter expression built in the request path rather
+  than injected by a trusted layer; a collection or namespace parameter in the API; a vector-database
+  port or console reachable from a network position you hold; `top_k` results whose count varies with
+  another tenant's data volume; a store with no per-tenant credential at all.
+- **Confirm (least-impact):** two tenants you own. Seed a registered `GNBB-CANARY-<uuid4>` document into
+  tenant A's corpus, then query as tenant B and prove either the canary's content, its identifier, or a
+  count or latency that only its presence explains. Query through the store's own API as well as through
+  the app, because the finding is *which layer enforces the boundary*: if the app filters correctly and
+  the store does not, the defect is still here and any second consumer of that store inherits it. Read
+  only your own canary; a query that begins returning real tenant content is a §7.11 stop condition.
+- **Boundary with PB-16 `L7`:** `L7` owns retrieval scope decided by **app code** — the app resolves the
+  wrong corpus for an entitled caller. `I11` owns the boundary the **store** was supposed to enforce.
+  This class exists because `L7` and `L14` both route store-level tenancy to PB-20 and, before `I11`,
+  landed on `I2`, which covers model and deployment routing only and has no store content.
+- **Maps to:** AML.T0057, AML.T0085.000, T1213, T1078; PB-16 `L7` for the app-side half; chains into I8
+  where the only crossing you can prove is a count or a latency. Defensive twin
+  [D&R-20](20-ai-serving-plane-isolation.md) for the cache-key and tenancy dimensions; PB-23 owns the
+  governance side of embedding retention.
+- **Severity:** critical for canary-proven cross-tenant retrieval of content; high for retrieved-then-
+  discarded neighbours, because the data left the boundary regardless of what the client saw; medium for
+  a count or timing oracle alone. Do not report a shared index as a finding on its own — shared indexes
+  are a normal design, and the finding is the absent enforcement.
+
+### I12 — Telemetry, trace and evaluation tenancy at the platform tier
+
+- **What:** the platform's own observability, evaluation, and analytics tier holding prompts,
+  completions, retrieved context, and tool arguments, with a weaker boundary than the inference path it
+  instruments. Forms: a shared tracing or APM project where one tenant reads another's spans; guessable
+  or sequential trace and request ids; an unauthenticated debug, trace, or metrics endpoint on the
+  serving **platform** rather than the application; prompt and completion bodies in a shared log sink or
+  error-tracking project; an evaluation, annotation, or feedback store carrying production content under
+  looser access control than production; and retention on that tier exceeding the retention promised for
+  the inference path.
+- **Recognize:** a trace id echoed in responses or headers that is short, sequential, or timestamp-
+  derived; a platform console, `/metrics`, `/debug`, or trace-viewer route reachable with your
+  credentials or none; request bodies visible in an observability vendor's UI; an eval or feedback
+  dataset built from production traffic; a documented inference-path retention that the trace tier
+  contradicts.
+- **Confirm (least-impact):** your own traffic, carrying a registered canary, and your own two tenants.
+  Prove the canary is readable from a position that should not reach it — tenant B's console, an
+  unauthenticated endpoint, or a third-party origin in your own browser traffic. For an id-guessability
+  claim, demonstrate the derivation on **your own** ids and stop; do not enumerate into the id space,
+  because the first hit is another tenant's content and a §7.11 stop condition. Never pull other
+  tenants' entries to size the exposure, and quote the documented retention statement any
+  contradiction claim rests on.
+- **Boundary with `I10` and PB-16 `L14`:** `I10` owns whether the path is **encrypted** — transport and
+  at-rest crypto. `I12` owns **who can read** the telemetry tier once it is stored. `L14` owns the
+  application's own logging and its third-party analytics. `L14` routed platform-tier log handling to
+  `I10`, which is crypto-only; `I12` is where that reference now lands.
+- **Maps to:** AML.T0057, T1213, T1078; PB-16 `L14` for the application half; PB-23 for retention and
+  deletion governance; PB-17 `S8` where the same content appears in build or image layers. Defensive
+  twin [D&R-20](20-ai-serving-plane-isolation.md).
+- **Severity:** high to critical for an unauthenticated platform endpoint returning prompts or
+  completions; high for proven cross-tenant trace reads; medium for id guessability demonstrated on your
+  own ids without a crossing; low-to-informational for content in a first-party tier with correct access
+  control, which is a hygiene and retention finding — calling that a breach is the inflation triagers
+  punish.
 
 ## Chains that carry impact
 
@@ -368,7 +468,7 @@ model/version string, and the falsifier that would have killed it.
 Use the PB-15 AI report template, then add these lines:
 
 ```
-DEFECT-CLASS:     I1–I10 (one primary; chain listed in sequence, e.g. I5 → I2 → I9)
+DEFECT-CLASS:     I1–I12 (one primary; chain listed in sequence, e.g. I5 → I2 → I9)
 DEPLOYMENT-MODEL: hosted-API | dedicated-endpoint | self-hosted/infra
 TENANCY-PROOF:    two-tenants-owned: Y/N · canary IDs: GNBB-CANARY-<uuid4> (A) / <uuid4> (B)
 TRIAL-LEDGER:     successes/trials @ temperature (95% CI low–high) · interval · interleaved: Y/N

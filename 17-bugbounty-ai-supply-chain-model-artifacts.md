@@ -22,10 +22,10 @@ missing gate. It is the deterministic counterpart to PB-16 (`L`, the app around 
 
 | Finding | Prefix | Owner |
 | --- | --- | --- |
-| Artifact format, origin, provenance, pinning, registry, cache, model-build pipeline | `S1–S10` | **PB-17 (here)** |
-| Prompt handling, RAG retrieval at inference, output handling, sessions, app-level authz | `L1–L14` | PB-16 |
-| Tool/function invocation, agent autonomy, MCP server trust, agent credential scope | `G1–G12` | PB-18 |
-| Serving plane: GPU/process isolation, cache and batching leakage, endpoint authn, tenancy | `I1–I10` | PB-20 |
+| Artifact format, origin, provenance, pinning, registry, cache, model-build pipeline | `S1–S12` | **PB-17 (here)** |
+| Prompt handling, RAG retrieval at inference, output handling, sessions, app-level authz | `L1–L19` | PB-16 |
+| Tool/function invocation, agent autonomy, MCP server trust, agent credential scope | `G1–G14` | PB-18 |
+| Serving plane: GPU/process isolation, cache and batching leakage, endpoint authn, tenancy | `I1–I12` | PB-20 |
 | Jailbreak, disallowed content, refusal bypass with no security consequence | none | PB-19 → model-safety channel |
 
 Tiebreaker, consistent with PB-16's: **what you loaded and where it came from** is `S`; a recognizable
@@ -75,21 +75,23 @@ on your own infrastructure. If a claim cannot be made from metadata, it is not a
 | Supply Chain Compromise: Compromise Software Supply Chain | T1195.002 | Registry, promotion, mirror, delivery path |
 | Command and Scripting Interpreter | T1059 | Code executed by the loader during deserialization (S1) |
 | Unsecured Credentials: Credentials In Files | T1552.001 | Notebooks, configs, model cards, layers (S8) |
-| Subvert Trust Controls: Code Signing | — | S9's remediation surface; mapped by impact per PB-11 |
+| Subvert Trust Controls: Code Signing | T1553.002 | S9's remediation surface; mapped by impact per PB-11 |
 
-*ATT&CK citations in this table were verified against ATT&CK Enterprise v19.2 on 2026-08-09;
-Subvert Trust Controls: Code Signing sits under the new TA0112 Defense Impairment tactic that v19
-split out when it retired "Defense Evasion" (TA0005 renamed Stealth). Cited against ATLAS collection
-2026.06 per [CONVENTIONS §4](CONVENTIONS.md); ATLAS IDs and names
-are both versioned — re-map to your platform's collection at deployment. Techniques without a cited ID
-appear by name only.*
+> **Mapping discipline (`CONVENTIONS §4`).** ATT&CK citations in this table were verified against
+> ATT&CK Enterprise v19.2 on 2026-08-09; Subvert Trust Controls: Code Signing sits under the new
+> TA0112 Defense Impairment tactic that v19 split out when it retired "Defense Evasion" (TA0005
+> renamed Stealth). Cited against ATLAS collection 2026.06 per [CONVENTIONS §4](CONVENTIONS.md);
+> ATLAS IDs and names are both versioned — re-map to your platform's collection at deployment.
+> Techniques without a cited ID appear by name only.
 
 ## Defect-class catalog
 
 ### S1 — Code-executing artifact formats loaded without isolation
 - **What:** in pickle-derived formats deserialization *is* execution — `.pkl`, `.pt`/`.bin`, `joblib`,
   `np.load(allow_pickle=True)`, Keras `Lambda` layers where the loader runs `safe_mode=False` (Keras 3
-  defaults it `True`, which blocks that), and `trust_remote_code`/`auto_map` repo imports. `.ckpt` is
+  defaults it `True` — but **`safe_mode` governs the Keras v3 `.keras` format only**, so a legacy HDF5
+  `.h5` or TF SavedModel load carrying a `Lambda` layer is outside its scope; those are exactly what an
+  older model repo ships, and clearing such a repo by citing the default is a false negative), and `trust_remote_code`/`auto_map` repo imports. `.ckpt` is
   not exclusively pickle — TensorFlow checkpoints use the extension too — so read the header, not the
   suffix. Safetensors and GGUF have no deserialize-to-code path **by design**, a claim about the format
   and not the parser: reader memory safety is a separate question. And **"safe format" is not "trusted
@@ -98,8 +100,11 @@ appear by name only.*
   still delivers template text onto the prompt-assembly path (S6).
 - **Recognize:** `.bin`/`.pt`/`.ckpt` with no safetensors equivalent; **record the pinned torch version,
   because the default flipped in 2.6** — `torch.load` has defaulted to `weights_only=True` since
-  PyTorch 2.6, so the finding is an explicit `weights_only=False`, a pre-2.6 pin, or a `joblib.load` /
-  `np.load(allow_pickle=True)` call, not the bare presence of `torch.load`; `trust_remote_code=True` or
+  PyTorch 2.6, so the finding is an explicit `weights_only=False`, a pre-2.6 pin, a `joblib.load` /
+  `np.load(allow_pickle=True)` call, or a `torch.serialization.add_safe_globals()` call or
+  `safe_globals` context manager that widens the allowlist back out — a number of wrapper libraries
+  invoke that on the caller's behalf, so grep for it rather than stopping at the version check — not the
+  bare presence of `torch.load`; `trust_remote_code=True` or
   `auto_map`; any user-supplied checkpoint path. `weights_only=True` is a type allowlist, not a sandbox:
   cite it as a mitigating control, never as proof of safety.
 - **Confirm (least-impact):** static and offline — archive listing and metadata, never the object graph
@@ -132,8 +137,10 @@ appear by name only.*
   re-registration**, rename-and-reclaim **where the platform leaves the old path resolvable to a new
   claimant**, stale org membership, unclaimed hub orgs mirroring the brand. Name-reuse behavior is
   per-platform, not a universal mechanic: GitHub redirects after a rename but retires the namespace for
-  popular repos, npm blocks name reuse after unpublish, PyPI restricts deleted project names, and model
-  hubs differ again.
+  popular repos; npm's block on reusing an unpublished name is **time-limited, not permanent**; PyPI's
+  handling of deleted project names is governed by its own policy and has historically freed names, which
+  is part of why this class exists; and model hubs differ again. Record the platform's *documented,
+  current* policy as the evidence — this list is a prompt to go read it, not a substitute for doing so.
 - **Recognize:** production pull paths in a personal namespace or an org the target does not obviously
   control; a pre-rename path still referenced; a hub org with no members and no verification marker.
 - **Confirm (least-impact):** read-only resolution — record whether the namespace exists, who the hub
@@ -149,7 +156,9 @@ appear by name only.*
 - **What:** the consumer pulls `main`, `latest`, a branch, or a moveable tag instead of a pinned
   revision or content digest, so the artifact reviewed is not necessarily the artifact loaded — a
   floating container tag with a bigger blast radius, the object landing in a privileged runtime.
-- **Recognize:** `from_pretrained("org/model")` with no `revision=`; `:latest` on a model-server image;
+- **Recognize:** `from_pretrained("org/model")` with no `revision=` — and note that the presence of
+  `revision=` is **not** itself a pin, because it accepts a branch or tag and defaults to `main`; only an
+  immutable commit SHA pins, so read the value, not the keyword; `:latest` on a model-server image;
   IaC referencing an object-store path with no version id; a registry accepting a re-push; a lockfile
   pinning every Python dependency and no model.
 - **Confirm (least-impact):** static read of manifests, IaC, deployment config, and the registry's
@@ -281,6 +290,67 @@ appear by name only.*
   unauthenticated or attacker-influenceable pull path feeds a code-bearing loader (S1), high for a
   cross-tenant readable or writable cache, medium where transport is authenticated but the key mutable.
 
+### S11 — AI runtime, serving image and dependency provenance
+
+- **What:** the artifact everyone forgets is an artifact. The serving runtime, inference container, its
+  base image, and the Python/CUDA/driver dependency chain are all **loaded**, and the questions this
+  catalog asks of a model apply to them unchanged: who built it, is it signed, is the reference
+  immutable, and can an outside party influence what lands in it. Forms: an inference image pulled by a
+  mutable tag with no digest pin; a base image from an unowned or unverified namespace; a runtime built
+  from a fork with no attestation; a conversion, compile, or quantization tool pulled at build time from
+  a mutable source; build-time `pip`/`conda` resolution with no lockfile or hash pinning, including
+  index-priority and extra-index-url confusion; and a model server whose plugin or custom-op path loads
+  compiled objects from a writable location.
+- **Recognize:** a Dockerfile or manifest referencing `:latest` or a moving tag for the serving image; no
+  `cosign verify` or equivalent attestation check in the deploy path; a requirements file without hashes;
+  a custom-op, extension, or plugin directory on a writable mount; a runtime version the target cannot
+  tie to a build record; an `--extra-index-url` alongside the public index.
+- **Confirm (least-impact):** read-only and static. Record the reference form (tag vs. digest), the
+  presence or absence of a signature and attestation and *whether the deploy path verifies it rather
+  than merely publishing it*, and the dependency resolution inputs. Prove mutability by showing the same
+  tag resolving to two different digests **across your own pulls**, never by pushing to the target's
+  registry. Never run the image; never execute a fetched artifact ([§7.8](CONVENTIONS.md)).
+- **Boundary with PB-20 `I`:** this class owns the runtime **as a supply-chain artifact** — its origin,
+  signature, and reference immutability. PB-20 owns the **running** serving plane and its behavior. The
+  MITRE row for AI software in the table above maps here.
+- **Maps to:** AML.T0010.001; T1195.002, T1059; S1 where a plugin path loads a code-bearing object, S2
+  for the signing gap, S4 for the mutable reference, S7 for the build that produced it; PB-20 `I4`/`I9`
+  for what that runtime then does. Defensive side: PB-22 owns the release gate that should have verified
+  it; PB-21 should carry the runtime in the AI-BOM.
+- **Severity:** high where an unpinned or unsigned runtime reaches production and an outside party can
+  influence its contents; medium for a mutable reference with signing present but unverified; low for a
+  version-disclosure-only finding. Score the *missing verification*, not the mere use of a tag.
+
+### S12 — Unsigned transform and broken re-attestation
+
+- **What:** the signature chain breaks where the pipeline **transforms** the artifact. A signed model
+  enters a conversion, quantization, adapter-merge, or compilation step and an **unsigned** artifact
+  comes out, with no re-attestation binding the output to the verified input. Everything downstream then
+  trusts an object whose provenance ended one step earlier. Forms: GGUF/ONNX conversion, post-training
+  quantization, LoRA or adapter merge into base weights, TensorRT or other graph compilation, tokenizer
+  or chat-template regeneration, and sharding or re-packaging for a serving format. Model-**merge
+  lineage** belongs here specifically: a merged model's parentage is frequently undocumented and
+  unverifiable, so the merge is where two provenance chains become none.
+- **Recognize:** a signature or attestation on the upstream artifact but none on the deployed one; a
+  conversion or quantization step in CI with no signing stage after it; a model card naming a base model
+  the deployed weights cannot be tied to; a merged model with no recorded parents and no per-parent
+  verification; a serving format produced by a tool version the target cannot name.
+- **Confirm (least-impact):** static and documentary. Show the verified upstream artifact, the transform
+  step, and the absence of a signature or attestation on the output — a pipeline definition, a registry
+  listing, and a digest comparison are sufficient. Where the target claims re-signing, check *what the
+  new signature attests to*: a signature over the output that does not reference the verified input is
+  not a chain, it is a fresh assertion. Never execute a transform tool on a target artifact.
+- **Boundary with `S6`:** `S6` covers **consuming a third party's** post-training modification — someone
+  else's quantized republication. `S12` covers **the target's own** transform breaking its own chain.
+- **Maps to:** AML.T0010; S2 (the provenance the transform drops), S6 (the third-party sibling), S9
+  where the surviving signatures are classical-only on a long-lived artifact, S11 (the tool performing
+  the transform is itself an unverified artifact). PB-22 owns the gate; PB-11 owns signing practice.
+- **Severity:** high where the deployed production artifact has no verifiable chain to a signed input and
+  an unprivileged party can influence the transform; medium where the chain is broken but the transform
+  runs in a controlled pipeline; a documented, accepted break with a compensating control is a migration
+  finding, scored as one. Do **not** score this as artifact tampering unless you demonstrated tampering —
+  the finding is the absent chain.
+
 ## Chains that carry impact
 
 - `S3 → S4 → S1 → code execution in the model-loading service` — an unowned namespace resolved by an
@@ -343,7 +413,7 @@ appear by name only.*
 Use the PB-15 AI report template. Add these lines:
 
 ```
-DEFECT-CLASS:     ____   (S1–S10 primary; full chain sequence if any)
+DEFECT-CLASS:     ____   (S1–S12 primary; full chain sequence if any)
 ARTIFACT-REF:     org/model@<revision|digest> · image@sha256:… · exactly as inspected + UTC ts
 ARTIFACT-FORMAT:  safetensors | gguf | code-bearing (.pt/.bin/.ckpt/.pkl/.joblib) | container | config
 VERIFY-GATE:      signature | attestation | digest-pin | none  →  enforced | fails-open | absent

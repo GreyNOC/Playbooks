@@ -60,7 +60,7 @@ This domain requires telemetry most SOCs do not yet collect. The detection strat
 - Behavioral-bot signals: request rate, navigation depth, missing browser fingerprint primitives (no JS execution, no canvas/WebGL fingerprint, headless markers), unrealistic typing or scroll cadence in instrumented forms.
 - Content-quality signals on inbound writeable surfaces (signups, support tickets, reviews, web forms): uniformly fluent, structurally similar, low-entropy submissions; content embeddings clustering tightly across many submitters.
 - Inbound mail signals: semantically coherent lures with no template artifacts, novel sender infrastructure, no historical sender reputation, and personalization beyond what classic phishing templates produce.
-- Recon at unusual depth or breadth consistent with agent-driven crawling: full-site enumeration, API-schema probing, structured data extraction, sitemap/llm.txt requests.
+- Recon at unusual depth or breadth consistent with agent-driven crawling: full-site enumeration, API-schema probing, structured data extraction, sitemap and `/llms.txt` requests.
 
 **B. Abuse of your own AI features / agents**
 
@@ -76,11 +76,17 @@ This domain requires telemetry most SOCs do not yet collect. The detection strat
 
 **Adversary automation:**
 
-- Headless browser fingerprints (HeadlessChrome UA, missing `navigator.webdriver` mismatch, evasion JS clusters).
+- Headless-automation markers: a `HeadlessChrome` user-agent string (a declared UA, not a fingerprint);
+  `navigator.webdriver === true`; absent browser features a real client would expose (no image or font
+  loads, JS never executed, no plugin or codec surface); and evasion-script clusters that patch those
+  properties. Note the polarity: `webdriver` is positive when **true** — a *missing* property is the
+  normal state in a non-automated browser and is not on its own a signal.
 - High request rate against authentication, signup, search, and pricing endpoints.
 - Submissions to writeable forms with high cosine similarity in content embeddings.
 - Inbound emails that are semantically coherent but structurally novel (no template hash match).
-- Recon traffic following sitemaps, `robots.txt`, `llm.txt`, OpenAPI/Swagger, and GraphQL introspection.
+- Recon traffic following sitemaps, `robots.txt`, `/llms.txt` (the proposed agent-guidance convention —
+  note the plural; a rule watching `llm.txt` will not match what agents actually request), OpenAPI/Swagger,
+  and GraphQL introspection.
 
 **Owned AI feature abuse:**
 

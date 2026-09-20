@@ -3,10 +3,10 @@
 Production-grade detection, response, and authorized-testing playbooks authored by the GreyNOC detection-engineering team. The library spans three complementary collections:
 
 - **Detection & Response** — behavior-based SOC playbooks across the intrusion lifecycle, from initial access to impact, including AI incident response and inference-serving isolation.
-- **AI · Post-Quantum · E2EE** — 27 playbooks covering the cryptographic transition, E2EE protocol security, enterprise AI governance/development/data/resilience, and eight authorized bug-bounty playbooks — two against PQ/E2EE attack surface and six against AI systems.
+- **AI · Post-Quantum · E2EE** — 28 playbooks covering the cryptographic transition, E2EE protocol security, enterprise AI governance/development/data/resilience, eight authorized bug-bounty playbooks — two against PQ/E2EE attack surface and six against AI systems — and an operator prompt library for AI-assisted security work.
 - **Transmission & Physical Layer** — 3 playbooks covering the media everything else runs on and the silicon underneath them: radio-frequency spectrum, nanometer-scale optical, and post-quantum cryptography as it actually executes in fabricated logic. Where the adversary never touches a network port, where harvest-now-decrypt-later capture actually happens, and where a compiler can undo a constant-time implementation.
 
-Every detection playbook follows the same GreyNOC structure: overview, MITRE ATT&CK / ATLAS mapping, detection strategy, indicators, sample logic, example data, investigation steps, false positives, tuning, response actions, escalation criteria, an analyst-notes template, and a closing summary. The authorized-testing playbooks (07–08, 15–20) follow the bug-bounty structure instead: overview, MITRE mapping, surface map or defect-class catalog, phased methodology or hunting workflow, anti-patterns, validation discipline, report template, stop conditions, and summary. Written for SOC analysts, IR, detection engineers, and authorized offensive operators. Behavior-based over signature-based; operational clarity over theory.
+Every detection playbook follows the same GreyNOC structure: overview, MITRE ATT&CK / ATLAS mapping, detection strategy, indicators, sample logic, example data, investigation steps, false positives, tuning, response actions, escalation criteria, an analyst-notes template, and a closing summary. The authorized-testing playbooks (07–08, 15–20) follow the bug-bounty structure instead: overview, MITRE mapping, surface map or defect-class catalog, phased methodology or hunting workflow, anti-patterns, validation discipline, report template, stop conditions, and summary. Two sets of files deliberately carry neither structure, and this is noted so the difference does not read as an omission: the governance playbooks (21–24) are control-and-evidence documents organized around ownership, gates, and audit artifacts rather than detections; and the prompt library (28) is organized as prompt families, each entry carrying a use case, required inputs, the prompt, an output contract, and the verification step that must pass before the output is used. Written for SOC analysts, IR, detection engineers, and authorized offensive operators. Behavior-based over signature-based; operational clarity over theory.
 
 > **MITRE mapping baseline.** Every ATT&CK mapping in the library is pinned to **ATT&CK Enterprise
 > v19.2** (and ICS v19.2 for the TX collection), verified technique-by-technique against
@@ -29,7 +29,7 @@ references are published:
 
 | Publication | Key | Version | Contents |
 | --- | --- | --- | --- |
-| [GreyNOC_AI_PQC_Playbooks.pdf](output/pdf/GreyNOC_AI_PQC_Playbooks.pdf) | `ai-pqc` | v2.1.0 (2026-08-09) | The AI · Post-Quantum · E2EE collection, three AI D&R playbooks, and `CONVENTIONS.md` |
+| [GreyNOC_AI_PQC_Playbooks.pdf](output/pdf/GreyNOC_AI_PQC_Playbooks.pdf) | `ai-pqc` | v2.2.0 | The AI · Post-Quantum · E2EE collection, three AI D&R playbooks, and `CONVENTIONS.md` |
 | [GreyNOC_Transmission_Physical_Layer_Playbooks.pdf](output/pdf/GreyNOC_Transmission_Physical_Layer_Playbooks.pdf) | `transmission` | v1.2.0 (2026-08-09) | The Transmission & Physical Layer collection, its coverage audit, and `CONVENTIONS.md` |
 
 Rebuild both with `node scripts/build_playbook_pdfs.mjs`, one with
@@ -85,11 +85,11 @@ Rebuild both with `node scripts/build_playbook_pdfs.mjs`, one with
 | 13 | [Crypto-Agility & PQ Migration Operations](13-crypto-agility-migration-ops.md) | Agility architecture, wave rollout, rollback gates, algorithm-break runbook |
 | 14 | [Quantum Risk Governance & Compliance](14-quantum-risk-governance.md) | Mosca's inequality, CNSA 2.0 / NSM-10 mandates, evidence-backed reporting |
 | 15 | [Bug Bounty: AI & LLM Attack-Surface Methodology](15-bugbounty-ai-attack-surface-methodology.md) | Trust-boundary mapping, test harness, trial ledgers, security-vs-safety routing |
-| 16 | [Bug Bounty: LLM Application-Layer Defects](16-bugbounty-llm-application-defects.md) | `L1–L14` — prompt injection, RAG scope, output handling, sessions, app authz |
-| 17 | [Bug Bounty: AI Supply Chain & Model Artifacts](17-bugbounty-ai-supply-chain-model-artifacts.md) | `S1–S10` — artifact provenance, registries, pipelines, PQ signing gaps |
-| 18 | [Bug Bounty: Agentic Systems, Tools & the MCP Boundary](18-bugbounty-agentic-systems-mcp.md) | `G1–G12` — tool poisoning, confused deputy, connector scope, autonomy limits |
+| 16 | [Bug Bounty: LLM Application-Layer Defects](16-bugbounty-llm-application-defects.md) | `L1–L19` — prompt injection, RAG scope, output handling, sessions, app authz, template and role-delimiter injection, schema coercion, streaming races, multimodal carriers, compaction provenance loss |
+| 17 | [Bug Bounty: AI Supply Chain & Model Artifacts](17-bugbounty-ai-supply-chain-model-artifacts.md) | `S1–S12` — artifact provenance, registries, pipelines, PQ signing gaps, runtime and serving-image provenance, unsigned transforms |
+| 18 | [Bug Bounty: Agentic Systems, Tools & the MCP Boundary](18-bugbounty-agentic-systems-mcp.md) | `G1–G14` — tool poisoning, confused deputy, connector scope, autonomy limits, run-initiation boundary, action attribution |
 | 19 | [Bug Bounty: Model Behavior & Safety-Boundary Testing](19-bugbounty-model-behavior-safety-boundaries.md) | Routing, measurement standard, proof without harm — model-safety channel |
-| 20 | [Bug Bounty: Inference Infrastructure & Multi-Tenant Isolation](20-bugbounty-inference-infrastructure-isolation.md) | `I1–I10` — control plane, tenant routing, caches, quotas, inference transport |
+| 20 | [Bug Bounty: Inference Infrastructure & Multi-Tenant Isolation](20-bugbounty-inference-infrastructure-isolation.md) | `I1–I12` — control plane, tenant routing, caches, quotas, inference transport, vector-store tenancy, platform telemetry tenancy |
 | 21 | [AI Governance, Asset Inventory & Third-Party Risk](21-ai-governance-asset-third-party-risk.md) | AI-BOM, risk tiers, shadow AI, approval, supplier assurance, and lifecycle ownership |
 | 22 | [AI Secure Development, TEVV & Change Management](22-ai-secure-development-tev-v-change-management.md) | Threat modeling, evaluation gates, immutable release identity, regression and drift |
 | 23 | [AI Data Governance, Privacy, Retention & DLP](23-ai-data-governance-privacy-retention.md) | End-to-end AI data flows, provider use, RAG/memory governance, deletion and DLP |
@@ -97,6 +97,7 @@ Rebuild both with `node scripts/build_playbook_pdfs.mjs`, one with
 | 25 | [PQ Key Management & Data-at-Rest Migration](25-pq-key-management-data-at-rest.md) | PQ key/seed lifecycle, KMS/HSM, rewrap/re-encryption, backup and recovery |
 | 26 | [PQ Enterprise Identity, Messaging & Trust Infrastructure](26-pq-enterprise-identity-messaging-trust.md) | PIV/FIDO, S/MIME, document signing, DNSSEC, RPKI and relying-party migration |
 | 27 | [PQ Capacity, Interoperability & Vendor Assurance](27-pq-capacity-interoperability-vendor-assurance.md) | Artifact growth, HSM/network capacity, interop matrix, procurement and vendor evidence |
+| 28 | [AI Prompt Library for Cyber Operations](28-ai-prompt-library-cyber-operations.md) | `P-DEF`/`P-OFF`/`P-BTY`/`P-BUG`/`P-REP` — 37 operator prompts with output contracts and verification steps, across defense, offensive security, bounty, bug analysis and reporting |
 
 ---
 
